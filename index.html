@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
     <meta name="apple-mobile-web-app-title" content="📚 Hifz Record">
     <meta name="theme-color" content="#007AFF">
-    <title>📚 Hifz Record - GitHub Edition</title>
+    <title>📚 Hifz Record - Complete</title>
     
     <!-- PDF Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -38,55 +38,58 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #007AFF, #0051D5);
+            background: linear-gradient(135deg, #F8F9FA, #E9ECEF);
             padding: 20px 20px 30px 20px;
             text-align: center;
             border-radius: 0 0 25px 25px;
-            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .app-title {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 8px;
-            color: white;
+            color: #1C1C1E;
         }
 
         .current-date {
             font-size: 16px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
+            color: #8E8E93;
         }
 
         .cloud-status {
             margin-top: 12px;
             padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 20px;
-            color: white;
+            color: #1C1C1E;
             font-size: 12px;
             font-weight: 600;
             display: inline-block;
         }
 
         .cloud-status.connected {
-            background: rgba(52, 199, 89, 0.9);
+            background: rgba(52, 199, 89, 0.2);
+            color: #1B5E20;
         }
 
         .cloud-status.connecting {
-            background: rgba(255, 149, 0, 0.9);
+            background: rgba(255, 149, 0, 0.2);
+            color: #E65100;
         }
 
         .cloud-status.disconnected {
-            background: rgba(255, 59, 48, 0.9);
+            background: rgba(255, 59, 48, 0.2);
+            color: #C62828;
         }
 
         .user-info {
             margin-top: 15px;
             padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 12px;
-            color: white;
+            color: #1C1C1E;
             font-size: 14px;
             font-weight: 600;
         }
@@ -283,59 +286,634 @@
             margin-bottom: 8px;
         }
 
-        /* All original app styles */
-        .login-section { margin: 20px; display: none; }
-        .login-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 1px solid #E5E5EA; }
-        .login-title { font-size: 22px; font-weight: 700; color: #1C1C1E; margin-bottom: 20px; text-align: center; }
-        .role-selector { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .role-button { padding: 16px; border: 2px solid #E5E5EA; border-radius: 12px; background: #F2F2F7; color: #8E8E93; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-align: center; }
-        .role-button.active { background: #007AFF; border-color: #007AFF; color: white; }
-        .form-select { width: 100%; padding: 12px 16px; border: 1px solid #E5E5EA; border-radius: 10px; background: #F2F2F7; color: #1C1C1E; font-size: 16px; transition: all 0.3s ease; }
-        .form-select:focus { outline: none; border-color: #007AFF; background: white; }
-        .login-button { width: 100%; padding: 14px; background: #007AFF; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .login-button:hover { background: #0051D5; }
+        /* Login styles */
+        .login-section { 
+            margin: 20px; 
+            display: none; 
+        }
+        
+        .login-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 24px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); 
+            border: 1px solid #E5E5EA; 
+        }
+        
+        .login-title { 
+            font-size: 22px; 
+            font-weight: 700; 
+            color: #1C1C1E; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        
+        .role-selector { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-bottom: 20px; 
+        }
+        
+        .role-button { 
+            padding: 16px; 
+            border: 2px solid #E5E5EA; 
+            border-radius: 12px; 
+            background: #F2F2F7; 
+            color: #8E8E93; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            text-align: center; 
+        }
+        
+        .role-button.active { 
+            background: #007AFF; 
+            border-color: #007AFF; 
+            color: white; 
+        }
+        
+        .form-select { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 1px solid #E5E5EA; 
+            border-radius: 10px; 
+            background: #F2F2F7; 
+            color: #1C1C1E; 
+            font-size: 16px; 
+            transition: all 0.3s ease; 
+        }
+        
+        .form-select:focus { 
+            outline: none; 
+            border-color: #007AFF; 
+            background: white; 
+        }
+        
+        .login-button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #007AFF; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .login-button:hover { 
+            background: #0051D5; 
+        }
 
-        .main-content { display: none; padding: 20px; }
-        .student-selector { margin-bottom: 20px; }
-        .student-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-        .student-tab { min-width: 120px; padding: 12px 16px; background: white; border: 1px solid #E5E5EA; border-radius: 20px; color: #8E8E93; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-align: center; white-space: nowrap; }
-        .student-tab.active { background: #007AFF; border-color: #007AFF; color: white; }
+        /* Main app styles */
+        .main-content { 
+            display: none; 
+            padding: 20px; 
+        }
+        
+        .student-selector { 
+            margin-bottom: 20px; 
+        }
+        
+        .student-tabs { 
+            display: flex; 
+            gap: 8px; 
+            overflow-x: auto; 
+            padding-bottom: 4px; 
+        }
+        
+        .student-tab { 
+            min-width: 120px; 
+            padding: 12px 16px; 
+            background: white; 
+            border: 1px solid #E5E5EA; 
+            border-radius: 20px; 
+            color: #8E8E93; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            text-align: center; 
+            white-space: nowrap; 
+        }
+        
+        .student-tab.active { 
+            background: #007AFF; 
+            border-color: #007AFF; 
+            color: white; 
+        }
 
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 16px; border-radius: 16px; border: 1px solid #E5E5EA; text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
-        .stat-number { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-        .stat-label { font-size: 12px; color: #8E8E93; font-weight: 600; }
-        .stat-card.sabak .stat-number { color: #007AFF; }
-        .stat-card.para .stat-number { color: #8E44AD; }
-        .stat-card.dhor .stat-number { color: #FF9500; }
+        .stats-container { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            margin-bottom: 20px; 
+        }
+        
+        .stat-card { 
+            background: white; 
+            padding: 16px; 
+            border-radius: 16px; 
+            border: 1px solid #E5E5EA; 
+            text-align: center; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+        }
+        
+        .stat-number { 
+            font-size: 24px; 
+            font-weight: 700; 
+            margin-bottom: 4px; 
+        }
+        
+        .stat-label { 
+            font-size: 12px; 
+            color: #8E8E93; 
+            font-weight: 600; 
+        }
+        
+        .stat-card.sabak .stat-number { 
+            color: #007AFF; 
+        }
+        
+        .stat-card.para .stat-number { 
+            color: #8E44AD; 
+        }
+        
+        .stat-card.dhor .stat-number { 
+            color: #FF9500; 
+        }
 
-        .section { margin-bottom: 20px; }
-        .section-title { font-size: 18px; font-weight: 700; color: #1C1C1E; margin-bottom: 12px; padding-left: 4px; }
+        .section { 
+            margin-bottom: 20px; 
+        }
+        
+        .section-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #1C1C1E; 
+            margin-bottom: 12px; 
+            padding-left: 4px; 
+        }
 
-        .today-progress { background: white; border-radius: 16px; overflow: hidden; border: 1px solid #E5E5EA; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
-        .progress-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid #F2F2F7; cursor: pointer; transition: all 0.3s ease; }
-        .progress-row:last-child { border-bottom: none; }
-        .progress-row:hover { background: #F8F9FA; }
-        .progress-info { display: flex; align-items: center; }
-        .progress-icon { width: 40px; height: 40px; background: #F2F2F7; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 18px; }
-        .progress-icon.sabak { background: rgba(0, 122, 255, 0.1); color: #007AFF; }
-        .progress-icon.para { background: rgba(142, 68, 173, 0.1); color: #8E44AD; }
-        .progress-icon.dhor { background: rgba(255, 149, 0, 0.1); color: #FF9500; }
-        .progress-details h4 { font-size: 16px; font-weight: 600; margin-bottom: 2px; color: #1C1C1E; }
-        .progress-details p { font-size: 13px; color: #8E8E93; }
-        .progress-status { display: flex; align-items: center; gap: 8px; }
-        .amount-badge { background: #F2F2F7; color: #8E8E93; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .grade-badge { background: #34C759; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .grade-badge.good { background: #007AFF; }
-        .grade-badge.okay { background: #FF9500; }
-        .grade-badge.poor { background: #FF3B30; }
-        .absent-button { background: #FF3B30; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .absent-button.active { background: #8E8E93; }
-        .today-progress.absent { opacity: 0.5; pointer-events: none; }
+        .today-progress { 
+            background: white; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            border: 1px solid #E5E5EA; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+        }
+        
+        .progress-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px 18px; 
+            border-bottom: 1px solid #F2F2F7; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .progress-row:last-child { 
+            border-bottom: none; 
+        }
+        
+        .progress-row:hover { 
+            background: #F8F9FA; 
+        }
+        
+        .progress-info { 
+            display: flex; 
+            align-items: center; 
+        }
+        
+        .progress-icon { 
+            width: 40px; 
+            height: 40px; 
+            background: #F2F2F7; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-right: 12px; 
+            font-size: 18px; 
+        }
+        
+        .progress-icon.sabak { 
+            background: rgba(0, 122, 255, 0.1); 
+            color: #007AFF; 
+        }
+        
+        .progress-icon.para { 
+            background: rgba(142, 68, 173, 0.1); 
+            color: #8E44AD; 
+        }
+        
+        .progress-icon.dhor { 
+            background: rgba(255, 149, 0, 0.1); 
+            color: #FF9500; 
+        }
+        
+        .progress-details h4 { 
+            font-size: 16px; 
+            font-weight: 600; 
+            margin-bottom: 2px; 
+            color: #1C1C1E; 
+        }
+        
+        .progress-details p { 
+            font-size: 13px; 
+            color: #8E8E93; 
+        }
+        
+        .progress-status { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        
+        .amount-badge { 
+            background: #F2F2F7; 
+            color: #8E8E93; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 600; 
+        }
+        
+        .grade-badge { 
+            background: #34C759; 
+            color: white; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 600; 
+        }
+        
+        .grade-badge.good { 
+            background: #007AFF; 
+        }
+        
+        .grade-badge.okay { 
+            background: #FF9500; 
+        }
+        
+        .grade-badge.poor { 
+            background: #FF3B30; 
+        }
+        
+        .absent-button { 
+            background: #FF3B30; 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .absent-button.active { 
+            background: #8E8E93; 
+        }
+        
+        .today-progress.absent { 
+            opacity: 0.5; 
+            pointer-events: none; 
+        }
 
-        .footer { text-align: center; padding: 20px; color: #8E8E93; font-size: 12px; }
-        .logout-button { background: #FF3B30; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        /* Parent Check Button - EXACT same style as absent button but green */
+        .parent-check-button { 
+            background: #34C759; 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .parent-check-button.checked { 
+            background: #8E8E93; 
+        }
 
+        .parent-check-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #34C759;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        /* Calendar styles */
+        .calendar-container { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 20px; 
+            border: 1px solid #E5E5EA; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+        }
+        
+        .calendar-grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 4px; 
+            margin-top: 12px; 
+        }
+        
+        .day-header { 
+            font-weight: 600; 
+            text-align: center; 
+            padding: 10px; 
+            color: #8E8E93; 
+            font-size: 12px; 
+        }
+        
+        .calendar-day { 
+            aspect-ratio: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background: #F2F2F7; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            border: 1px solid #E5E5EA; 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            position: relative; 
+            color: #1C1C1E; 
+        }
+        
+        .calendar-day:hover { 
+            background: #E5E5EA; 
+        }
+        
+        .calendar-day.today { 
+            background: #007AFF; 
+            color: #1C1C1E; 
+            border-color: #007AFF; 
+            font-weight: 700;
+        }
+        
+        .calendar-day.has-data { 
+            background: white; 
+            border-color: #007AFF; 
+        }
+        
+        .day-indicators { 
+            display: flex; 
+            gap: 1px; 
+            margin-top: 2px; 
+        }
+        
+        .indicator { 
+            width: 4px; 
+            height: 4px; 
+            border-radius: 50%; 
+        }
+        
+        .indicator.sabak { 
+            background: #007AFF; 
+        }
+        
+        .indicator.para { 
+            background: #8E44AD; 
+        }
+        
+        .indicator.dhor { 
+            background: #FF9500; 
+        }
+        
+        .nav-arrow { 
+            background: white; 
+            border: 1px solid #E5E5EA; 
+            color: #007AFF; 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+        }
+        
+        .month-navigation { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 16px; 
+            padding: 0 4px; 
+        }
+        
+        .month-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #1C1C1E; 
+            text-align: center; 
+            flex: 1; 
+            margin: 0 12px; 
+        }
+
+        /* Modal styles */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(5px); 
+        }
+        
+        .modal-content { 
+            background: white; 
+            margin: 15% auto; 
+            padding: 24px; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 350px; 
+            position: relative; 
+            max-height: 70vh; 
+            overflow-y: auto; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
+        }
+        
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 12px; 
+            border-bottom: 1px solid #F2F2F7; 
+        }
+        
+        .modal-title { 
+            font-size: 20px; 
+            font-weight: 700; 
+            color: #1C1C1E; 
+        }
+        
+        .close { 
+            color: #8E8E93; 
+            font-size: 28px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: color 0.3s ease; 
+            padding: 8px; 
+            line-height: 1; 
+        }
+        
+        .entry-form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+        }
+        
+        .grade-buttons { 
+            display: flex; 
+            gap: 8px; 
+        }
+        
+        .grade-button { 
+            flex: 1; 
+            padding: 12px; 
+            border: 1px solid #E5E5EA; 
+            border-radius: 10px; 
+            background: #F2F2F7; 
+            color: #8E8E93; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .grade-button.selected { 
+            background: #007AFF; 
+            border-color: #007AFF; 
+            color: white; 
+        }
+        
+        .save-button { 
+            background: #007AFF; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        
+        .clear-button { 
+            background: #FF3B30; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-top: 8px; 
+        }
+
+        /* Admin controls */
+        .admin-controls { 
+            display: none; 
+            margin: 20px; 
+        }
+        
+        .admin-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 20px; 
+            border: 1px solid #E5E5EA; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+        }
+        
+        .admin-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #1C1C1E; 
+            margin-bottom: 16px; 
+        }
+        
+        .admin-button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #F2F2F7; 
+            border: 1px solid #E5E5EA; 
+            border-radius: 10px; 
+            color: #1C1C1E; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-bottom: 8px; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        
+        .admin-button.danger { 
+            background: #FF3B30; 
+            border-color: #FF3B30; 
+            color: white; 
+        }
+        
+        .pdf-export-button { 
+            background: linear-gradient(135deg, #007AFF, #0051D5) !important; 
+            color: white !important; 
+            border: none !important; 
+        }
+        
+        .loading-spinner { 
+            display: none; 
+            width: 16px; 
+            height: 16px; 
+            border: 2px solid #ffffff; 
+            border-top: 2px solid transparent; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* Footer */
+        .footer { 
+            text-align: center; 
+            padding: 20px; 
+            color: #8E8E93; 
+            font-size: 12px; 
+        }
+        
+        .logout-button { 
+            background: #FF3B30; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin: 16px auto; 
+            display: block; 
+        }
+
+        /* Sync indicator */
         .sync-indicator {
             position: fixed;
             top: 10px;
@@ -441,8 +1019,8 @@
 Your data will be stored like this:
 📁 hifz-record-data/
 ├── 📄 students.json          (student list)
-├── 📄 progress_abdullah.json (Abdullah's progress)
-├── 📄 progress_ahsan.json    (Ahsan's progress)
+├── 📄 progress_abdul_qadir.json (Abdul Qadir's progress)
+├── 📄 progress_ahsan_haque.json (Ahsan Haque's progress)
 └── 📄 ... (more students)
                 </div>
 
@@ -456,7 +1034,7 @@ Your data will be stored like this:
             </div>
         </div>
 
-        <!-- Login Section (same as original) -->
+        <!-- Login Section -->
         <div class="login-section" id="loginSection">
             <div class="login-card">
                 <h2 class="login-title">Welcome</h2>
@@ -479,7 +1057,7 @@ Your data will be stored like this:
                     <input type="password" class="form-input" id="accessCode" placeholder="Enter access code">
                 </div>
 
-                <div class="form-group" id="studentSelectGroup">
+                <div class="form-group" id="studentSelectGroup" style="display: none;">
                     <label class="form-label">Select Student</label>
                     <select class="form-select" id="studentSelect">
                         <option value="">Choose your child</option>
@@ -490,7 +1068,7 @@ Your data will be stored like this:
             </div>
         </div>
 
-        <!-- Main Content (same structure as original) -->
+        <!-- Main Content -->
         <div class="main-content" id="mainContent">
             <!-- Student Selector -->
             <div class="student-selector" id="studentSelector" style="display: none;">
@@ -498,18 +1076,21 @@ Your data will be stored like this:
             </div>
 
             <!-- Statistics -->
-            <div class="stats-container">
-                <div class="stat-card sabak">
-                    <div class="stat-number" id="sabakCount">0</div>
-                    <div class="stat-label">Sabak</div>
-                </div>
-                <div class="stat-card para">
-                    <div class="stat-number" id="paraCount">0</div>
-                    <div class="stat-label">Para</div>
-                </div>
-                <div class="stat-card dhor">
-                    <div class="stat-number" id="dhorCount">0</div>
-                    <div class="stat-label">Dhor</div>
+            <div class="section">
+                <h2 class="section-title">Monthly Progress</h2>
+                <div class="stats-container">
+                    <div class="stat-card sabak">
+                        <div class="stat-number" id="sabakCount">0</div>
+                        <div class="stat-label">Sabak</div>
+                    </div>
+                    <div class="stat-card para">
+                        <div class="stat-number" id="paraCount">0</div>
+                        <div class="stat-label">Para</div>
+                    </div>
+                    <div class="stat-card dhor">
+                        <div class="stat-number" id="dhorCount">0</div>
+                        <div class="stat-label">Dhor</div>
+                    </div>
                 </div>
             </div>
 
@@ -561,9 +1142,18 @@ Your data will be stored like this:
                 </div>
             </div>
 
+            <!-- Parent Check Section -->
+            <div class="section" id="parentCheckSection" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">Parent Check</h2>
+                    <button class="parent-check-button" onclick="toggleParentCheck()" id="parentCheckButton">
+                        ✓ Mark as Checked
+                    </button>
+                </div>
+            </div>
+
             <!-- Monthly Calendar -->
             <div class="section">
-                <h2 class="section-title">Monthly Progress</h2>
                 <div class="month-navigation">
                     <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
                     <h3 class="month-title" id="monthTitle">Loading...</h3>
@@ -576,7 +1166,7 @@ Your data will be stored like this:
         </div>
 
         <!-- Admin Controls -->
-        <div class="admin-controls" id="adminControls" style="display: none;">
+        <div class="admin-controls" id="adminControls">
             <div class="admin-card">
                 <h3 class="admin-title">Admin Controls</h3>
                 <button class="admin-button" onclick="showAddStudentModal()">➕ Add New Student</button>
@@ -589,104 +1179,6 @@ Your data will be stored like this:
                 <button class="admin-button danger" onclick="showResetModal()">🗑️ Reset All Data</button>
                 <button class="logout-button" onclick="logout()">Logout</button>
             </div>
-        </div>
-
-        <!-- All Modals -->
-        <div id="progressModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="modalTitle">Enter Progress</h2>
-                    <span class="close" onclick="closeModal('progressModal')">&times;</span>
-                </div>
-                <div class="entry-form">
-                    <div class="form-group">
-                        <label class="form-label">Amount/Pages</label>
-                        <input type="text" class="form-input" id="amountInput" placeholder="e.g., 5 lines, 1 page">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Grade</label>
-                        <div class="grade-buttons">
-                            <div class="grade-button" data-grade="excellent" onclick="selectGrade('excellent')">Excellent</div>
-                            <div class="grade-button" data-grade="good" onclick="selectGrade('good')">Good</div>
-                            <div class="grade-button" data-grade="okay" onclick="selectGrade('okay')">Okay</div>
-                            <div class="grade-button" data-grade="poor" onclick="selectGrade('poor')">Poor</div>
-                        </div>
-                    </div>
-                    <button class="save-button" onclick="saveProgress()">Save Progress</button>
-                    <button class="clear-button" onclick="clearProgress()">Clear Entry</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="dayModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="dayModalTitle">Day Progress</h2>
-                    <span class="close" onclick="closeModal('dayModal')">&times;</span>
-                </div>
-                <div id="dayProgressList"></div>
-            </div>
-        </div>
-
-        <div id="addStudentModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">Add New Student</h2>
-                    <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
-                </div>
-                <div class="entry-form">
-                    <div class="form-group">
-                        <label class="form-label">Student Name</label>
-                        <input type="text" class="form-input" id="newStudentName" placeholder="Enter student name">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Parent Access Code</label>
-                        <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code">
-                    </div>
-                    <button class="save-button" onclick="addStudent()">Add Student</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- All calendar and modal styles -->
-        <style>
-            .calendar-container { background: white; border-radius: 16px; padding: 20px; border: 1px solid #E5E5EA; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
-            .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
-            .day-header { font-weight: 600; text-align: center; padding: 10px; color: #8E8E93; font-size: 12px; }
-            .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #F2F2F7; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid #E5E5EA; transition: all 0.3s ease; cursor: pointer; position: relative; color: #1C1C1E; }
-            .calendar-day:hover { background: #E5E5EA; }
-            .calendar-day.today { background: #007AFF; color: white; border-color: #007AFF; }
-            .calendar-day.has-data { background: white; border-color: #007AFF; }
-            .day-indicators { display: flex; gap: 1px; margin-top: 2px; }
-            .indicator { width: 4px; height: 4px; border-radius: 50%; }
-            .indicator.sabak { background: #007AFF; }
-            .indicator.para { background: #8E44AD; }
-            .indicator.dhor { background: #FF9500; }
-            .nav-arrow { background: white; border: 1px solid #E5E5EA; color: #007AFF; padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease; }
-            .month-navigation { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding: 0 4px; }
-            .month-title { font-size: 18px; font-weight: 700; color: #1C1C1E; text-align: center; flex: 1; margin: 0 12px; }
-
-            .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); }
-            .modal-content { background: white; margin: 15% auto; padding: 24px; border-radius: 20px; width: 90%; max-width: 350px; position: relative; max-height: 70vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); }
-            .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #F2F2F7; }
-            .modal-title { font-size: 20px; font-weight: 700; color: #1C1C1E; }
-            .close { color: #8E8E93; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s ease; padding: 8px; line-height: 1; }
-            .entry-form { display: flex; flex-direction: column; gap: 16px; }
-            .grade-buttons { display: flex; gap: 8px; }
-            .grade-button { flex: 1; padding: 12px; border: 1px solid #E5E5EA; border-radius: 10px; background: #F2F2F7; color: #8E8E93; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-            .grade-button.selected { background: #007AFF; border-color: #007AFF; color: white; }
-            .save-button { background: #007AFF; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-            .clear-button { background: #FF3B30; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-
-            .admin-controls { display: none; margin: 20px; }
-            .admin-card { background: white; border-radius: 16px; padding: 20px; border: 1px solid #E5E5EA; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
-            .admin-title { font-size: 18px; font-weight: 700; color: #1C1C1E; margin-bottom: 16px; }
-            .admin-button { width: 100%; padding: 12px; background: #F2F2F7; border: 1px solid #E5E5EA; border-radius: 10px; color: #1C1C1E; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 8px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
-            .admin-button.danger { background: #FF3B30; border-color: #FF3B30; color: white; }
-            .pdf-export-button { background: linear-gradient(135deg, #007AFF, #0051D5) !important; color: white !important; border: none !important; }
-            .loading-spinner { display: none; width: 16px; height: 16px; border: 2px solid #ffffff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; }
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        </style>
         </div>
 
         <div class="footer">
@@ -703,6 +1195,123 @@ Your data will be stored like this:
         🔄 Syncing to GitHub...
     </div>
 
+    <!-- Modals -->
+    <div id="progressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Enter Progress</h2>
+                <span class="close" onclick="closeModal('progressModal')">&times;</span>
+            </div>
+            <div class="entry-form">
+                <div class="form-group">
+                    <label class="form-label">Amount/Pages</label>
+                    <input type="text" class="form-input" id="amountInput" placeholder="e.g., 5 lines, 1 page">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Grade</label>
+                    <div class="grade-buttons">
+                        <div class="grade-button" data-grade="excellent" onclick="selectGrade('excellent')">Excellent</div>
+                        <div class="grade-button" data-grade="good" onclick="selectGrade('good')">Good</div>
+                        <div class="grade-button" data-grade="okay" onclick="selectGrade('okay')">Okay</div>
+                        <div class="grade-button" data-grade="poor" onclick="selectGrade('poor')">Poor</div>
+                    </div>
+                </div>
+                <button class="save-button" onclick="saveProgress()">Save Progress</button>
+                <button class="clear-button" onclick="clearProgress()">Clear Entry</button>
+                
+                <!-- Parent Check in Modal -->
+                <div class="form-group" id="modalParentCheck" style="display: none;">
+                    <hr style="margin: 16px 0; border: none; border-top: 1px solid #E5E5EA;">
+                    <label class="form-label">Parent Check</label>
+                    <button type="button" class="parent-check-button" onclick="toggleModalParentCheck()" id="modalParentCheckButton" style="width: 100%;">
+                        ✓ Mark as Checked
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="dayModalTitle">Day Progress</h2>
+                <span class="close" onclick="closeModal('dayModal')">&times;</span>
+            </div>
+            <div id="dayProgressList"></div>
+        </div>
+    </div>
+
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Student</h2>
+                <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
+            </div>
+            <div class="entry-form">
+                <div class="form-group">
+                    <label class="form-label">Student Name</label>
+                    <input type="text" class="form-input" id="newStudentName" placeholder="Enter student name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Parent Access Code</label>
+                    <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code">
+                </div>
+                <button class="save-button" onclick="addStudent()">Add Student</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="removeStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Remove Student</h2>
+                <span class="close" onclick="closeModal('removeStudentModal')">&times;</span>
+            </div>
+            <div class="entry-form">
+                <div class="form-group">
+                    <label class="form-label">Select Student to Remove</label>
+                    <select class="form-select" id="removeStudentSelect">
+                        <option value="">Choose student to remove</option>
+                    </select>
+                </div>
+                <div style="background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; color: #856404;">
+                    ⚠️ <strong>Warning:</strong> This will keep the data in GitHub but remove from active student list.
+                </div>
+                <button class="save-button" style="background: #FF3B30;" onclick="removeStudent()">Remove Student</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="exportPDFModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Export Student PDF Report</h2>
+                <span class="close" onclick="closeModal('exportPDFModal')">&times;</span>
+            </div>
+            <div class="entry-form">
+                <div class="form-group">
+                    <label class="form-label">Select Student</label>
+                    <select class="form-select" id="pdfStudentSelect">
+                        <option value="">Choose student for PDF report</option>
+                        <option value="all">All Students (Combined Report)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Report Type</label>
+                    <select class="form-select" id="pdfReportType">
+                        <option value="detailed">Detailed Progress Report</option>
+                        <option value="monthly">Current Month Progress</option>
+                        <option value="summary">Progress Summary</option>
+                    </select>
+                </div>
+                <button class="save-button pdf-export-button" onclick="generateSelectedPDF()" id="generatePDFBtn">
+                    <div class="loading-spinner" id="modalPdfSpinner"></div>
+                    <span id="modalPdfBtnText">📄 Generate PDF Report</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // GitHub configuration and app state
         let githubConfig = {
@@ -714,7 +1323,7 @@ Your data will be stored like this:
         
         let demoMode = false;
 
-        // Application state (same as original)
+        // Application state
         let currentUser = null;
         let currentRole = 'parent';
         let currentStudent = null;
@@ -724,16 +1333,18 @@ Your data will be stored like this:
         let currentDisplayYear = new Date().getFullYear();
         let selectedGrade = null;
 
-        // Default students data (same as original)
+        // Default students data with full names
         const defaultStudents = [
-            { id: 'abdullah', name: 'Abdullah', parentCode: 'abd123' },
-            { id: 'ahsan', name: 'Ahsan', parentCode: 'ahs123' },
-            { id: 'arafat', name: 'Arafat', parentCode: 'ara123' },
-            { id: 'ayyan', name: 'Ayyan', parentCode: 'ayy123' },
-            { id: 'ishaq', name: 'Ishaq', parentCode: 'ish123' },
-            { id: 'ismail', name: 'Ismail', parentCode: 'ism123' },
-            { id: 'naveed', name: 'Naveed', parentCode: 'nav123' },
-            { id: 'rayhan', name: 'Rayhan', parentCode: 'ray123' }
+            { id: 'abdul_qadir', name: 'Abdul Qadir', parentCode: 'aqd123' },
+            { id: 'abdullah_sheriwala', name: 'Abdullah Sheriwala', parentCode: 'abs123' },
+            { id: 'ahsan_haque', name: 'Ahsan Haque', parentCode: 'ahs123' },
+            { id: 'arafat_rayyan', name: 'Arafat Rayyan', parentCode: 'ara123' },
+            { id: 'ayyan_miah', name: 'Ayyan Miah', parentCode: 'ayy123' },
+            { id: 'ishaq_noor', name: 'Ishaq Noor', parentCode: 'ish123' },
+            { id: 'ismail_hussain', name: 'Ismail Hussain', parentCode: 'ism123' },
+            { id: 'naveed_khan', name: 'Naveed Khan', parentCode: 'nav123' },
+            { id: 'raqib_awal', name: 'Raqib Awal', parentCode: 'raq123' },
+            { id: 'rayhan_rahman', name: 'Rayhan Rahman', parentCode: 'ray123' }
         ];
 
         const officeCode = 'office2025';
@@ -1147,7 +1758,7 @@ Your data will be stored like this:
             }
         }
 
-        // Original app functions (simplified for demo)
+        // Login and role selection functions
         function selectRole(role) {
             currentRole = role;
             document.querySelectorAll('.role-button').forEach(btn => {
@@ -1156,12 +1767,8 @@ Your data will be stored like this:
             document.querySelector(`[data-role="${role}"]`).classList.add('active');
             
             const studentSelectGroup = document.getElementById('studentSelectGroup');
-            if (role === 'parent') {
-                studentSelectGroup.style.display = 'block';
-                populateStudentSelect();
-            } else {
-                studentSelectGroup.style.display = 'none';
-            }
+            // Hide student selector for all roles now - parents access directly with code
+            studentSelectGroup.style.display = 'none';
         }
 
         function populateStudentSelect() {
@@ -1169,12 +1776,9 @@ Your data will be stored like this:
             const students = JSON.parse(localStorage.getItem('students') || '[]');
             
             select.innerHTML = '<option value="">Choose your child</option>';
-            students.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.id;
-                option.textContent = student.name;
-                select.appendChild(option);
-            });
+            
+            // For parents, only show their specific child based on access code later
+            // This will be populated after they enter the access code
         }
 
         function login() {
@@ -1203,18 +1807,14 @@ Your data will be stored like this:
                     showError('Invalid teacher access code', 'errorMessage');
                 }
             } else if (currentRole === 'parent') {
-                if (!studentId) {
-                    showError('Please select your child', 'errorMessage');
-                    return;
-                }
-                
-                const student = students.find(s => s.id === studentId);
-                if (student && student.parentCode === accessCode) {
-                    currentUser = { role: 'parent', studentAccess: studentId, canEdit: false };
-                    currentStudent = studentId;
+                // Find student by parent code
+                const student = students.find(s => s.parentCode === accessCode);
+                if (student) {
+                    currentUser = { role: 'parent', studentAccess: student.id, canEdit: false };
+                    currentStudent = student.id;
                     showMainInterface();
                 } else {
-                    showError('Invalid access code for selected student', 'errorMessage');
+                    showError('Invalid parent access code', 'errorMessage');
                 }
             }
         }
@@ -1237,14 +1837,34 @@ Your data will be stored like this:
                 if (students.length > 0) {
                     selectStudent(students[0].id);
                 }
+                
+                // Hide parent check section for teachers/office
+                document.getElementById('parentCheckSection').style.display = 'none';
             } else {
+                // Parent role
                 document.getElementById('studentSelector').style.display = 'none';
                 document.getElementById('adminControls').style.display = 'none';
                 document.getElementById('parentLogout').style.display = 'block';
+                document.getElementById('parentCheckSection').style.display = 'block';
                 selectStudent(currentStudent);
             }
             
             generateCalendar();
+        }
+
+        function updateUserInfo() {
+            const userInfo = document.getElementById('userInfo');
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            
+            if (currentUser.role === 'office') {
+                userInfo.textContent = '🕌 Office - View Only Access';
+            } else if (currentUser.role === 'teacher') {
+                userInfo.textContent = '📖 Teacher - Full Access';
+            } else {
+                const student = students.find(s => s.id === currentStudent);
+                userInfo.textContent = `🧑‍🧒‍🧒 Parent: ${student ? student.name : 'Unknown'}`;
+            }
+            userInfo.style.display = 'block';
         }
 
         function populateStudentTabs() {
@@ -1281,21 +1901,6 @@ Your data will be stored like this:
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
-        function updateUserInfo() {
-            const userInfo = document.getElementById('userInfo');
-            const students = JSON.parse(localStorage.getItem('students') || '[]');
-            
-            if (currentUser.role === 'office') {
-                userInfo.textContent = '🕌 Office - View Only Access';
-            } else if (currentUser.role === 'teacher') {
-                userInfo.textContent = '📖 Teacher - Full Access';
-            } else {
-                const student = students.find(s => s.id === currentStudent);
-                userInfo.textContent = `🧑‍🧒‍🧒 Parent: ${student ? student.name : 'Unknown'}`;
-            }
-            userInfo.style.display = 'block';
-        }
-
         function updateTodaysProgress() {
             if (!currentStudent) return;
             
@@ -1330,14 +1935,28 @@ Your data will be stored like this:
                 if (isAbsent) {
                     statusEl.innerHTML = '<span class="amount-badge">Absent</span>';
                 } else if (entry) {
+                    const parentChecked = todayData.parentChecked ? '<div class="parent-check-indicator"></div>' : '';
                     statusEl.innerHTML = `
                         <span class="amount-badge">${entry.amount}</span>
                         <span class="grade-badge ${entry.grade}">${entry.grade}</span>
+                        ${parentChecked}
                     `;
                 } else {
                     statusEl.innerHTML = '<span class="amount-badge">Not Set</span>';
                 }
             });
+
+            // Update parent check button
+            if (currentUser.role === 'parent') {
+                const parentCheckButton = document.getElementById('parentCheckButton');
+                if (todayData.parentChecked) {
+                    parentCheckButton.textContent = '✓ Checked';
+                    parentCheckButton.classList.add('checked');
+                } else {
+                    parentCheckButton.textContent = '✓ Mark as Checked';
+                    parentCheckButton.classList.remove('checked');
+                }
+            }
         }
 
         function updateStats() {
@@ -1364,7 +1983,7 @@ Your data will be stored like this:
         }
 
         function openProgressModal(type, title) {
-            if (!currentUser.canEdit) return;
+            if (!currentUser.canEdit && currentUser.role !== 'parent') return;
             
             const today = getDateKey();
             const studentData = getStudentData(currentStudent);
@@ -1384,6 +2003,15 @@ Your data will be stored like this:
             document.querySelectorAll('.grade-button').forEach(btn => {
                 btn.classList.remove('selected');
             });
+
+            // Show parent check section in modal for parents
+            const modalParentCheck = document.getElementById('modalParentCheck');
+            if (currentUser.role === 'parent') {
+                modalParentCheck.style.display = 'block';
+                updateModalParentCheck();
+            } else {
+                modalParentCheck.style.display = 'none';
+            }
             
             document.getElementById('progressModal').style.display = 'block';
         }
@@ -1423,6 +2051,13 @@ Your data will be stored like this:
             updateStats();
             generateCalendar();
             closeModal('progressModal');
+            
+            if (currentDate && currentDate !== getDateKey()) {
+                setTimeout(() => {
+                    const dayNumber = parseInt(currentDate.split('-')[2]);
+                    openDayModal(dayNumber);
+                }, 200);
+            }
         }
 
         function clearProgress() {
@@ -1443,6 +2078,13 @@ Your data will be stored like this:
                 updateStats();
                 generateCalendar();
                 closeModal('progressModal');
+                
+                if (currentDate && currentDate !== getDateKey()) {
+                    setTimeout(() => {
+                        const dayNumber = parseInt(currentDate.split('-')[2]);
+                        openDayModal(dayNumber);
+                    }, 200);
+                }
             }
         }
 
@@ -1471,6 +2113,45 @@ Your data will be stored like this:
             updateTodaysProgress();
             updateStats();
             generateCalendar();
+        }
+
+        function toggleParentCheck() {
+            if (currentUser.role !== 'parent' || !currentStudent) return;
+            
+            const today = getDateKey();
+            const studentData = getStudentData(currentStudent);
+            
+            if (!studentData[today]) {
+                studentData[today] = {};
+            }
+            
+            studentData[today].parentChecked = !studentData[today].parentChecked;
+            
+            saveStudentData(currentStudent, studentData);
+            updateTodaysProgress();
+            generateCalendar();
+        }
+
+        function updateModalParentCheck() {
+            if (currentUser.role !== 'parent') return;
+            
+            const today = getDateKey();
+            const studentData = getStudentData(currentStudent);
+            const todayData = studentData[today] || {};
+            
+            const modalButton = document.getElementById('modalParentCheckButton');
+            if (todayData.parentChecked) {
+                modalButton.textContent = '✓ Checked';
+                modalButton.classList.add('checked');
+            } else {
+                modalButton.textContent = '✓ Mark as Checked';
+                modalButton.classList.remove('checked');
+            }
+        }
+
+        function toggleModalParentCheck() {
+            toggleParentCheck();
+            updateModalParentCheck();
         }
 
         function generateCalendar() {
@@ -1513,6 +2194,12 @@ Your data will be stored like this:
                 dayEl.className = 'calendar-day';
                 dayEl.innerHTML = `<div>${day}</div>`;
                 
+                // Make all days clickable
+                dayEl.style.cursor = 'pointer';
+                dayEl.addEventListener('click', function() {
+                    openDayModal(day);
+                });
+                
                 if (currentStudent) {
                     const dateKey = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     const studentData = getStudentData(currentStudent);
@@ -1537,6 +2224,13 @@ Your data will be stored like this:
                                 }
                             });
                             
+                            // Add parent check indicator
+                            if (dayData.parentChecked) {
+                                const parentIndicator = document.createElement('div');
+                                parentIndicator.style.cssText = 'width: 4px; height: 4px; background: #34C759; border-radius: 50%;';
+                                indicators.appendChild(parentIndicator);
+                            }
+                            
                             dayEl.appendChild(indicators);
                         }
                     }
@@ -1547,6 +2241,158 @@ Your data will be stored like this:
                 }
                 
                 grid.appendChild(dayEl);
+            }
+        }
+
+        function openDayModal(day) {
+            if (!currentStudent) return;
+            
+            const dateKey = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const studentData = getStudentData(currentStudent);
+            const dayData = studentData[dateKey] || {};
+            
+            const date = new Date(currentDisplayYear, currentDisplayMonth - 1, day);
+            const dateStr = date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            document.getElementById('dayModalTitle').textContent = dateStr;
+            
+            const progressList = document.getElementById('dayProgressList');
+            progressList.innerHTML = '';
+            
+            if (dayData.absent) {
+                progressList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #FF3B30;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">😴</div>
+                        <h3 style="font-size: 18px; margin-bottom: 8px;">Student was Absent</h3>
+                        <p style="color: #8E8E93; font-size: 14px;">No progress recorded for this day</p>
+                        ${currentUser.canEdit ? `
+                            <button onclick="removeAbsent('${dateKey}')" style="
+                                background: #007AFF; color: white; border: none; 
+                                padding: 10px 20px; border-radius: 8px; 
+                                font-size: 14px; font-weight: 600; 
+                                cursor: pointer; margin-top: 16px;
+                            ">Mark as Present</button>
+                        ` : ''}
+                    </div>
+                `;
+                document.getElementById('dayModal').style.display = 'block';
+                return;
+            }
+            
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'today-progress';
+            
+            const progressData = [
+                { type: 'sabak', title: 'Sabak', icon: '📖' },
+                { type: 'para', title: 'Sabak Para', icon: '🔄' },
+                { type: 'dhor', title: 'Dhor', icon: '💭' }
+            ];
+            
+            progressData.forEach((item, index) => {
+                const entry = dayData[item.type];
+                
+                const progressRow = document.createElement('div');
+                progressRow.className = 'progress-row';
+                
+                if (index < progressData.length - 1) {
+                    progressRow.style.borderBottom = '1px solid #F2F2F7';
+                }
+                
+                let statusHtml = '<span class="amount-badge">Not Set</span>';
+                if (entry) {
+                    statusHtml = `
+                        <span class="amount-badge">${entry.amount}</span>
+                        <span class="grade-badge ${entry.grade}">${entry.grade}</span>
+                    `;
+                }
+                
+                progressRow.innerHTML = `
+                    <div class="progress-info">
+                        <div class="progress-icon ${item.type}">${item.icon}</div>
+                        <div class="progress-details">
+                            <h4>${item.title}</h4>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="progress-status">${statusHtml}</div>
+                `;
+                
+                if (currentUser.canEdit || currentUser.role === 'parent') {
+                    progressRow.style.cursor = 'pointer';
+                    progressRow.addEventListener('click', function() {
+                        currentProgressType = item.type;
+                        currentDate = dateKey;
+                        document.getElementById('modalTitle').textContent = `${item.title}`;
+                        
+                        if (entry) {
+                            document.getElementById('amountInput').value = entry.amount;
+                            selectedGrade = entry.grade;
+                            document.querySelectorAll('.grade-button').forEach(btn => {
+                                btn.classList.remove('selected');
+                            });
+                            document.querySelector(`[data-grade="${entry.grade}"]`).classList.add('selected');
+                        } else {
+                            document.getElementById('amountInput').value = '';
+                            selectedGrade = null;
+                            document.querySelectorAll('.grade-button').forEach(btn => {
+                                btn.classList.remove('selected');
+                            });
+                        }
+
+                        // Show parent check in modal if parent
+                        const modalParentCheck = document.getElementById('modalParentCheck');
+                        if (currentUser.role === 'parent') {
+                            modalParentCheck.style.display = 'block';
+                            updateModalParentCheck();
+                        } else {
+                            modalParentCheck.style.display = 'none';
+                        }
+                        
+                        closeModal('dayModal');
+                        document.getElementById('progressModal').style.display = 'block';
+                    });
+                }
+                
+                progressContainer.appendChild(progressRow);
+            });
+
+            // Add parent check status for day
+            if (dayData.parentChecked) {
+                const parentCheckRow = document.createElement('div');
+                parentCheckRow.style.cssText = 'padding: 12px 18px; background: #F0F9FF; border-top: 1px solid #E0F2FE; text-align: center; color: #0369A1; font-size: 14px; font-weight: 600;';
+                parentCheckRow.innerHTML = '✓ Checked by Parent';
+                progressContainer.appendChild(parentCheckRow);
+            }
+            
+            progressList.appendChild(progressContainer);
+            document.getElementById('dayModal').style.display = 'block';
+        }
+
+        function removeAbsent(dateKey) {
+            if (!currentUser.canEdit || !currentStudent) return;
+            
+            const studentData = getStudentData(currentStudent);
+            if (studentData[dateKey] && studentData[dateKey].absent) {
+                delete studentData[dateKey].absent;
+                if (Object.keys(studentData[dateKey]).length === 0) {
+                    delete studentData[dateKey];
+                }
+                
+                saveStudentData(currentStudent, studentData);
+                updateTodaysProgress();
+                updateStats();
+                generateCalendar();
+                closeModal('dayModal');
+                
+                setTimeout(() => {
+                    const dayNumber = parseInt(dateKey.split('-')[2]);
+                    openDayModal(dayNumber);
+                }, 200);
             }
         }
 
@@ -1569,6 +2415,7 @@ Your data will be stored like this:
             document.getElementById(modalId).style.display = 'none';
         }
 
+        // Admin functions
         function showAddStudentModal() {
             document.getElementById('newStudentName').value = '';
             document.getElementById('newParentCode').value = '';
@@ -1585,7 +2432,7 @@ Your data will be stored like this:
             }
             
             const students = JSON.parse(localStorage.getItem('students') || '[]');
-            const studentId = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const studentId = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
             
             if (students.find(s => s.id === studentId)) {
                 alert('Student with this name already exists');
@@ -1605,6 +2452,822 @@ Your data will be stored like this:
             alert(`Student ${name} added successfully!\nParent code: ${parentCode}`);
         }
 
+        function showRemoveStudentModal() {
+            const select = document.getElementById('removeStudentSelect');
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            
+            select.innerHTML = '<option value="">Choose student to remove</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                select.appendChild(option);
+            });
+            
+            document.getElementById('removeStudentModal').style.display = 'block';
+        }
+
+        function removeStudent() {
+            const select = document.getElementById('removeStudentSelect');
+            const studentId = select.value;
+            
+            if (!studentId) {
+                alert('Please select a student to remove');
+                return;
+            }
+            
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            const student = students.find(s => s.id === studentId);
+            
+            if (!student) {
+                alert('Student not found');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to remove ${student.name} from the active student list? Their data will be kept in GitHub.`)) {
+                return;
+            }
+            
+            const updatedStudents = students.filter(s => s.id !== studentId);
+            localStorage.setItem('students', JSON.stringify(updatedStudents));
+            
+            // Update students list in GitHub but keep individual progress files
+            if (githubConfig.connected && !demoMode) {
+                saveFileToGitHub('students.json', updatedStudents, `Remove student from active list: ${student.name}`);
+            }
+            
+            populateStudentTabs();
+            closeModal('removeStudentModal');
+            
+            if (currentStudent === studentId) {
+                if (updatedStudents.length > 0) {
+                    selectStudent(updatedStudents[0].id);
+                } else {
+                    currentStudent = null;
+                    updateTodaysProgress();
+                    updateStats();
+                    generateCalendar();
+                }
+            }
+            
+            alert(`${student.name} has been removed from active students. Their progress data is preserved in GitHub.`);
+        }
+
+        function exportStudentPDF() {
+            const select = document.getElementById('pdfStudentSelect');
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            
+            select.innerHTML = '<option value="">Choose student for PDF report</option><option value="all">All Students (Combined Report)</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                select.appendChild(option);
+            });
+            
+            document.getElementById('exportPDFModal').style.display = 'block';
+        }
+
+        function generateSelectedPDF() {
+            const studentSelect = document.getElementById('pdfStudentSelect');
+            const reportType = document.getElementById('pdfReportType').value;
+            const selectedStudent = studentSelect.value;
+            
+            if (!selectedStudent) {
+                alert('Please select a student');
+                return;
+            }
+
+            const btn = document.getElementById('generatePDFBtn');
+            const btnText = document.getElementById('modalPdfBtnText');
+            const spinner = document.getElementById('modalPdfSpinner');
+            
+            const originalText = btnText.textContent;
+            btnText.textContent = 'Generating PDF...';
+            spinner.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                if (typeof window.jspdf === 'undefined') {
+                    alert('PDF library not loaded. Please refresh the page and try again.');
+                    resetPdfButton();
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                if (selectedStudent === 'all') {
+                    generateAllStudentsPDF(doc, reportType);
+                } else {
+                    generateSingleStudentPDF(doc, selectedStudent, reportType);
+                }
+                
+                closeModal('exportPDFModal');
+                setTimeout(() => {
+                    alert('📄 PDF report generated successfully!');
+                }, 500);
+                
+                resetPdfButton();
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF: ' + error.message);
+                resetPdfButton();
+            }
+            
+            function resetPdfButton() {
+                btnText.textContent = originalText;
+                spinner.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        function generateSingleStudentPDF(doc, studentId, reportType) {
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            const student = students.find(s => s.id === studentId);
+            const studentData = getStudentData(studentId);
+            
+            if (!student) {
+                throw new Error('Student not found');
+            }
+
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Calculate comprehensive statistics
+            let totalEntries = 0;
+            let sabakCount = 0;
+            let paraCount = 0;
+            let dhorCount = 0;
+            let absentDays = 0;
+            let parentCheckedDays = 0;
+            const gradeStats = { excellent: 0, good: 0, okay: 0, poor: 0 };
+            const monthlyBreakdown = {};
+
+            Object.entries(studentData).forEach(([date, dayData]) => {
+                const month = date.substring(0, 7); // YYYY-MM
+                
+                if (!monthlyBreakdown[month]) {
+                    monthlyBreakdown[month] = { sabak: 0, para: 0, dhor: 0, absent: 0, parentChecked: 0 };
+                }
+
+                if (dayData.absent) {
+                    absentDays++;
+                    monthlyBreakdown[month].absent++;
+                    return;
+                }
+
+                if (dayData.parentChecked) {
+                    parentCheckedDays++;
+                    monthlyBreakdown[month].parentChecked++;
+                }
+
+                progressTypes.forEach(type => {
+                    const entry = dayData[type];
+                    if (entry) {
+                        totalEntries++;
+                        
+                        if (type === 'sabak') {
+                            sabakCount++;
+                            monthlyBreakdown[month].sabak++;
+                        } else if (type === 'para') {
+                            paraCount++;
+                            monthlyBreakdown[month].para++;
+                        } else if (type === 'dhor') {
+                            dhorCount++;
+                            monthlyBreakdown[month].dhor++;
+                        }
+                        
+                        if (gradeStats[entry.grade] !== undefined) {
+                            gradeStats[entry.grade]++;
+                        }
+                    }
+                });
+            });
+
+            if (reportType === 'detailed') {
+                // Generate detailed multi-page report
+                generateDetailedPDF(doc, student, studentData, {
+                    totalEntries, sabakCount, paraCount, dhorCount, absentDays, 
+                    parentCheckedDays, gradeStats, monthlyBreakdown, currentDate
+                });
+            } else if (reportType === 'monthly') {
+                // Generate current month report
+                generateMonthlyPDF(doc, student, studentData, currentDate);
+            } else {
+                // Generate summary report
+                generateSummaryPDF(doc, student, {
+                    totalEntries, sabakCount, paraCount, dhorCount, absentDays,
+                    parentCheckedDays, gradeStats, currentDate
+                });
+            }
+        }
+
+        function generateDetailedPDF(doc, student, studentData, stats) {
+            // Page 1: Overview
+            doc.setFillColor(0, 122, 255);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('DETAILED PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            doc.setFontSize(14);
+            doc.setTextColor(230, 230, 230);
+            doc.text(`${student.name}'s Complete Hifz Journey`, 105, 25, { align: 'center' });
+            
+            doc.setTextColor(184, 184, 184);
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Generated on ${stats.currentDate}`, 105, 35, { align: 'center' });
+
+            let yPos = 50;
+
+            // Overview statistics
+            doc.setTextColor(31, 41, 55);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('Progress Overview', 105, yPos, { align: 'center' });
+
+            yPos += 15;
+
+            const overviewStats = [
+                ['Metric', 'Count', 'Details'],
+                ['Total Sabak Sessions', stats.sabakCount.toString(), 'New lessons learned'],
+                ['Total Para Sessions', stats.paraCount.toString(), 'Previous lessons reviewed'],
+                ['Total Dhor Sessions', stats.dhorCount.toString(), 'Revision completed'],
+                ['Total Entries', stats.totalEntries.toString(), 'Combined progress entries'],
+                ['Absent Days', stats.absentDays.toString(), 'Days marked absent'],
+                ['Parent Checked Days', stats.parentCheckedDays.toString(), 'Days reviewed by parent']
+            ];
+
+            doc.autoTable({
+                startY: yPos,
+                head: [overviewStats[0]],
+                body: overviewStats.slice(1),
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [0, 122, 255], 
+                    textColor: [255, 255, 255],
+                    fontSize: 11,
+                    fontStyle: 'bold'
+                },
+                bodyStyles: { 
+                    fontSize: 10,
+                    cellPadding: 5
+                },
+                columnStyles: {
+                    0: { cellWidth: 60, fontStyle: 'bold' },
+                    1: { cellWidth: 30, halign: 'center', fontStyle: 'bold' },
+                    2: { cellWidth: 80 }
+                }
+            });
+
+            yPos = doc.lastAutoTable.finalY + 20;
+
+            // Grade distribution
+            if (stats.totalEntries > 0) {
+                doc.setTextColor(31, 41, 55);
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text('Grade Distribution', 15, yPos);
+
+                yPos += 10;
+
+                const gradeData = [
+                    ['Grade', 'Count', 'Percentage'],
+                    ['Excellent', stats.gradeStats.excellent.toString(), `${Math.round((stats.gradeStats.excellent / stats.totalEntries) * 100)}%`],
+                    ['Good', stats.gradeStats.good.toString(), `${Math.round((stats.gradeStats.good / stats.totalEntries) * 100)}%`],
+                    ['Okay', stats.gradeStats.okay.toString(), `${Math.round((stats.gradeStats.okay / stats.totalEntries) * 100)}%`],
+                    ['Poor', stats.gradeStats.poor.toString(), `${Math.round((stats.gradeStats.poor / stats.totalEntries) * 100)}%`]
+                ];
+
+                doc.autoTable({
+                    startY: yPos,
+                    head: [gradeData[0]],
+                    body: gradeData.slice(1),
+                    theme: 'striped',
+                    headStyles: { 
+                        fillColor: [0, 122, 255], 
+                        textColor: [255, 255, 255],
+                        fontSize: 10,
+                        fontStyle: 'bold'
+                    },
+                    bodyStyles: { 
+                        fontSize: 9,
+                        cellPadding: 4
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 40 },
+                        1: { cellWidth: 30, halign: 'center' },
+                        2: { cellWidth: 30, halign: 'center', fontStyle: 'bold' }
+                    },
+                    margin: { left: 15, right: 15 },
+                    tableWidth: 100
+                });
+            }
+
+            // Page 2+: Monthly breakdown
+            const sortedMonths = Object.keys(stats.monthlyBreakdown).sort();
+            
+            if (sortedMonths.length > 0) {
+                doc.addPage();
+                
+                doc.setFillColor(0, 122, 255);
+                doc.rect(0, 0, 210, 30, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(16);
+                doc.setFont(undefined, 'bold');
+                doc.text('MONTHLY BREAKDOWN', 105, 20, { align: 'center' });
+
+                yPos = 45;
+
+                const monthlyData = [['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Parent Checked']];
+                
+                sortedMonths.forEach(month => {
+                    const data = stats.monthlyBreakdown[month];
+                    const monthName = new Date(month + '-01').toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long' 
+                    });
+                    
+                    monthlyData.push([
+                        monthName,
+                        data.sabak.toString(),
+                        data.para.toString(),
+                        data.dhor.toString(),
+                        data.absent.toString(),
+                        data.parentChecked.toString()
+                    ]);
+                });
+
+                doc.autoTable({
+                    startY: yPos,
+                    head: [monthlyData[0]],
+                    body: monthlyData.slice(1),
+                    theme: 'grid',
+                    headStyles: { 
+                        fillColor: [0, 122, 255], 
+                        textColor: [255, 255, 255],
+                        fontSize: 10,
+                        fontStyle: 'bold'
+                    },
+                    bodyStyles: { 
+                        fontSize: 9,
+                        cellPadding: 4
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 50, fontStyle: 'bold' },
+                        1: { cellWidth: 25, halign: 'center', fillColor: [240, 248, 255] },
+                        2: { cellWidth: 25, halign: 'center', fillColor: [248, 243, 255] },
+                        3: { cellWidth: 25, halign: 'center', fillColor: [255, 248, 240] },
+                        4: { cellWidth: 25, halign: 'center', fillColor: [255, 242, 242] },
+                        5: { cellWidth: 30, halign: 'center', fillColor: [240, 253, 244] }
+                    }
+                });
+            }
+
+            // Footer
+            doc.setTextColor(107, 114, 128);
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text('Generated by Hifz Record - May Allah bless your journey of learning the Quran', 105, 285, { align: 'center' });
+            
+            // Save the PDF
+            const fileName = `${student.name.toLowerCase().replace(/\s+/g, '_')}_detailed_report_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+
+        function generateMonthlyPDF(doc, student, studentData, currentDate) {
+            const currentMonth = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}`;
+            const monthName = new Date(currentDisplayYear, currentDisplayMonth - 1, 1).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long' 
+            });
+
+            // Header
+            doc.setFillColor(0, 122, 255);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('MONTHLY PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setTextColor(230, 230, 230);
+            doc.text(`${student.name} - ${monthName}`, 105, 25, { align: 'center' });
+            
+            doc.setTextColor(184, 184, 184);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Generated on ${currentDate}`, 105, 35, { align: 'center' });
+
+            let yPos = 55;
+
+            // Filter data for current month
+            const monthData = Object.entries(studentData).filter(([date]) => 
+                date.startsWith(currentMonth)
+            ).sort(([a], [b]) => a.localeCompare(b));
+
+            if (monthData.length === 0) {
+                doc.setTextColor(107, 114, 128);
+                doc.setFontSize(14);
+                doc.text('No progress data available for this month.', 105, yPos + 50, { align: 'center' });
+            } else {
+                // Daily progress table
+                const dailyData = [['Date', 'Sabak', 'Para', 'Dhor', 'Parent Check', 'Status']];
+                
+                monthData.forEach(([date, dayData]) => {
+                    const dayNum = new Date(date).getDate();
+                    const sabak = dayData.sabak ? `${dayData.sabak.amount} (${dayData.sabak.grade})` : '-';
+                    const para = dayData.para ? `${dayData.para.amount} (${dayData.para.grade})` : '-';
+                    const dhor = dayData.dhor ? `${dayData.dhor.amount} (${dayData.dhor.grade})` : '-';
+                    const parentCheck = dayData.parentChecked ? '✓' : '-';
+                    const status = dayData.absent ? 'Absent' : 'Present';
+                    
+                    dailyData.push([dayNum.toString(), sabak, para, dhor, parentCheck, status]);
+                });
+
+                doc.autoTable({
+                    startY: yPos,
+                    head: [dailyData[0]],
+                    body: dailyData.slice(1),
+                    theme: 'striped',
+                    headStyles: { 
+                        fillColor: [0, 122, 255], 
+                        textColor: [255, 255, 255],
+                        fontSize: 9,
+                        fontStyle: 'bold'
+                    },
+                    bodyStyles: { 
+                        fontSize: 8,
+                        cellPadding: 3
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
+                        1: { cellWidth: 35 },
+                        2: { cellWidth: 35 },
+                        3: { cellWidth: 35 },
+                        4: { cellWidth: 25, halign: 'center' },
+                        5: { cellWidth: 25, halign: 'center' }
+                    }
+                });
+            }
+
+            // Footer
+            doc.setTextColor(107, 114, 128);
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text('Generated by Hifz Record', 105, 285, { align: 'center' });
+            
+            // Save the PDF
+            const fileName = `${student.name.toLowerCase().replace(/\s+/g, '_')}_${monthName.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+
+        function generateSummaryPDF(doc, student, stats) {
+            // Header design
+            doc.setFillColor(0, 122, 255);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('PROGRESS SUMMARY REPORT', 105, 15, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setTextColor(230, 230, 230);
+            doc.text(`${student.name}'s Hifz Progress`, 105, 22, { align: 'center' });
+            
+            doc.setTextColor(184, 184, 184);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Generated on ${stats.currentDate}`, 105, 28, { align: 'center' });
+            doc.text('Overall Progress Summary', 105, 34, { align: 'center' });
+
+            let yPos = 50;
+
+            // Statistics overview
+            doc.setTextColor(31, 41, 55);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('Progress Summary', 105, yPos, { align: 'center' });
+
+            yPos += 10;
+
+            // Stats boxes
+            const statBoxWidth = 35;
+            const statBoxHeight = 25;
+            const startX = 20;
+            const gap = 4;
+
+            const statsList = [
+                { label: 'Sabak', value: stats.sabakCount, color: [0, 122, 255] },
+                { label: 'Para', value: stats.paraCount, color: [142, 68, 173] },
+                { label: 'Dhor', value: stats.dhorCount, color: [255, 149, 0] },
+                { label: 'Absent', value: stats.absentDays, color: [255, 59, 48] },
+                { label: 'Total', value: stats.totalEntries, color: [52, 199, 89] }
+            ];
+
+            statsList.forEach((stat, index) => {
+                const x = startX + (statBoxWidth + gap) * index;
+                
+                // Background
+                doc.setFillColor(248, 250, 252);
+                doc.roundedRect(x, yPos, statBoxWidth, statBoxHeight, 3, 3, 'F');
+                
+                // Border
+                doc.setDrawColor(226, 232, 240);
+                doc.setLineWidth(0.5);
+                doc.roundedRect(x, yPos, statBoxWidth, statBoxHeight, 3, 3, 'S');
+                
+                // Number
+                doc.setTextColor(stat.color[0], stat.color[1], stat.color[2]);
+                doc.setFontSize(16);
+                doc.setFont(undefined, 'bold');
+                doc.text(stat.value.toString(), x + statBoxWidth / 2, yPos + 12, { align: 'center' });
+                
+                // Label
+                doc.setTextColor(100, 116, 139);
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                doc.text(stat.label, x + statBoxWidth / 2, yPos + 20, { align: 'center' });
+            });
+
+            yPos += 35;
+
+            // Grade distribution
+            if (stats.totalEntries > 0) {
+                doc.setTextColor(31, 41, 55);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('Grade Distribution', 15, yPos);
+
+                yPos += 8;
+
+                const gradeData = [
+                    ['Grade', 'Count', 'Percentage'],
+                    ['Excellent', stats.gradeStats.excellent.toString(), `${Math.round((stats.gradeStats.excellent / stats.totalEntries) * 100)}%`],
+                    ['Good', stats.gradeStats.good.toString(), `${Math.round((stats.gradeStats.good / stats.totalEntries) * 100)}%`],
+                    ['Okay', stats.gradeStats.okay.toString(), `${Math.round((stats.gradeStats.okay / stats.totalEntries) * 100)}%`],
+                    ['Poor', stats.gradeStats.poor.toString(), `${Math.round((stats.gradeStats.poor / stats.totalEntries) * 100)}%`]
+                ];
+
+                doc.autoTable({
+                    startY: yPos,
+                    head: [gradeData[0]],
+                    body: gradeData.slice(1),
+                    theme: 'striped',
+                    headStyles: { 
+                        fillColor: [0, 122, 255], 
+                        textColor: [255, 255, 255],
+                        fontSize: 10,
+                        fontStyle: 'bold'
+                    },
+                    bodyStyles: { 
+                        fontSize: 9,
+                        cellPadding: 4
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 40 },
+                        1: { cellWidth: 30, halign: 'center' },
+                        2: { cellWidth: 30, halign: 'center', fontStyle: 'bold' }
+                    },
+                    margin: { left: 15, right: 15 },
+                    tableWidth: 100
+                });
+
+                yPos = doc.lastAutoTable.finalY + 20;
+
+                // Parent engagement section
+                doc.setTextColor(31, 41, 55);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('Parent Engagement', 15, yPos);
+
+                yPos += 10;
+
+                const engagementRate = stats.parentCheckedDays > 0 ? 
+                    Math.round((stats.parentCheckedDays / (stats.totalEntries + stats.absentDays)) * 100) : 0;
+
+                doc.setTextColor(100, 116, 139);
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.text(`Days checked by parent: ${stats.parentCheckedDays}`, 15, yPos);
+                doc.text(`Engagement rate: ${engagementRate}%`, 15, yPos + 10);
+                
+                if (engagementRate >= 80) {
+                    doc.setTextColor(52, 199, 89);
+                    doc.text('Excellent parent involvement! 🌟', 15, yPos + 20);
+                } else if (engagementRate >= 50) {
+                    doc.setTextColor(255, 149, 0);
+                    doc.text('Good parent involvement', 15, yPos + 20);
+                } else {
+                    doc.setTextColor(255, 59, 48);
+                    doc.text('Consider increasing parent involvement', 15, yPos + 20);
+                }
+            }
+
+            // Footer
+            doc.setTextColor(107, 114, 128);
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text('Generated by Hifz Record', 105, 285, { align: 'center' });
+            doc.text('May Allah bless your journey of learning the Quran.', 105, 290, { align: 'center' });
+            
+            // Save the PDF
+            const fileName = `${student.name.toLowerCase().replace(/\s+/g, '_')}_summary_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+
+        function generateAllStudentsPDF(doc, reportType) {
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Collect data for all students
+            const allStudentsData = students.map(student => {
+                const studentData = getStudentData(student.id);
+                
+                let totalEntries = 0;
+                let sabakCount = 0;
+                let paraCount = 0;
+                let dhorCount = 0;
+                let absentDays = 0;
+                let parentCheckedDays = 0;
+
+                Object.entries(studentData).forEach(([date, dayData]) => {
+                    if (dayData.absent) {
+                        absentDays++;
+                        return;
+                    }
+
+                    if (dayData.parentChecked) {
+                        parentCheckedDays++;
+                    }
+
+                    progressTypes.forEach(type => {
+                        const entry = dayData[type];
+                        if (entry) {
+                            totalEntries++;
+                            
+                            if (type === 'sabak') sabakCount++;
+                            else if (type === 'para') paraCount++;
+                            else if (type === 'dhor') dhorCount++;
+                        }
+                    });
+                });
+
+                return {
+                    name: student.name,
+                    totalEntries,
+                    sabakCount,
+                    paraCount,
+                    dhorCount,
+                    absentDays,
+                    parentCheckedDays
+                };
+            });
+
+            // Header design
+            doc.setFillColor(0, 122, 255);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            // Header text
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('ALL STUDENTS PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setTextColor(230, 230, 230);
+            doc.text('Class Performance Overview', 105, 22, { align: 'center' });
+            
+            doc.setTextColor(184, 184, 184);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Generated on ${currentDate}`, 105, 28, { align: 'center' });
+            doc.text(`${allStudentsData.length} Students`, 105, 34, { align: 'center' });
+
+            let yPos = 60;
+
+            // Class summary statistics
+            const totalSabak = allStudentsData.reduce((sum, student) => sum + student.sabakCount, 0);
+            const totalPara = allStudentsData.reduce((sum, student) => sum + student.paraCount, 0);
+            const totalDhor = allStudentsData.reduce((sum, student) => sum + student.dhorCount, 0);
+            const totalAbsent = allStudentsData.reduce((sum, student) => sum + student.absentDays, 0);
+            const totalParentChecked = allStudentsData.reduce((sum, student) => sum + student.parentCheckedDays, 0);
+
+            doc.setTextColor(31, 41, 55);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Class Summary', 15, yPos);
+
+            yPos += 8;
+
+            const classSummary = [
+                ['Metric', 'Total', 'Average per Student'],
+                ['Sabak Sessions', totalSabak.toString(), Math.round(totalSabak / allStudentsData.length).toString()],
+                ['Para Sessions', totalPara.toString(), Math.round(totalPara / allStudentsData.length).toString()],
+                ['Dhor Sessions', totalDhor.toString(), Math.round(totalDhor / allStudentsData.length).toString()],
+                ['Absent Days', totalAbsent.toString(), Math.round(totalAbsent / allStudentsData.length).toString()],
+                ['Parent Checked', totalParentChecked.toString(), Math.round(totalParentChecked / allStudentsData.length).toString()]
+            ];
+
+            doc.autoTable({
+                startY: yPos,
+                head: [classSummary[0]],
+                body: classSummary.slice(1),
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [0, 122, 255], 
+                    textColor: [255, 255, 255],
+                    fontSize: 10,
+                    fontStyle: 'bold'
+                },
+                bodyStyles: { 
+                    fontSize: 9,
+                    cellPadding: 4
+                },
+                columnStyles: {
+                    0: { cellWidth: 60, fontStyle: 'bold' },
+                    1: { cellWidth: 40, halign: 'center' },
+                    2: { cellWidth: 50, halign: 'center', fontStyle: 'bold' }
+                },
+                margin: { left: 15, right: 15 }
+            });
+
+            yPos = doc.lastAutoTable.finalY + 20;
+
+            // Individual student table
+            doc.setTextColor(31, 41, 55);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Individual Student Progress', 15, yPos);
+
+            yPos += 8;
+
+            const studentTableData = allStudentsData.map(student => [
+                student.name,
+                student.sabakCount.toString(),
+                student.paraCount.toString(),
+                student.dhorCount.toString(),
+                student.absentDays.toString(),
+                student.parentCheckedDays.toString(),
+                student.totalEntries.toString()
+            ]);
+
+            doc.autoTable({
+                startY: yPos,
+                head: [['Student Name', 'Sabak', 'Para', 'Dhor', 'Absent', 'Parent Check', 'Total']],
+                body: studentTableData,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [0, 122, 255], 
+                    textColor: [255, 255, 255],
+                    fontSize: 9,
+                    fontStyle: 'bold'
+                },
+                bodyStyles: { 
+                    fontSize: 8,
+                    cellPadding: 3
+                },
+                columnStyles: {
+                    0: { cellWidth: 45, fontStyle: 'bold' },
+                    1: { cellWidth: 20, halign: 'center', fillColor: [240, 248, 255] },
+                    2: { cellWidth: 20, halign: 'center', fillColor: [248, 243, 255] },
+                    3: { cellWidth: 20, halign: 'center', fillColor: [255, 248, 240] },
+                    4: { cellWidth: 20, halign: 'center', fillColor: [255, 242, 242] },
+                    5: { cellWidth: 25, halign: 'center', fillColor: [240, 253, 244] },
+                    6: { cellWidth: 20, halign: 'center', fontStyle: 'bold', fillColor: [245, 245, 245] }
+                },
+                margin: { left: 15, right: 15 }
+            });
+
+            // Footer
+            doc.setTextColor(107, 114, 128);
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text('Generated by Hifz Record', 105, 285, { align: 'center' });
+            doc.text('May Allah bless your students\' journey of learning the Quran.', 105, 290, { align: 'center' });
+            
+            // Save the PDF
+            const fileName = `all_students_progress_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+
         function exportGitHubData() {
             if (!githubConfig.connected) {
                 alert('Not connected to GitHub');
@@ -1616,9 +3279,31 @@ Your data will be stored like this:
             alert(`Your data is stored at:\n${repoUrl}\n\nYou can download individual files or clone the entire repository.`);
         }
 
+        function showResetModal() {
+            if (confirm('Are you sure you want to reset ALL student data? This cannot be undone.')) {
+                if (confirm('This will permanently delete all progress records. Continue?')) {
+                    const students = JSON.parse(localStorage.getItem('students') || '[]');
+                    students.forEach(student => {
+                        localStorage.removeItem(`student_${student.id}`);
+                    });
+                    
+                    localStorage.setItem('students', JSON.stringify(defaultStudents));
+                    
+                    alert('All data has been reset');
+                    location.reload();
+                }
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentStudent = null;
+            showLoginSection();
+        }
+
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'dayModal', 'addStudentModal'];
+            const modals = ['progressModal', 'dayModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -1627,11 +3312,17 @@ Your data will be stored like this:
             });
         }
 
-        function logout() {
-            currentUser = null;
-            currentStudent = null;
-            showLoginSection();
-        }
+        // Allow Enter key for login
+        document.addEventListener('DOMContentLoaded', function() {
+            const accessCodeInput = document.getElementById('accessCode');
+            if (accessCodeInput) {
+                accessCodeInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        login();
+                    }
+                });
+            }
+        });
 
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', init);
