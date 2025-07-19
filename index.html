@@ -1029,6 +1029,7 @@
             display: flex; 
             gap: 1px; 
             margin-top: 2px; 
+            align-items: center;
         }
         
         .indicator { 
@@ -1058,6 +1059,20 @@
 
         .indicator.homework {
             background: #3B82F6;
+        }
+
+        .parent-check-tick {
+            color: #007AFF;
+            font-size: 8px;
+            font-weight: bold;
+            margin-left: 1px;
+        }
+
+        @media (min-width: 768px) {
+            .parent-check-tick {
+                font-size: 10px;
+                margin-left: 2px;
+            }
         }
         
         .nav-arrow { 
@@ -1847,6 +1862,10 @@
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="width: 12px; height: 12px; background: #FF3B30; border-radius: 50%; display: inline-block;"></span>
                         <span style="color: #8E8E93;">Poor</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="color: #007AFF; font-size: 12px; font-weight: bold;">✓</span>
+                        <span style="color: #8E8E93;">Parent Check</span>
                     </div>
                 </div>
             </div>
@@ -2898,21 +2917,32 @@
             generateCalendar();
         }
 
-        async function toggleParentCheck() {
+        async function toggleParentCheck(dateKey = null) {
             if (currentUserType !== 'parent' || !currentStudent) return;
             
-            const today = getDateKey();
+            const targetDate = dateKey || getDateKey();
             const studentData = await window.getStudentData(currentStudent);
             
-            if (!studentData[today]) {
-                studentData[today] = {};
+            if (!studentData[targetDate]) {
+                studentData[targetDate] = {};
             }
             
-            studentData[today].parentChecked = !studentData[today].parentChecked;
+            studentData[targetDate].parentChecked = !studentData[targetDate].parentChecked;
             
             await window.saveStudentData(currentStudent, studentData);
-            updateTodaysProgress();
+            
+            // Update UI based on which date was modified
+            if (!dateKey || dateKey === getDateKey()) {
+                updateTodaysProgress();
+            }
             generateCalendar();
+            
+            // If modal is open for this date, refresh it
+            const dayModalTitle = document.getElementById('dayModalTitle').textContent;
+            if (dayModalTitle.includes(new Date(targetDate).toLocaleDateString('en-US', { day: 'numeric' }))) {
+                const day = parseInt(targetDate.split('-')[2]);
+                setTimeout(() => openDayModal(day), 100);
+            }
         }
 
         function generateCalendar() {
@@ -2997,10 +3027,11 @@
                                     }
                                 });
                                 
-                                // Add parent check indicator (green dot)
+                                // Add parent check indicator (blue tick)
                                 if (dayData.parentChecked) {
                                     const parentIndicator = document.createElement('div');
-                                    parentIndicator.style.cssText = 'width: 4px; height: 4px; background: #34C759; border-radius: 50%;';
+                                    parentIndicator.className = 'parent-check-tick';
+                                    parentIndicator.textContent = '✓';
                                     parentIndicator.title = 'Checked by Parent';
                                     indicators.appendChild(parentIndicator);
                                 }
@@ -3212,12 +3243,46 @@
                         progressContainer.appendChild(progressRow);
                     });
                     
-                    // Add parent check status for day
-                    if (dayData.parentChecked) {
-                        const parentCheckRow = document.createElement('div');
-                        parentCheckRow.style.cssText = 'padding: 16px 24px; background: #F0F9FF; border-top: 1px solid #E0F2FE; text-align: center; color: #0369A1; font-size: 14px; font-weight: 600; margin-top: 4px;';
-                        parentCheckRow.innerHTML = '✓ Checked by Parent';
-                        progressContainer.appendChild(parentCheckRow);
+                    // Add parent check section for any weekday
+                    if (!isWeekendDay && !isHolidayDay) {
+                        // Parent check button for parents
+                        if (currentUserType === 'parent') {
+                            const parentCheckRow = document.createElement('div');
+                            parentCheckRow.style.cssText = 'padding: 16px 24px; border-top: 1px solid #F2F2F7; background: #F8F9FA;';
+                            
+                            const isChecked = dayData.parentChecked || false;
+                            const buttonText = isChecked ? '✓ Checked by Parent' : '✓ Mark as Checked';
+                            const buttonColor = isChecked ? '#8E8E93' : '#34C759';
+                            
+                            parentCheckRow.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #1C1C1E;">Parent Review</h4>
+                                        <p style="font-size: 14px; color: #8E8E93;">Mark when you have reviewed this day's progress</p>
+                                    </div>
+                                    <button onclick="toggleParentCheck('${dateKey}')" style="
+                                        background: ${buttonColor}; color: white; border: none; 
+                                        padding: 12px 16px; border-radius: 8px; 
+                                        font-size: 14px; font-weight: 600; 
+                                        cursor: pointer; min-width: 140px;
+                                    ">${buttonText}</button>
+                                </div>
+                            `;
+                            progressContainer.appendChild(parentCheckRow);
+                        }
+                        
+                        // Parent check status for teachers and office (show both checked and unchecked status)
+                        else if (currentUserType === 'teacher' || currentUserType === 'office') {
+                            const parentStatusRow = document.createElement('div');
+                            if (dayData.parentChecked) {
+                                parentStatusRow.style.cssText = 'padding: 16px 24px; background: #F0F9FF; border-top: 1px solid #E0F2FE; text-align: center; color: #0369A1; font-size: 14px; font-weight: 600;';
+                                parentStatusRow.innerHTML = '✓ Reviewed by Parent';
+                            } else {
+                                parentStatusRow.style.cssText = 'padding: 16px 24px; background: #FEF2F2; border-top: 1px solid #FECACA; text-align: center; color: #DC2626; font-size: 14px; font-weight: 600;';
+                                parentStatusRow.innerHTML = '✗ Not yet reviewed by Parent';
+                            }
+                            progressContainer.appendChild(parentStatusRow);
+                        }
                     }
                     
                     progressList.appendChild(progressContainer);
