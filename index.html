@@ -924,6 +924,30 @@
             background: #D1D5DB;
             cursor: not-allowed;
         }
+
+        .weekend-homework-button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .weekend-homework-button {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+
+        .weekend-homework-button:hover {
+            background: #2563EB;
+        }
         
         .today-progress.absent { 
             opacity: 0.5; 
@@ -1313,6 +1337,70 @@
             background: white; 
         }
 
+        /* Homework checkbox styles */
+        .homework-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .homework-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid #E5E5EA;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .homework-checkbox:hover {
+            background: #F8F9FA;
+        }
+
+        .homework-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .homework-checkbox-content {
+            flex: 1;
+        }
+
+        .homework-checkbox-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 4px;
+        }
+
+        .homework-checkbox-desc {
+            font-size: 14px;
+            color: #8E8E93;
+        }
+
+        .homework-description {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: #F2F2F7;
+            color: #1C1C1E;
+            font-size: 14px;
+            resize: vertical;
+            margin-top: 8px;
+        }
+
+        .homework-description:focus {
+            outline: none;
+            border-color: #10A37F;
+            background: white;
+        }
+
         /* Controls */
         .app-controls { 
             margin: 10px 20px 20px 20px; 
@@ -1604,11 +1692,16 @@
 
                 <!-- Today's Progress -->
                 <div class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                         <h2 class="section-title" style="margin-bottom: 0;" id="progressSectionTitle">Today's Progress</h2>
-                        <button class="absent-button" onclick="toggleAbsent()" id="absentButton" style="display: none;">
-                            🔴 Absent
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="absent-button" onclick="toggleAbsent()" id="absentButton" style="display: none;">
+                                🔴 Absent
+                            </button>
+                            <button class="weekend-homework-button" onclick="showWeekendHomeworkModal()" id="weekendHomeworkButton" style="display: none;">
+                                📚 Weekend Homework
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="today-progress" id="todayProgressContainer">
@@ -1755,6 +1848,62 @@
         </div>
     </div>
 
+    <!-- Weekend Homework Modal -->
+    <div id="weekendHomeworkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Weekend Homework</h2>
+                <span class="close" onclick="closeModal('weekendHomeworkModal')">&times;</span>
+            </div>
+            <div class="entry-form">
+                <div class="form-group">
+                    <label class="form-label">Select what the student should practice over the weekend:</label>
+                    <div class="homework-checkbox-group">
+                        <label class="homework-checkbox">
+                            <input type="checkbox" id="homeworkSabak">
+                            <div class="homework-checkbox-content">
+                                <div class="homework-checkbox-title">Sabak</div>
+                                <div class="homework-checkbox-desc">Practice new lessons learned this week</div>
+                            </div>
+                        </label>
+                        <label class="homework-checkbox">
+                            <input type="checkbox" id="homeworkPara">
+                            <div class="homework-checkbox-content">
+                                <div class="homework-checkbox-title">Sabak Para</div>
+                                <div class="homework-checkbox-desc">Review previous lessons and chapters</div>
+                            </div>
+                        </label>
+                        <label class="homework-checkbox">
+                            <input type="checkbox" id="homeworkDhor">
+                            <div class="homework-checkbox-content">
+                                <div class="homework-checkbox-title">Dhor</div>
+                                <div class="homework-checkbox-desc">Revise and strengthen memorized portions</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional Instructions (Optional)</label>
+                    <textarea class="homework-description" id="homeworkDescription" placeholder="Add specific instructions or details for the weekend homework..."></textarea>
+                </div>
+                <button class="save-button" onclick="saveWeekendHomework()">Save Weekend Homework</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Weekend Homework Modal -->
+    <div id="viewWeekendHomeworkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Weekend Homework</h2>
+                <span class="close" onclick="closeModal('viewWeekendHomeworkModal')">&times;</span>
+            </div>
+            <div id="weekendHomeworkContent">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
     <!-- Add Student Modal -->
     <div id="addStudentModal" class="modal">
         <div class="modal-content">
@@ -1846,7 +1995,7 @@
             <!-- Legend for colored dots -->
             <div style="margin-top: 24px; padding: 16px; background: #F8F9FA; border-radius: 12px; border-top: 1px solid #E5E5EA;">
                 <div style="font-size: 12px; font-weight: 600; color: #8E8E93; margin-bottom: 12px; text-align: center;">Progress Indicators</div>
-                <div style="display: flex; justify-content: center; gap: 20px; font-size: 11px;">
+                <div style="display: flex; justify-content: center; gap: 20px; font-size: 11px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="width: 12px; height: 12px; background: #34C759; border-radius: 50%; display: inline-block;"></span>
                         <span style="color: #8E8E93;">Excellent</span>
@@ -1862,10 +2011,6 @@
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="width: 12px; height: 12px; background: #FF3B30; border-radius: 50%; display: inline-block;"></span>
                         <span style="color: #8E8E93;">Poor</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="color: #007AFF; font-size: 12px; font-weight: bold;">✓</span>
-                        <span style="color: #8E8E93;">Parent Check</span>
                     </div>
                 </div>
             </div>
@@ -2249,6 +2394,7 @@
         function updateUIForUserType() {
             const container = document.querySelector('.container');
             const absentButton = document.getElementById('absentButton');
+            const weekendHomeworkButton = document.getElementById('weekendHomeworkButton');
             const teacherControls = document.getElementById('teacherControls');
             const officeControls = document.getElementById('officeControls');
             const parentControls = document.getElementById('parentControls');
@@ -2267,6 +2413,7 @@
             switch(currentUserType) {
                 case 'teacher':
                     absentButton.style.display = 'inline-block';
+                    weekendHomeworkButton.style.display = 'none'; // Will be shown on Fridays
                     teacherControls.style.display = 'block';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'none';
@@ -2275,6 +2422,7 @@
                     
                 case 'office':
                     absentButton.style.display = 'none';
+                    weekendHomeworkButton.style.display = 'none';
                     teacherControls.style.display = 'none';
                     officeControls.style.display = 'block';
                     parentControls.style.display = 'none';
@@ -2290,6 +2438,7 @@
                 case 'parent':
                     container.classList.add('parent-mode');
                     absentButton.style.display = 'none';
+                    weekendHomeworkButton.style.display = 'none';
                     teacherControls.style.display = 'none';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'block';
@@ -2518,6 +2667,10 @@
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
+        function isFriday(date = new Date()) {
+            return date.getDay() === 5; // Friday = 5
+        }
+
         async function updateTodaysProgress() {
             if (!currentStudent) return;
             
@@ -2530,19 +2683,49 @@
             const isWeekendToday = isWeekend(today);
             const isHolidayToday = isHolidayDate(today);
             const holidayInfo = getHolidayInfo(today);
+            const isFridayToday = isFriday(today);
             
             // Get UI elements
             const progressSectionTitle = document.getElementById('progressSectionTitle');
             const progressContainer = document.getElementById('todayProgressContainer');
             const absentButton = document.getElementById('absentButton');
+            const weekendHomeworkButton = document.getElementById('weekendHomeworkButton');
+            
+            // Show weekend homework button only for teachers on Fridays
+            if (currentUserType === 'teacher' && isFridayToday && !isWeekendToday && !isHolidayToday) {
+                weekendHomeworkButton.style.display = 'inline-block';
+            } else {
+                weekendHomeworkButton.style.display = 'none';
+            }
             
             if (isWeekendToday) {
                 // Weekend mode - show mosque closed message
                 progressSectionTitle.textContent = 'Weekend - Mosque Closed';
                 
-                // Hide absent button
+                // Hide buttons
                 if (absentButton) {
                     absentButton.style.display = 'none';
+                }
+                if (weekendHomeworkButton) {
+                    weekendHomeworkButton.style.display = 'none';
+                }
+                
+                // Check for weekend homework for parents
+                let weekendHomeworkHtml = '';
+                if (currentUserType === 'parent') {
+                    const currentWeekHomework = await getWeekendHomework(currentStudent);
+                    if (currentWeekHomework) {
+                        weekendHomeworkHtml = `
+                            <div style="margin-top: 20px;">
+                                <button onclick="showViewWeekendHomeworkModal()" style="
+                                    background: #3B82F6; color: white; border: none; 
+                                    padding: 12px 24px; border-radius: 10px; 
+                                    font-size: 14px; font-weight: 600; 
+                                    cursor: pointer; width: 100%;
+                                ">📚 View Weekend Homework</button>
+                            </div>
+                        `;
+                    }
                 }
                 
                 // Show weekend closed message instead of progress
@@ -2554,6 +2737,7 @@
                         <div style="margin-top: 20px; padding: 12px; background: #E8F4FD; border-radius: 8px; font-size: 14px; color: #1E40AF;">
                             Classes resume on Monday
                         </div>
+                        ${weekendHomeworkHtml}
                     </div>
                 `;
                 
@@ -2568,9 +2752,12 @@
                 // Holiday mode - show holiday message
                 progressSectionTitle.textContent = `Holiday - ${holidayInfo.name}`;
                 
-                // Hide absent button
+                // Hide buttons
                 if (absentButton) {
                     absentButton.style.display = 'none';
+                }
+                if (weekendHomeworkButton) {
+                    weekendHomeworkButton.style.display = 'none';
                 }
                 
                 // Show holiday message instead of progress
@@ -2945,6 +3132,146 @@
             }
         }
 
+        // Weekend Homework Functions
+        function showWeekendHomeworkModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Reset form
+            document.getElementById('homeworkSabak').checked = false;
+            document.getElementById('homeworkPara').checked = false;
+            document.getElementById('homeworkDhor').checked = false;
+            document.getElementById('homeworkDescription').value = '';
+            
+            document.getElementById('weekendHomeworkModal').style.display = 'block';
+        }
+
+        async function saveWeekendHomework() {
+            if (currentUserType !== 'teacher' || !currentStudent) return;
+            
+            const sabakChecked = document.getElementById('homeworkSabak').checked;
+            const paraChecked = document.getElementById('homeworkPara').checked;
+            const dhorChecked = document.getElementById('homeworkDhor').checked;
+            const description = document.getElementById('homeworkDescription').value.trim();
+            
+            if (!sabakChecked && !paraChecked && !dhorChecked) {
+                alert('Please select at least one homework type');
+                return;
+            }
+            
+            const homeworkData = {
+                sabak: sabakChecked,
+                para: paraChecked,
+                dhor: dhorChecked,
+                description: description,
+                assignedDate: new Date().toISOString(),
+                weekOf: getWeekOfDate(new Date())
+            };
+            
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const weekKey = getWeekOfDate(new Date());
+                await setDoc(doc(db, 'weekend_homework', `${currentStudent}_${weekKey}`), homeworkData);
+                
+                closeModal('weekendHomeworkModal');
+                alert('Weekend homework assigned successfully!');
+            } catch (error) {
+                console.error('Error saving weekend homework:', error);
+                alert('Error saving weekend homework: ' + error.message);
+            }
+        }
+
+        async function getWeekendHomework(studentId) {
+            try {
+                const { getDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const weekKey = getWeekOfDate(new Date());
+                const homeworkDoc = await getDoc(doc(db, 'weekend_homework', `${studentId}_${weekKey}`));
+                
+                if (homeworkDoc.exists()) {
+                    return homeworkDoc.data();
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching weekend homework:', error);
+                return null;
+            }
+        }
+
+        async function showViewWeekendHomeworkModal() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            const homeworkData = await getWeekendHomework(currentStudent);
+            const content = document.getElementById('weekendHomeworkContent');
+            
+            if (!homeworkData) {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
+                        <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">No Homework Assigned</h3>
+                        <p style="color: #8E8E93; font-size: 14px;">No weekend homework has been assigned this week.</p>
+                    </div>
+                `;
+            } else {
+                let homeworkItems = [];
+                if (homeworkData.sabak) homeworkItems.push('📖 Sabak - Practice new lessons learned this week');
+                if (homeworkData.para) homeworkItems.push('🔄 Sabak Para - Review previous lessons and chapters');
+                if (homeworkData.dhor) homeworkItems.push('💭 Dhor - Revise and strengthen memorized portions');
+                
+                const homeworkListHtml = homeworkItems.map(item => 
+                    `<div style="padding: 12px; background: #F8F9FA; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">${item}</div>`
+                ).join('');
+                
+                const descriptionHtml = homeworkData.description ? 
+                    `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Additional Instructions:</h4>
+                        <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${homeworkData.description}</p>
+                    </div>` : '';
+                
+                content.innerHTML = `
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Weekend Homework</h3>
+                            <p style="color: #8E8E93; font-size: 14px;">Practice the following during the weekend:</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            ${homeworkListHtml}
+                        </div>
+                        
+                        ${descriptionHtml}
+                    </div>
+                `;
+            }
+            
+            // Add parent review section
+            const parentReviewHtml = `
+                <div style="border-top: 1px solid #F2F2F7; padding: 16px 20px; background: #F8F9FA;">
+                    <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">Parent Review</h4>
+                    <button onclick="toggleParentCheck()" style="
+                        background: #34C759; color: white; border: none; 
+                        padding: 12px 16px; border-radius: 8px; 
+                        font-size: 14px; font-weight: 600; 
+                        cursor: pointer; width: 100%;
+                    " id="weekendParentCheckButton">✓ Mark as Reviewed</button>
+                </div>
+            `;
+            
+            content.innerHTML += parentReviewHtml;
+            
+            document.getElementById('viewWeekendHomeworkModal').style.display = 'block';
+        }
+
+        function getWeekOfDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-week${Math.ceil(day / 7)}`;
+        }
+
         function generateCalendar() {
             const grid = document.getElementById('calendarGrid');
             const monthTitle = document.getElementById('monthTitle');
@@ -3258,7 +3585,6 @@
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <div>
                                         <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #1C1C1E;">Parent Review</h4>
-                                        <p style="font-size: 14px; color: #8E8E93;">Mark when you have reviewed this day's progress</p>
                                     </div>
                                     <button onclick="toggleParentCheck('${dateKey}')" style="
                                         background: ${buttonColor}; color: white; border: none; 
@@ -4425,7 +4751,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
+            const modals = ['progressModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'weekendHomeworkModal', 'viewWeekendHomeworkModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -4497,6 +4823,9 @@
         window.showHolidayModal = showHolidayModal;
         window.addHoliday = addHoliday;
         window.removeHoliday = removeHoliday;
+        window.showWeekendHomeworkModal = showWeekendHomeworkModal;
+        window.saveWeekendHomework = saveWeekendHomework;
+        window.showViewWeekendHomeworkModal = showViewWeekendHomeworkModal;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
         window.showResetModal = showResetModal;
