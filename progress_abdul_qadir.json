@@ -37,6 +37,11 @@
       "juz": 0.059,
       "fraction": "1.54 pages",
       "quranType": 13
+    },
+    "para": {
+      "grade": "poor",
+      "timestamp": "2025-07-19T01:54:00.697Z",
+      "amount": "2 pages"
     }
   }
 }
