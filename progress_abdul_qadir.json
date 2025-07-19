@@ -48,5 +48,17 @@
       "timestamp": "2025-07-19T01:54:06.703Z",
       "amount": "Yes"
     }
+  },
+  "2025-07-16": {
+    "sabak": {
+      "grade": "excellent",
+      "timestamp": "2025-07-19T01:54:16.230Z",
+      "lines": 30,
+      "amount": "30 lines",
+      "pages": 2.31,
+      "juz": 0.089,
+      "fraction": "2.31 pages",
+      "quranType": 13
+    }
   }
 }
