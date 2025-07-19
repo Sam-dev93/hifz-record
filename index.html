@@ -1410,6 +1410,28 @@
                 font-size: 16px;
             }
         }
+
+        .access-code-info {
+            background: #E8F4FD;
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #1E40AF;
+        }
+
+        .access-code-info strong {
+            color: #1E40AF;
+        }
+
+        @media (min-width: 768px) {
+            .access-code-info {
+                font-size: 16px;
+                padding: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1429,7 +1451,7 @@
                 <div class="profile-option" onclick="selectProfile('teacher')" data-profile="teacher">
                     <div class="profile-icon">📖</div>
                     <div class="profile-info">
-                        <h3>Teacher</h3>
+                        <h3>Ustaadh</h3>
                         <p>Full access - Add/edit progress, manage students, reports</p>
                     </div>
                 </div>
@@ -1470,16 +1492,11 @@
 
                 <button class="login-button" onclick="login()">Login</button>
                 
-                <!-- Demo Access Info -->
-                <div style="margin-top: 20px; padding: 12px; background: #FFF3CD; border-radius: 8px; border: 1px solid #FFEAA7;">
-                    <div style="font-size: 14px; color: #856404; font-weight: 600; margin-bottom: 8px;">📝 Demo Access Codes:</div>
-                    <div style="font-size: 12px; color: #856404; line-height: 1.4;">
-                        • Teacher: <strong>teacher2025</strong><br>
-                        • Office: <strong>office2025</strong><br>
-                        • Parent (Abdul Qadir): <strong>AQ240701</strong><br>
-                        • Parent (Abdullah): <strong>AS240702</strong><br>
-                        • Parent (Ahsan): <strong>AH240703</strong>
-                    </div>
+                <!-- Access Code Info -->
+                <div class="access-code-info">
+                    <div style="font-weight: 600; margin-bottom: 8px;">📝 Need Your Access Code?</div>
+                    <div>If you need your access code please contact Ustaadh:</div>
+                    <div style="margin-top: 8px;"><strong>sam.dev247@gmail.com</strong></div>
                 </div>
             </div>
         </div>
@@ -1604,7 +1621,7 @@
                     <div class="controls-card">
                         <h3 class="controls-title" id="controlsTitle">Controls</h3>
                         
-                        <!-- Teacher Controls -->
+                        <!-- Ustaadh Controls -->
                         <div id="teacherControls" style="display: none;">
                             <button class="control-button" onclick="showAddStudentModal()">➕ Add New Student</button>
                             <button class="control-button" onclick="showRemoveStudentModal()">➖ Remove Student</button>
@@ -1748,12 +1765,13 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="width: 12px; height: 12px; background: #FF3B30; border-radius: 50%; display: inline-block;"></span>
-                        <span style="color: #8E8E93;">Poor/Unchecked</span>
+                        <span style="color: #8E8E93;">Poor</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
     <div id="exportPDFModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1798,25 +1816,37 @@
         let studentUnsubscribes = []; // For Firebase listeners
 
         // Access codes
-        const teacherCode = 'teacher2025';
-        const officeCode = 'office2025';
+        const teacherCode = 'P455word';
+        const officeCode = 'sjoffice25';
 
         // Student access codes mapping
         const studentAccessCodes = {
-            'AQ240701': { studentId: 'abdul_qadir', studentName: 'Abdul Qadir' },
-            'AS240702': { studentId: 'abdullah_sheriwala', studentName: 'Abdullah Sheriwala' },
-            'AH240703': { studentId: 'ahsan_haque', studentName: 'Ahsan Haque' },
-            'AR240704': { studentId: 'arafat_rayyan', studentName: 'Arafat Rayyan' },
-            'AM240705': { studentId: 'ayyan_miah', studentName: 'Ayyan Miah' }
+            'ra123456': { studentId: 'raqib_awal', studentName: 'Raqib Awal' },
+            'ah123456': { studentId: 'ahsan_haque', studentName: 'Ahsan Haque' },
+            'ar123456': { studentId: 'arafat_rayyan', studentName: 'Arafat Rayyan' },
+            'in123456': { studentId: 'ishaq_noor', studentName: 'Ishaq Noor' },
+            'nk123456': { studentId: 'naveed_khan', studentName: 'Naveed Khan' },
+            'rr123456': { studentId: 'rayhan_rahman', studentName: 'Rayhan Rahman' },
+            'ih123456': { studentId: 'ismail_hussain', studentName: 'Ismail Hussain' },
+            'sn123456': { studentId: 'sulaiman_noor', studentName: 'Sulaiman Noor' },
+            'am123456': { studentId: 'ayyan_miah', studentName: 'Ayyan Miah' },
+            'aq123456': { studentId: 'abdul_qadir', studentName: 'Abdul Qadir' },
+            'as123456': { studentId: 'abdullah_sheriwala', studentName: 'Abdullah Sheriwala' }
         };
 
-        // Default students data with access codes
+        // Default students data with access codes - sorted alphabetically
         const defaultStudents = [
-            { id: 'abdul_qadir', name: 'Abdul Qadir', parentEmail: 'parent1@hifz.com', quranType: 13, accessCode: 'AQ240701' },
-            { id: 'abdullah_sheriwala', name: 'Abdullah Sheriwala', parentEmail: 'parent2@hifz.com', quranType: 13, accessCode: 'AS240702' },
-            { id: 'ahsan_haque', name: 'Ahsan Haque', parentEmail: 'parent3@hifz.com', quranType: 13, accessCode: 'AH240703' },
-            { id: 'arafat_rayyan', name: 'Arafat Rayyan', parentEmail: 'parent4@hifz.com', quranType: 13, accessCode: 'AR240704' },
-            { id: 'ayyan_miah', name: 'Ayyan Miah', parentEmail: 'parent5@hifz.com', quranType: 13, accessCode: 'AM240705' }
+            { id: 'abdul_qadir', name: 'Abdul Qadir', parentEmail: 'parent1@hifz.com', quranType: 13, accessCode: 'aq123456' },
+            { id: 'abdullah_sheriwala', name: 'Abdullah Sheriwala', parentEmail: 'parent2@hifz.com', quranType: 13, accessCode: 'as123456' },
+            { id: 'ahsan_haque', name: 'Ahsan Haque', parentEmail: 'parent3@hifz.com', quranType: 13, accessCode: 'ah123456' },
+            { id: 'arafat_rayyan', name: 'Arafat Rayyan', parentEmail: 'parent4@hifz.com', quranType: 13, accessCode: 'ar123456' },
+            { id: 'ayyan_miah', name: 'Ayyan Miah', parentEmail: 'parent5@hifz.com', quranType: 13, accessCode: 'am123456' },
+            { id: 'ishaq_noor', name: 'Ishaq Noor', parentEmail: 'parent6@hifz.com', quranType: 13, accessCode: 'in123456' },
+            { id: 'ismail_hussain', name: 'Ismail Hussain', parentEmail: 'parent7@hifz.com', quranType: 13, accessCode: 'ih123456' },
+            { id: 'naveed_khan', name: 'Naveed Khan', parentEmail: 'parent8@hifz.com', quranType: 13, accessCode: 'nk123456' },
+            { id: 'raqib_awal', name: 'Raqib Awal', parentEmail: 'parent9@hifz.com', quranType: 13, accessCode: 'ra123456' },
+            { id: 'rayhan_rahman', name: 'Rayhan Rahman', parentEmail: 'parent10@hifz.com', quranType: 13, accessCode: 'rr123456' },
+            { id: 'sulaiman_noor', name: 'Sulaiman Noor', parentEmail: 'parent11@hifz.com', quranType: 13, accessCode: 'sn123456' }
         ];
 
         const progressTypes = ['sabak', 'para', 'dhor'];
@@ -1957,7 +1987,7 @@
                 const studentsDoc = await getDoc(studentsRef);
                 
                 if (!studentsDoc.exists()) {
-                    // Initialize with default students
+                    // Initialize with default students (already sorted alphabetically)
                     await setDoc(studentsRef, {
                         list: defaultStudents,
                         lastUpdated: new Date().toISOString()
@@ -2008,9 +2038,9 @@
             
             switch(selectedProfile) {
                 case 'teacher':
-                    loginTitle.textContent = '📖 Teacher Login';
-                    accessCodeLabel.textContent = 'Teacher Access Code';
-                    accessCodeInput.placeholder = 'Enter teacher access code';
+                    loginTitle.textContent = '📖 Ustaadh Login';
+                    accessCodeLabel.textContent = 'Ustaadh Access Code';
+                    accessCodeInput.placeholder = 'Enter Ustaadh access code';
                     break;
                 case 'office':
                     loginTitle.textContent = '🕌 Office Login';
@@ -2062,7 +2092,7 @@
                     break;
                 case 'parent':
                     // Check if access code matches any student's access code
-                    const studentInfo = studentAccessCodes[accessCode.toUpperCase()];
+                    const studentInfo = studentAccessCodes[accessCode.toLowerCase()];
                     if (studentInfo) {
                         loginSuccess = true;
                         currentStudent = studentInfo.studentId;
@@ -2118,7 +2148,7 @@
             const permissionNotice = document.getElementById('permissionNotice');
             switch(currentUserType) {
                 case 'teacher':
-                    permissionNotice.textContent = '📖 TEACHER ACCESS - Full read/write permissions';
+                    permissionNotice.textContent = '📖 USTAADH ACCESS - Full read/write permissions';
                     permissionNotice.className = 'permission-notice';
                     break;
                 case 'office':
@@ -2164,7 +2194,7 @@
                     teacherControls.style.display = 'block';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'none';
-                    controlsTitle.textContent = 'Teacher Controls';
+                    controlsTitle.textContent = 'Ustaadh Controls';
                     break;
                     
                 case 'office':
@@ -2207,7 +2237,7 @@
             
             switch(currentUserType) {
                 case 'teacher':
-                    userInfo.textContent = '📖 Teacher - Full Access';
+                    userInfo.textContent = '📖 Ustaadh - Full Access';
                     footerText.textContent = 'Track daily student progress with Firebase real-time sync';
                     break;
                 case 'office':
@@ -2256,6 +2286,9 @@
         function populateStudentTabs(students) {
             const tabsContainer = document.getElementById('studentTabs');
             tabsContainer.innerHTML = '';
+            
+            // Sort students alphabetically by name
+            students.sort((a, b) => a.name.localeCompare(b.name));
             
             if (currentUserType === 'parent') {
                 // Parents only see their child's tab
@@ -2337,12 +2370,14 @@
                 
                 const studentsDoc = await getDoc(doc(db, 'config', 'students'));
                 if (studentsDoc.exists()) {
-                    return studentsDoc.data().list || [];
+                    const students = studentsDoc.data().list || [];
+                    // Sort alphabetically by name
+                    return students.sort((a, b) => a.name.localeCompare(b.name));
                 }
-                return defaultStudents;
+                return defaultStudents.sort((a, b) => a.name.localeCompare(b.name));
             } catch (error) {
                 console.error('Error fetching students:', error);
-                return defaultStudents;
+                return defaultStudents.sort((a, b) => a.name.localeCompare(b.name));
             }
         };
 
@@ -3109,6 +3144,8 @@
                 }
                 
                 await window.saveStudentData(currentStudent, studentData);
+                updateTodaysProgress();
+                updateStats();
                 generateCalendar();
                 closeModal('dayModal');
                 
@@ -3174,7 +3211,7 @@
             }
             
             // Check if access code already exists
-            if (students.find(s => s.accessCode === parentCode.toUpperCase())) {
+            if (students.find(s => s.accessCode === parentCode.toLowerCase())) {
                 alert('This access code is already in use');
                 return;
             }
@@ -3184,7 +3221,7 @@
                 name: name, 
                 parentEmail: `parent_${studentId}@hifz.com`,
                 quranType: quranType,
-                accessCode: parentCode.toUpperCase()
+                accessCode: parentCode.toLowerCase()
             };
             
             students.push(newStudent);
@@ -3201,7 +3238,7 @@
                 
                 populateStudentTabs(students);
                 closeModal('addStudentModal');
-                alert(`Student ${name} added successfully!\nQuran Type: ${quranType} Line\nParent access code: ${parentCode.toUpperCase()}`);
+                alert(`Student ${name} added successfully!\nQuran Type: ${quranType} Line\nParent access code: ${parentCode.toLowerCase()}`);
             } catch (error) {
                 console.error('Error adding student:', error);
                 alert('Error adding student: ' + error.message);
@@ -3313,7 +3350,7 @@
             });
         }
 
-        function generateSelectedPDF() {
+        async function generateSelectedPDF() {
             const studentSelect = document.getElementById('pdfStudentSelect');
             const reportType = document.getElementById('pdfReportType').value;
             const selectedStudent = studentSelect.value;
@@ -3334,34 +3371,34 @@
 
             try {
                 if (typeof window.jspdf === 'undefined') {
-                    alert('PDF library not loaded. Please refresh the page and try again.');
-                    resetPdfButton();
-                    return;
+                    throw new Error('PDF library not loaded. Please refresh the page and try again.');
                 }
 
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
                 if (selectedStudent === 'all') {
-                    generateAllStudentsPDF(doc, reportType);
+                    await generateAllStudentsPDF(doc, reportType);
                 } else {
-                    generateSingleStudentPDF(doc, selectedStudent, reportType);
+                    await generateSingleStudentPDF(doc, selectedStudent, reportType);
                 }
                 
                 closeModal('exportPDFModal');
+                
+                // Reset button state
+                btnText.textContent = originalText;
+                spinner.style.display = 'none';
+                btn.disabled = false;
+                
                 setTimeout(() => {
                     alert('📄 PDF report generated successfully!');
                 }, 500);
-                
-                resetPdfButton();
 
             } catch (error) {
                 console.error('Error generating PDF:', error);
                 alert('Error generating PDF: ' + error.message);
-                resetPdfButton();
-            }
-            
-            function resetPdfButton() {
+                
+                // Reset button state
                 btnText.textContent = originalText;
                 spinner.style.display = 'none';
                 btn.disabled = false;
@@ -3628,7 +3665,7 @@
                 doc.setTextColor(107, 114, 128);
                 doc.setFontSize(8);
                 doc.setFont(undefined, 'normal');
-                doc.text('🕌 Generated by Hifz Record Teacher App', 20, 285);
+                doc.text('🕌 Generated by Hifz Record Ustaadh App', 20, 285);
                 doc.text(`📄 Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
             }
             
@@ -3743,7 +3780,7 @@
             doc.setTextColor(107, 114, 128);
             doc.setFontSize(8);
             doc.setFont(undefined, 'normal');
-            doc.text('🕌 Generated by Hifz Record Teacher App', 20, 285);
+            doc.text('🕌 Generated by Hifz Record Ustaadh App', 20, 285);
             doc.text('📄 Page 1 of 1', 190, 285, { align: 'right' });
 
             const fileName = `all_students_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
