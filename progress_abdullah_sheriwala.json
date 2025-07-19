@@ -38,5 +38,17 @@
   },
   "2025-07-16": {
     "absent": true
+  },
+  "2025-07-15": {
+    "sabak": {
+      "lines": 26,
+      "amount": "26 lines",
+      "pages": 2,
+      "juz": 0.077,
+      "fraction": "2 pages",
+      "grade": "good",
+      "timestamp": "2025-07-19T00:33:17.122Z",
+      "quranType": 13
+    }
   }
 }
