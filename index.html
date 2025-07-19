@@ -1606,7 +1606,7 @@
                                 </div>
                             </div>
                             <div class="progress-status" id="sabakStatus">
-                                <span class="amount-badge">Not Set</span>
+                                <span class="amount-badge">--</span>
                             </div>
                         </div>
                         <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
@@ -1618,7 +1618,7 @@
                                 </div>
                             </div>
                             <div class="progress-status" id="paraStatus">
-                                <span class="amount-badge">Not Set</span>
+                                <span class="amount-badge">--</span>
                             </div>
                         </div>
                         <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
@@ -1630,7 +1630,7 @@
                                 </div>
                             </div>
                             <div class="progress-status" id="dhorStatus">
-                                <span class="amount-badge">Not Set</span>
+                                <span class="amount-badge">--</span>
                             </div>
                         </div>
                     </div>
@@ -2594,7 +2594,7 @@
                         </div>
                     </div>
                     <div class="progress-status" id="sabakStatus">
-                        <span class="amount-badge">Not Set</span>
+                        <span class="amount-badge">--</span>
                     </div>
                 </div>
                 <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
@@ -2606,7 +2606,7 @@
                         </div>
                     </div>
                     <div class="progress-status" id="paraStatus">
-                        <span class="amount-badge">Not Set</span>
+                        <span class="amount-badge">--</span>
                     </div>
                 </div>
                 <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
@@ -2618,7 +2618,7 @@
                         </div>
                     </div>
                     <div class="progress-status" id="dhorStatus">
-                        <span class="amount-badge">Not Set</span>
+                        <span class="amount-badge">--</span>
                     </div>
                 </div>
             `;
@@ -2676,7 +2676,7 @@
                         `;
                     }
                 } else {
-                    statusEl.innerHTML = '<span class="amount-badge">Not Set</span>';
+                    statusEl.innerHTML = '<span class="amount-badge">--</span>';
                 }
             });
 
@@ -3122,7 +3122,7 @@
                             progressRow.style.borderBottom = '1px solid #F2F2F7';
                         }
                         
-                        let statusHtml = '<span class="amount-badge">Not Set</span>';
+                        let statusHtml = '<span class="amount-badge">--</span>';
                         if (entry) {
                             if (item.type === 'sabak' && entry.lines) {
                                 statusHtml = `
