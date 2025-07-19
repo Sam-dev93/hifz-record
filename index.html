@@ -1586,6 +1586,32 @@
             font-size: 12px;
             cursor: pointer;
         }
+
+        /* View Weekend Homework Button */
+        .view-weekend-homework-button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .view-weekend-homework-button:hover {
+            background: #2563EB;
+        }
+
+        @media (min-width: 768px) {
+            .view-weekend-homework-button {
+                font-size: 16px;
+                padding: 16px 32px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2671,6 +2697,12 @@
             return date.getDay() === 5; // Friday = 5
         }
 
+        // Check if current date is weekend (Friday to Sunday)
+        function isWeekendPeriod(date = new Date()) {
+            const day = date.getDay();
+            return day === 5 || day === 6 || day === 0; // Friday = 5, Saturday = 6, Sunday = 0
+        }
+
         async function updateTodaysProgress() {
             if (!currentStudent) return;
             
@@ -2684,6 +2716,7 @@
             const isHolidayToday = isHolidayDate(today);
             const holidayInfo = getHolidayInfo(today);
             const isFridayToday = isFriday(today);
+            const isWeekendPeriodToday = isWeekendPeriod(today);
             
             // Get UI elements
             const progressSectionTitle = document.getElementById('progressSectionTitle');
@@ -2691,8 +2724,8 @@
             const absentButton = document.getElementById('absentButton');
             const weekendHomeworkButton = document.getElementById('weekendHomeworkButton');
             
-            // Show weekend homework button only for teachers on Fridays
-            if (currentUserType === 'teacher' && isFridayToday && !isWeekendToday && !isHolidayToday) {
+            // Show weekend homework button ONLY for teachers on Fridays (and not holidays)
+            if (currentUserType === 'teacher' && isFridayToday && !isHolidayToday) {
                 weekendHomeworkButton.style.display = 'inline-block';
             } else {
                 weekendHomeworkButton.style.display = 'none';
@@ -2710,20 +2743,15 @@
                     weekendHomeworkButton.style.display = 'none';
                 }
                 
-                // Check for weekend homework for parents
+                // Check for weekend homework for parents during weekend period
                 let weekendHomeworkHtml = '';
-                if (currentUserType === 'parent') {
+                if (currentUserType === 'parent' && isWeekendPeriodToday) {
                     const currentWeekHomework = await getWeekendHomework(currentStudent);
                     if (currentWeekHomework) {
                         weekendHomeworkHtml = `
-                            <div style="margin-top: 20px;">
-                                <button onclick="showViewWeekendHomeworkModal()" style="
-                                    background: #3B82F6; color: white; border: none; 
-                                    padding: 12px 24px; border-radius: 10px; 
-                                    font-size: 14px; font-weight: 600; 
-                                    cursor: pointer; width: 100%;
-                                ">📚 View Weekend Homework</button>
-                            </div>
+                            <button onclick="showViewWeekendHomeworkModal()" class="view-weekend-homework-button">
+                                📚 View Weekend Homework
+                            </button>
                         `;
                     }
                 }
@@ -3215,6 +3243,7 @@
                     </div>
                 `;
             } else {
+                // Only show homework items that were actually assigned (checked)
                 let homeworkItems = [];
                 if (homeworkData.sabak) homeworkItems.push('📖 Sabak - Practice new lessons learned this week');
                 if (homeworkData.para) homeworkItems.push('🔄 Sabak Para - Review previous lessons and chapters');
