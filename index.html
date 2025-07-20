@@ -782,8 +782,8 @@
         .progress-status { 
             display: flex; 
             align-items: center; 
-            gap: 8px; 
-            flex-wrap: wrap;
+            gap: 6px;
+            white-space: nowrap;
         }
         
         .amount-badge { 
@@ -807,6 +807,7 @@
             height: 12px;
             border-radius: 50%;
             display: inline-block;
+            flex-shrink: 0;
         }
 
         @media (min-width: 768px) {
@@ -1040,15 +1041,13 @@
         }
 
         .calendar-day.holiday {
-            background: #FFF3CD;
-            border-color: #FF9500;
-            color: #856404;
+            background: #FFF3CD !important;
+            border-color: #FF9500 !important;
+            color: #856404 !important;
         }
 
         .calendar-day.weekend {
-            background: #E8F4FD;
-            border-color: #3B82F6;
-            color: #1E40AF;
+            color: #B8B8B8;
         }
         
         .day-indicators { 
@@ -1149,7 +1148,7 @@
             }
         }
 
-        /* Modal styles */
+        /* Modal styles - INCREASED SIZE */
         .modal { 
             display: none; 
             position: fixed; 
@@ -1164,22 +1163,22 @@
         
         .modal-content { 
             background: white; 
-            margin: 15% auto; 
-            padding: 32px; 
+            margin: 2% auto; 
+            padding: 50px; 
             border-radius: 20px; 
-            width: 90%; 
-            max-width: 350px; 
+            width: 95%; 
+            max-width: 900px; 
             position: relative; 
-            max-height: 70vh; 
+            max-height: 95vh; 
             overflow-y: auto; 
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
         }
 
         @media (min-width: 768px) {
             .modal-content {
-                max-width: 500px;
-                padding: 48px;
-                margin: 10% auto;
+                padding: 70px;
+                width: 90%;
+                max-width: 1000px;
             }
         }
         
@@ -1187,33 +1186,33 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            margin-bottom: 28px; 
-            padding-bottom: 16px; 
+            margin-bottom: 35px; 
+            padding-bottom: 20px; 
             border-bottom: 1px solid #F2F2F7; 
         }
 
         @media (min-width: 768px) {
             .modal-header {
-                margin-bottom: 36px;
-                padding-bottom: 20px;
+                margin-bottom: 45px;
+                padding-bottom: 25px;
             }
         }
         
         .modal-title { 
-            font-size: 20px; 
+            font-size: 24px; 
             font-weight: 700; 
             color: #1C1C1E; 
         }
 
         @media (min-width: 768px) {
             .modal-title {
-                font-size: 24px;
+                font-size: 28px;
             }
         }
         
         .close { 
             color: #8E8E93; 
-            font-size: 28px; 
+            font-size: 32px; 
             font-weight: bold; 
             cursor: pointer; 
             transition: color 0.3s ease; 
@@ -1223,41 +1222,41 @@
 
         @media (min-width: 768px) {
             .close {
-                font-size: 32px;
+                font-size: 36px;
             }
         }
         
         .entry-form { 
             display: flex; 
             flex-direction: column; 
-            gap: 20px; 
+            gap: 25px; 
         }
 
         @media (min-width: 768px) {
             .entry-form {
-                gap: 24px;
+                gap: 30px;
             }
         }
         
         .grade-buttons { 
             display: flex; 
-            gap: 8px; 
+            gap: 12px; 
         }
 
         @media (min-width: 768px) {
             .grade-buttons {
-                gap: 12px;
+                gap: 16px;
             }
         }
         
         .grade-button { 
             flex: 1; 
-            padding: 12px; 
+            padding: 16px; 
             border: 1px solid #E5E5EA; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             background: #F2F2F7; 
             color: #8E8E93; 
-            font-size: 14px; 
+            font-size: 16px; 
             font-weight: 600; 
             cursor: pointer; 
             transition: all 0.3s ease; 
@@ -1265,8 +1264,8 @@
 
         @media (min-width: 768px) {
             .grade-button {
-                padding: 16px;
-                font-size: 16px;
+                padding: 20px;
+                font-size: 18px;
             }
         }
         
@@ -1280,9 +1279,9 @@
             background: #10A37F; 
             color: white; 
             border: none; 
-            padding: 14px; 
+            padding: 18px; 
             border-radius: 12px; 
-            font-size: 16px; 
+            font-size: 18px; 
             font-weight: 600; 
             cursor: pointer; 
             transition: all 0.3s ease; 
@@ -1290,8 +1289,8 @@
 
         @media (min-width: 768px) {
             .save-button {
-                padding: 18px;
-                font-size: 18px;
+                padding: 22px;
+                font-size: 20px;
             }
         }
         
@@ -1299,37 +1298,37 @@
             background: #FF3B30; 
             color: white; 
             border: none; 
-            padding: 12px; 
-            border-radius: 10px; 
-            font-size: 14px; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-size: 16px; 
             font-weight: 600; 
             cursor: pointer; 
-            margin-top: 12px; 
+            margin-top: 15px; 
         }
 
         @media (min-width: 768px) {
             .clear-button {
-                padding: 16px;
-                font-size: 16px;
-                margin-top: 16px;
+                padding: 20px;
+                font-size: 18px;
+                margin-top: 20px;
             }
         }
 
         .form-select { 
             width: 100%; 
-            padding: 12px 16px; 
+            padding: 16px 20px; 
             border: 1px solid #E5E5EA; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             background: #F2F2F7; 
             color: #1C1C1E; 
-            font-size: 16px; 
+            font-size: 18px; 
             transition: all 0.3s ease; 
         }
 
         @media (min-width: 768px) {
             .form-select {
-                padding: 16px 20px;
-                font-size: 18px;
+                padding: 20px 24px;
+                font-size: 20px;
             }
         }
         
@@ -1343,16 +1342,16 @@
         .homework-checkbox-group {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .homework-checkbox {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 16px;
+            gap: 16px;
+            padding: 20px;
             border: 1px solid #E5E5EA;
-            border-radius: 12px;
+            border-radius: 16px;
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -1362,8 +1361,8 @@
         }
 
         .homework-checkbox input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             margin: 0;
             cursor: pointer;
         }
@@ -1373,28 +1372,28 @@
         }
 
         .homework-checkbox-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #1C1C1E;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .homework-checkbox-desc {
-            font-size: 14px;
+            font-size: 16px;
             color: #8E8E93;
         }
 
         .homework-description {
             width: 100%;
-            min-height: 80px;
-            padding: 12px;
+            min-height: 100px;
+            padding: 16px;
             border: 1px solid #E5E5EA;
-            border-radius: 8px;
+            border-radius: 12px;
             background: #F2F2F7;
             color: #1C1C1E;
-            font-size: 14px;
+            font-size: 16px;
             resize: vertical;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .homework-description:focus {
@@ -1878,9 +1877,14 @@
                         <div class="homework-notification-title">📚 New Homework Assigned</div>
                         <div class="homework-notification-desc" id="homeworkNotificationDesc">You have new homework from your teacher</div>
                         <div class="homework-due-date" id="homeworkDueDate">Due: Tomorrow</div>
-                        <button class="homework-button" onclick="showViewHomeworkModal()">
-                            📖 View Homework
-                        </button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="homework-button" onclick="showViewHomeworkModal()" style="flex: 1; margin-top: 0;">
+                                📖 View Homework
+                            </button>
+                            <button class="homework-button" onclick="showParentAllHomeworkModal()" style="flex: 1; margin-top: 0; background: #8E44AD;">
+                                📋 All Homework
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -2090,7 +2094,7 @@
         </div>
     </div>
 
-    <!-- View Homework Modal -->
+    <!-- View Homework Modal (Parent) -->
     <div id="viewHomeworkModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2098,6 +2102,19 @@
                 <span class="close" onclick="closeModal('viewHomeworkModal')">&times;</span>
             </div>
             <div id="homeworkContent">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent All Homework Modal -->
+    <div id="parentAllHomeworkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Your Child's Homework</h2>
+                <span class="close" onclick="closeModal('parentAllHomeworkModal')">&times;</span>
+            </div>
+            <div id="parentAllHomeworkContent">
                 <!-- Content will be populated dynamically -->
             </div>
         </div>
@@ -2842,6 +2859,134 @@
             document.getElementById('viewAllHomeworkModal').style.display = 'block';
         }
 
+        // Parent All Homework Modal function
+        async function showParentAllHomeworkModal() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const homework = await getStudentHomework(currentStudent);
+                const content = document.getElementById('parentAllHomeworkContent');
+                
+                if (!homework || homework.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">No Homework Assigned</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">No homework has been assigned yet.</p>
+                        </div>
+                    `;
+                } else {
+                    // Show all homework with summary at top
+                    const totalHomework = homework.length;
+                    const completedHomework = homework.filter(hw => hw.completed).length;
+                    const pendingHomework = homework.filter(hw => !hw.completed).length;
+                    const today = new Date();
+                    const overdueHomework = homework.filter(hw => !hw.completed && new Date(hw.dueDate) < today).length;
+                    
+                    let homeworkHtml = `
+                        <!-- Summary Section -->
+                        <div style="background: #F8F9FA; border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid #E5E5EA;">
+                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">📊 Homework Summary</h3>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: #1C1C1E;">${totalHomework}</div>
+                                    <div style="font-size: 14px; color: #8E8E93;">Total</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: #34C759;">${completedHomework}</div>
+                                    <div style="font-size: 14px; color: #8E8E93;">Completed</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: #FF9500;">${pendingHomework}</div>
+                                    <div style="font-size: 14px; color: #8E8E93;">Pending</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 700; color: #FF3B30;">${overdueHomework}</div>
+                                    <div style="font-size: 14px; color: #8E8E93;">Overdue</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">📋 All Homework</h3>
+                    `;
+                    
+                    homework.forEach((hw, index) => {
+                        const dueDateObj = new Date(hw.dueDate);
+                        const isOverdue = !hw.completed && dueDateObj < today;
+                        
+                        const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                        
+                        const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                        let typeDescription = '';
+                        
+                        switch(hw.type) {
+                            case 'sabak':
+                                typeDescription = 'Practice new lessons learned recently';
+                                break;
+                            case 'para':
+                                typeDescription = 'Review previous lessons and chapters';
+                                break;
+                            case 'dhor':
+                                typeDescription = 'Revise and strengthen memorized portions';
+                                break;
+                        }
+                        
+                        let statusHtml = '';
+                        let statusColor = '';
+                        if (hw.completed) {
+                            statusHtml = '<span style="color: #34C759; font-weight: 600;">✓ Completed by Teacher</span>';
+                            statusColor = '#D1FAE5';
+                        } else if (isOverdue) {
+                            statusHtml = '<span style="color: #FF3B30; font-weight: 600;">⚠ Overdue</span>';
+                            statusColor = '#FEE2E2';
+                        } else {
+                            statusHtml = '<span style="color: #FF9500; font-weight: 600;">⏳ Pending</span>';
+                            statusColor = '#FEF3C7';
+                        }
+                        
+                        const descriptionHtml = hw.description ? 
+                            `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
+                                <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${hw.description}</p>
+                            </div>` : '';
+                        
+                        homeworkHtml += `
+                            <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : isOverdue ? '#FF3B30' : '#E5E5EA'};">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                    <div>
+                                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay} Homework</h3>
+                                        <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
+                                    </div>
+                                    <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
+                                        ${statusHtml}
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 16px; background: #F8F9FA; border-radius: 12px; margin-bottom: 16px;">
+                                    <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay}</h4>
+                                    <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
+                                </div>
+                                
+                                ${descriptionHtml}
+                            </div>
+                        `;
+                    });
+                    
+                    content.innerHTML = homeworkHtml;
+                }
+                
+                document.getElementById('parentAllHomeworkModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error fetching all homework:', error);
+                alert('Error loading homework: ' + error.message);
+            }
+        }
+
         async function loadAllHomework(filter = 'all') {
             try {
                 const { getDocs, collection } = window.firebaseModules;
@@ -3135,105 +3280,95 @@
                         </div>
                     `;
                 } else {
-                    // Show all homework (completed and pending)
-                    let homeworkHtml = '';
+                    // Show only current/pending homework
+                    const currentHomework = homework.filter(hw => !hw.completed);
                     
-                    homework.forEach((hw, index) => {
-                        const dueDateObj = new Date(hw.dueDate);
-                        const today = new Date();
-                        const isOverdue = !hw.completed && dueDateObj < today;
+                    if (currentHomework.length === 0) {
+                        content.innerHTML = `
+                            <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
+                                <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+                                <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">All Homework Complete!</h3>
+                                <p style="color: #8E8E93; font-size: 14px;">Great work! You have completed all assigned homework.</p>
+                            </div>
+                        `;
+                    } else {
+                        let homeworkHtml = '';
                         
-                        const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
-                            weekday: 'long', 
-                            month: 'long', 
-                            day: 'numeric' 
+                        currentHomework.forEach((hw, index) => {
+                            const dueDateObj = new Date(hw.dueDate);
+                            const today = new Date();
+                            const isOverdue = dueDateObj < today;
+                            
+                            const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
+                                weekday: 'long', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            });
+                            
+                            const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                            let typeDescription = '';
+                            
+                            switch(hw.type) {
+                                case 'sabak':
+                                    typeDescription = 'Practice new lessons learned recently';
+                                    break;
+                                case 'para':
+                                    typeDescription = 'Review previous lessons and chapters';
+                                    break;
+                                case 'dhor':
+                                    typeDescription = 'Revise and strengthen memorized portions';
+                                    break;
+                            }
+                            
+                            let statusHtml = '';
+                            let statusColor = '';
+                            if (isOverdue) {
+                                statusHtml = '<span style="color: #FF3B30; font-weight: 600;">⚠ Overdue</span>';
+                                statusColor = '#FEE2E2';
+                            } else {
+                                statusHtml = '<span style="color: #FF9500; font-weight: 600;">⏳ Pending</span>';
+                                statusColor = '#FEF3C7';
+                            }
+                            
+                            const descriptionHtml = hw.description ? 
+                                `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
+                                    <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
+                                    <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${hw.description}</p>
+                                </div>` : '';
+                            
+                            homeworkHtml += `
+                                <div style="padding: 20px; margin-bottom: 16px; background: white; border-radius: 16px; border: 1px solid ${isOverdue ? '#FF3B30' : '#E5E5EA'};">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                        <div>
+                                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay} Homework</h3>
+                                            <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
+                                        </div>
+                                        <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
+                                            ${statusHtml}
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="padding: 16px; background: #F8F9FA; border-radius: 12px; margin-bottom: 16px;">
+                                        <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay}</h4>
+                                        <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
+                                    </div>
+                                    
+                                    ${descriptionHtml}
+                                </div>
+                            `;
                         });
                         
-                        const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
-                        let typeDescription = '';
-                        
-                        switch(hw.type) {
-                            case 'sabak':
-                                typeDescription = 'Practice new lessons learned recently';
-                                break;
-                            case 'para':
-                                typeDescription = 'Review previous lessons and chapters';
-                                break;
-                            case 'dhor':
-                                typeDescription = 'Revise and strengthen memorized portions';
-                                break;
-                        }
-                        
-                        let statusHtml = '';
-                        let statusColor = '';
-                        if (hw.completed) {
-                            statusHtml = '<span style="color: #34C759; font-weight: 600;">✓ Completed by Teacher</span>';
-                            statusColor = '#D1FAE5';
-                        } else if (isOverdue) {
-                            statusHtml = '<span style="color: #FF3B30; font-weight: 600;">⚠ Overdue</span>';
-                            statusColor = '#FEE2E2';
-                        } else {
-                            statusHtml = '<span style="color: #FF9500; font-weight: 600;">⏳ Pending</span>';
-                            statusColor = '#FEF3C7';
-                        }
-                        
-                        const descriptionHtml = hw.description ? 
-                            `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
-                                <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
-                                <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${hw.description}</p>
-                            </div>` : '';
-                        
-                        homeworkHtml += `
-                            <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : isOverdue ? '#FF3B30' : '#E5E5EA'};">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-                                    <div>
-                                        <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay} Homework</h3>
-                                        <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
-                                    </div>
-                                    <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
-                                        ${statusHtml}
-                                    </div>
+                        content.innerHTML = `
+                            <div style="padding: 20px;">
+                                <div style="text-align: center; margin-bottom: 24px;">
+                                    <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+                                    <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Current Homework</h3>
+                                    <p style="color: #8E8E93; font-size: 14px;">Complete these assignments on time</p>
                                 </div>
                                 
-                                <div style="padding: 16px; background: #F8F9FA; border-radius: 12px; margin-bottom: 16px;">
-                                    <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay}</h4>
-                                    <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
-                                </div>
-                                
-                                ${descriptionHtml}
+                                ${homeworkHtml}
                             </div>
                         `;
-                    });
-                    
-                    content.innerHTML = `
-                        <div style="padding: 20px;">
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
-                                <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Your Homework</h3>
-                                <p style="color: #8E8E93; font-size: 14px;">Review your assigned homework below</p>
-                            </div>
-                            
-                            ${homeworkHtml}
-                        </div>
-                    `;
-                    
-                    // Add parent acknowledgment section only for pending homework
-                    const pendingHomework = homework.filter(hw => !hw.completed);
-                    if (pendingHomework.length > 0) {
-                        const parentReviewHtml = `
-                            <div style="border-top: 1px solid #F2F2F7; padding: 16px 20px; background: #F8F9FA;">
-                                <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">Parent Acknowledgment</h4>
-                                <p style="font-size: 14px; color: #8E8E93; margin-bottom: 12px;">Mark when you have reviewed the homework with your child</p>
-                                <button onclick="acknowledgeHomework()" style="
-                                    background: #34C759; color: white; border: none; 
-                                    padding: 12px 16px; border-radius: 8px; 
-                                    font-size: 14px; font-weight: 600; 
-                                    cursor: pointer; width: 100%;
-                                " id="acknowledgeHomeworkButton">✓ Acknowledge Homework</button>
-                            </div>
-                        `;
-                        
-                        content.innerHTML += parentReviewHtml;
                     }
                 }
                 
@@ -3255,28 +3390,6 @@
             } catch (error) {
                 console.error('Error acknowledging homework:', error);
                 alert('Error acknowledging homework: ' + error.message);
-            }
-        }
-
-        async function markHomeworkReviewed(homeworkId) {
-            try {
-                const { updateDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                await updateDoc(doc(db, 'homework', homeworkId), {
-                    reviewed: true,
-                    reviewedDate: new Date().toISOString()
-                });
-                
-                closeModal('viewHomeworkModal');
-                alert('Homework marked as reviewed!');
-                
-                // Refresh homework check
-                await checkForHomework();
-                
-            } catch (error) {
-                console.error('Error marking homework as reviewed:', error);
-                alert('Error marking homework as reviewed: ' + error.message);
             }
         }
 
@@ -3527,7 +3640,7 @@
                         
                         statusEl.innerHTML = `
                             <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                                <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                <div style="display: flex; gap: 4px; align-items: center;">
                                     <span class="amount-badge">${entry.lines} lines</span>
                                     <span class="grade-badge ${entry.grade}"></span>
                                     ${parentCheckHtml}
@@ -3548,7 +3661,7 @@
                         }
                         
                         statusEl.innerHTML = `
-                            <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 4px; align-items: center;">
                                 <span class="amount-badge">${entry.amount || entry.lines + ' lines'}</span>
                                 <span class="grade-badge ${entry.grade}"></span>
                                 ${parentCheckHtml}
@@ -3865,12 +3978,12 @@
                 
                 const dateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 
-                // Style weekends
+                // Style weekends - just lighter text, no special background
                 if (isWeekendDay && isCurrentMonthDay) {
                     dayEl.classList.add('weekend');
                 }
                 
-                // Check if it's a holiday
+                // Check if it's a holiday - holidays override weekend styling
                 if (isCurrentMonthDay && isHolidayDate(currentDate)) {
                     dayEl.classList.add('holiday');
                     const holidayInfo = getHolidayInfo(currentDate);
@@ -4534,13 +4647,225 @@
             return holiday || null;
         }
 
-        // PDF Export Functions (simplified for this demo)
+        // PDF Export Functions (simplified for this demo with homework summary)
         function exportStudentPDF() {
-            alert('PDF export functionality would be implemented here');
+            document.getElementById('exportPDFModal').style.display = 'block';
+            
+            // Populate student dropdown for PDF export
+            window.getStudents().then(students => {
+                const select = document.getElementById('pdfStudentSelect');
+                const existingOptions = select.querySelectorAll('option');
+                
+                // Clear existing options except first two
+                for (let i = existingOptions.length - 1; i >= 2; i--) {
+                    existingOptions[i].remove();
+                }
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            });
         }
 
-        function generateSelectedPDF() {
-            alert('PDF generation functionality would be implemented here');
+        async function generateSelectedPDF() {
+            const studentId = document.getElementById('pdfStudentSelect').value;
+            const reportType = document.getElementById('pdfReportType').value;
+            
+            if (!studentId) {
+                alert('Please select a student for PDF report');
+                return;
+            }
+            
+            // Show loading
+            const btn = document.getElementById('generatePDFBtn');
+            const spinner = document.getElementById('modalPdfSpinner');
+            const btnText = document.getElementById('modalPdfBtnText');
+            
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Generating PDF...';
+            btn.disabled = true;
+            
+            try {
+                if (studentId === 'all') {
+                    await generateAllStudentsPDF(reportType);
+                } else {
+                    await generateSingleStudentPDF(studentId, reportType);
+                }
+                
+                closeModal('exportPDFModal');
+                alert('PDF report generated successfully!');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF: ' + error.message);
+            } finally {
+                // Hide loading
+                spinner.style.display = 'none';
+                btnText.textContent = '📄 Generate PDF Report';
+                btn.disabled = false;
+            }
+        }
+
+        async function generateSingleStudentPDF(studentId, reportType) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentData = await window.getStudentData(studentId);
+            const homework = await getStudentHomework(studentId);
+            
+            // Create PDF with homework summary
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            
+            // Header
+            pdf.setFontSize(20);
+            pdf.text('📖 Hifz Progress Report', 20, 20);
+            
+            pdf.setFontSize(14);
+            pdf.text(`Student: ${student.name}`, 20, 35);
+            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 45);
+            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
+            
+            let yPosition = 75;
+            
+            // Homework Summary Section
+            if (homework && homework.length > 0) {
+                pdf.setFontSize(16);
+                pdf.text('📚 Homework Summary', 20, yPosition);
+                yPosition += 15;
+                
+                const totalHomework = homework.length;
+                const completedHomework = homework.filter(hw => hw.completed).length;
+                const pendingHomework = homework.filter(hw => !hw.completed).length;
+                const today = new Date();
+                const overdueHomework = homework.filter(hw => !hw.completed && new Date(hw.dueDate) < today).length;
+                
+                pdf.setFontSize(12);
+                pdf.text(`Total Homework Assigned: ${totalHomework}`, 25, yPosition);
+                yPosition += 8;
+                pdf.text(`Completed: ${completedHomework}`, 25, yPosition);
+                yPosition += 8;
+                pdf.text(`Pending: ${pendingHomework}`, 25, yPosition);
+                yPosition += 8;
+                pdf.text(`Overdue: ${overdueHomework}`, 25, yPosition);
+                yPosition += 8;
+                
+                const completionRate = totalHomework > 0 ? Math.round((completedHomework / totalHomework) * 100) : 0;
+                pdf.text(`Completion Rate: ${completionRate}%`, 25, yPosition);
+                yPosition += 20;
+            } else {
+                pdf.setFontSize(16);
+                pdf.text('📚 Homework Summary', 20, yPosition);
+                yPosition += 15;
+                pdf.setFontSize(12);
+                pdf.text('No homework has been assigned yet.', 25, yPosition);
+                yPosition += 20;
+            }
+            
+            // Progress Summary Section
+            pdf.setFontSize(16);
+            pdf.text('📊 Progress Summary', 20, yPosition);
+            yPosition += 15;
+            
+            const progressStats = { sabak: 0, para: 0, dhor: 0 };
+            let totalDays = 0;
+            
+            Object.entries(studentData).forEach(([date, dayData]) => {
+                if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    totalDays++;
+                    progressTypes.forEach(type => {
+                        if (dayData[type]) {
+                            progressStats[type]++;
+                        }
+                    });
+                }
+            });
+            
+            pdf.setFontSize(12);
+            pdf.text(`Total Days Recorded: ${totalDays}`, 25, yPosition);
+            yPosition += 8;
+            pdf.text(`Sabak (New Lessons): ${progressStats.sabak} days`, 25, yPosition);
+            yPosition += 8;
+            pdf.text(`Sabak Para (Previous Lessons): ${progressStats.para} days`, 25, yPosition);
+            yPosition += 8;
+            pdf.text(`Dhor (Revision): ${progressStats.dhor} days`, 25, yPosition);
+            yPosition += 15;
+            
+            // Save PDF
+            pdf.save(`${student.name}_${reportType}_report.pdf`);
+        }
+
+        async function generateAllStudentsPDF(reportType) {
+            const students = await window.getStudents();
+            
+            // Create PDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            
+            // Header
+            pdf.setFontSize(20);
+            pdf.text('📖 All Students Progress Report', 20, 20);
+            
+            pdf.setFontSize(14);
+            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 35);
+            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45);
+            
+            let yPosition = 65;
+            
+            for (const student of students) {
+                if (yPosition > 250) {
+                    pdf.addPage();
+                    yPosition = 20;
+                }
+                
+                const studentData = await window.getStudentData(student.id);
+                const homework = await getStudentHomework(student.id);
+                
+                // Student header
+                pdf.setFontSize(16);
+                pdf.text(`👤 ${student.name}`, 20, yPosition);
+                yPosition += 12;
+                
+                // Homework summary
+                if (homework && homework.length > 0) {
+                    const totalHomework = homework.length;
+                    const completedHomework = homework.filter(hw => hw.completed).length;
+                    const completionRate = Math.round((completedHomework / totalHomework) * 100);
+                    
+                    pdf.setFontSize(10);
+                    pdf.text(`Homework: ${completedHomework}/${totalHomework} (${completionRate}%)`, 25, yPosition);
+                    yPosition += 8;
+                } else {
+                    pdf.setFontSize(10);
+                    pdf.text('Homework: No assignments', 25, yPosition);
+                    yPosition += 8;
+                }
+                
+                // Progress summary
+                const progressStats = { sabak: 0, para: 0, dhor: 0 };
+                let totalDays = 0;
+                
+                Object.entries(studentData).forEach(([date, dayData]) => {
+                    if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        totalDays++;
+                        progressTypes.forEach(type => {
+                            if (dayData[type]) {
+                                progressStats[type]++;
+                            }
+                        });
+                    }
+                });
+                
+                pdf.text(`Progress: Sabak(${progressStats.sabak}) Para(${progressStats.para}) Dhor(${progressStats.dhor}) - Total: ${totalDays} days`, 25, yPosition);
+                yPosition += 15;
+            }
+            
+            // Save PDF
+            pdf.save(`all_students_${reportType}_report.pdf`);
         }
 
         function showResetModal() {
@@ -4586,7 +4911,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
+            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'parentAllHomeworkModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -4661,6 +4986,7 @@
         window.showAssignHomeworkModal = showAssignHomeworkModal;
         window.assignHomework = assignHomework;
         window.showViewHomeworkModal = showViewHomeworkModal;
+        window.showParentAllHomeworkModal = showParentAllHomeworkModal;
         window.showViewAllHomeworkModal = showViewAllHomeworkModal;
         window.loadAllHomework = loadAllHomework;
         window.toggleHomeworkCompletion = toggleHomeworkCompletion;
