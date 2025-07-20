@@ -973,7 +973,7 @@
         
         .calendar-grid { 
             display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
+            grid-template-columns: repeat(7, 1fr); 
             gap: 4px; 
             margin-top: 12px; 
         }
@@ -1618,6 +1618,156 @@
             font-weight: 600;
             margin-bottom: 16px;
         }
+
+        /* Homework management styles */
+        .homework-item {
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .homework-item.completed {
+            background: #F0F9FF;
+            border-color: #34C759;
+        }
+
+        .homework-item.overdue {
+            background: #FEF2F2;
+            border-color: #FF3B30;
+        }
+
+        .homework-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .homework-student-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 4px;
+        }
+
+        .homework-type-badge {
+            background: #3B82F6;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .homework-type-badge.sabak {
+            background: #10A37F;
+        }
+
+        .homework-type-badge.para {
+            background: #8E44AD;
+        }
+
+        .homework-type-badge.dhor {
+            background: #FF9500;
+        }
+
+        .homework-details {
+            color: #8E8E93;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .homework-description {
+            background: #F8F9FA;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1C1C1E;
+            margin-bottom: 12px;
+        }
+
+        .homework-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .homework-toggle {
+            background: #34C759;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .homework-toggle.incomplete {
+            background: #FF3B30;
+        }
+
+        .homework-toggle:hover {
+            opacity: 0.8;
+        }
+
+        .homework-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .homework-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .homework-status.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .homework-status.overdue {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .homework-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-button {
+            background: #F2F2F7;
+            border: 1px solid #E5E5EA;
+            color: #8E8E93;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-button.active {
+            background: #10A37F;
+            border-color: #10A37F;
+            color: white;
+        }
+
+        .no-homework {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8E8E93;
+        }
     </style>
 </head>
 <body>
@@ -1826,6 +1976,7 @@
                             <button class="control-button" onclick="showAddStudentModal()">➕ Add New Student</button>
                             <button class="control-button" onclick="showRemoveStudentModal()">➖ Remove Student</button>
                             <button class="control-button" onclick="showAssignHomeworkModal()">📚 Assign Homework</button>
+                            <button class="control-button" onclick="showViewAllHomeworkModal()">📋 View All Homework</button>
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="pdfSpinner"></div>
@@ -1922,6 +2073,19 @@
                     <textarea class="homework-description" id="homeworkDescriptionInput" placeholder="Enter homework details and instructions..."></textarea>
                 </div>
                 <button class="save-button" onclick="assignHomework()">Assign Homework</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View All Homework Modal (Teacher) -->
+    <div id="viewAllHomeworkModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">All Homework Assignments</h2>
+                <span class="close" onclick="closeModal('viewAllHomeworkModal')">&times;</span>
+            </div>
+            <div id="allHomeworkContent">
+                <!-- Content will be populated dynamically -->
             </div>
         </div>
     </div>
@@ -2671,6 +2835,175 @@
             }
         }
 
+        function showViewAllHomeworkModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            loadAllHomework();
+            document.getElementById('viewAllHomeworkModal').style.display = 'block';
+        }
+
+        async function loadAllHomework(filter = 'all') {
+            try {
+                const { getDocs, collection } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const querySnapshot = await getDocs(collection(db, 'homework'));
+                const allHomework = [];
+                
+                querySnapshot.forEach((doc) => {
+                    allHomework.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by assigned date (newest first)
+                allHomework.sort((a, b) => new Date(b.assignedDate) - new Date(a.assignedDate));
+                
+                // Get student names
+                const students = await window.getStudents();
+                
+                // Filter homework based on selection
+                let filteredHomework = allHomework;
+                if (filter === 'pending') {
+                    filteredHomework = allHomework.filter(hw => !hw.completed);
+                } else if (filter === 'completed') {
+                    filteredHomework = allHomework.filter(hw => hw.completed);
+                } else if (filter === 'overdue') {
+                    const today = new Date();
+                    filteredHomework = allHomework.filter(hw => !hw.completed && new Date(hw.dueDate) < today);
+                }
+                
+                displayAllHomework(filteredHomework, students, filter);
+                
+            } catch (error) {
+                console.error('Error loading homework:', error);
+            }
+        }
+
+        function displayAllHomework(homework, students, currentFilter) {
+            const content = document.getElementById('allHomeworkContent');
+            
+            const filtersHtml = `
+                <div class="homework-filters">
+                    <button class="filter-button ${currentFilter === 'all' ? 'active' : ''}" onclick="loadAllHomework('all')">All</button>
+                    <button class="filter-button ${currentFilter === 'pending' ? 'active' : ''}" onclick="loadAllHomework('pending')">Pending</button>
+                    <button class="filter-button ${currentFilter === 'completed' ? 'active' : ''}" onclick="loadAllHomework('completed')">Completed</button>
+                    <button class="filter-button ${currentFilter === 'overdue' ? 'active' : ''}" onclick="loadAllHomework('overdue')">Overdue</button>
+                </div>
+            `;
+            
+            if (homework.length === 0) {
+                content.innerHTML = filtersHtml + `
+                    <div class="no-homework">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+                        <h3 style="font-size: 18px; margin-bottom: 8px;">No Homework Found</h3>
+                        <p>No homework matches the current filter.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let homeworkListHtml = '';
+            
+            homework.forEach(hw => {
+                const student = students.find(s => s.id === hw.studentId);
+                const studentName = student ? student.name : 'Unknown Student';
+                
+                const dueDateObj = new Date(hw.dueDate);
+                const today = new Date();
+                const isOverdue = !hw.completed && dueDateObj < today;
+                
+                const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                
+                let statusHtml = '';
+                if (hw.completed) {
+                    statusHtml = '<span class="homework-status completed">✓ Completed</span>';
+                } else if (isOverdue) {
+                    statusHtml = '<span class="homework-status overdue">⚠ Overdue</span>';
+                } else {
+                    statusHtml = '<span class="homework-status pending">⏳ Pending</span>';
+                }
+                
+                const descriptionHtml = hw.description ? 
+                    `<div class="homework-description">${hw.description}</div>` : '';
+                
+                homeworkListHtml += `
+                    <div class="homework-item ${hw.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                        <div class="homework-header">
+                            <div>
+                                <div class="homework-student-name">${studentName}</div>
+                                <div class="homework-details">
+                                    <span class="homework-type-badge ${hw.type}">${typeDisplay}</span>
+                                    Due: ${dueDateStr}
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                ${statusHtml}
+                            </div>
+                        </div>
+                        
+                        ${descriptionHtml}
+                        
+                        <div class="homework-actions">
+                            <button class="homework-toggle ${hw.completed ? 'complete' : 'incomplete'}" 
+                                    onclick="toggleHomeworkCompletion('${hw.id}', ${!hw.completed})">
+                                ${hw.completed ? '✓ Mark Incomplete' : '✓ Mark Complete'}
+                            </button>
+                            <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
+                                    style="background: #FF3B30;">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = filtersHtml + homeworkListHtml;
+        }
+
+        async function toggleHomeworkCompletion(homeworkId, completed) {
+            try {
+                const { updateDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await updateDoc(doc(db, 'homework', homeworkId), {
+                    completed: completed,
+                    completedDate: completed ? new Date().toISOString() : null
+                });
+                
+                // Reload the homework list
+                loadAllHomework(document.querySelector('.filter-button.active').textContent.toLowerCase());
+                
+            } catch (error) {
+                console.error('Error updating homework completion:', error);
+                alert('Error updating homework: ' + error.message);
+            }
+        }
+
+        async function deleteHomework(homeworkId) {
+            if (!confirm('Are you sure you want to delete this homework assignment?')) {
+                return;
+            }
+            
+            try {
+                const { deleteDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await deleteDoc(doc(db, 'homework', homeworkId));
+                
+                // Reload the homework list
+                loadAllHomework(document.querySelector('.filter-button.active').textContent.toLowerCase());
+                
+            } catch (error) {
+                console.error('Error deleting homework:', error);
+                alert('Error deleting homework: ' + error.message);
+            }
+        }
+
         function showAssignHomeworkModal() {
             if (currentUserType !== 'teacher') return;
             
@@ -2802,68 +3135,106 @@
                         </div>
                     `;
                 } else {
-                    // Show the latest homework
-                    const latestHomework = homework.find(hw => !hw.completed) || homework[0];
+                    // Show all homework (completed and pending)
+                    let homeworkHtml = '';
                     
-                    const dueDateObj = new Date(latestHomework.dueDate);
-                    const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        month: 'long', 
-                        day: 'numeric' 
+                    homework.forEach((hw, index) => {
+                        const dueDateObj = new Date(hw.dueDate);
+                        const today = new Date();
+                        const isOverdue = !hw.completed && dueDateObj < today;
+                        
+                        const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                        
+                        const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                        let typeDescription = '';
+                        
+                        switch(hw.type) {
+                            case 'sabak':
+                                typeDescription = 'Practice new lessons learned recently';
+                                break;
+                            case 'para':
+                                typeDescription = 'Review previous lessons and chapters';
+                                break;
+                            case 'dhor':
+                                typeDescription = 'Revise and strengthen memorized portions';
+                                break;
+                        }
+                        
+                        let statusHtml = '';
+                        let statusColor = '';
+                        if (hw.completed) {
+                            statusHtml = '<span style="color: #34C759; font-weight: 600;">✓ Completed by Teacher</span>';
+                            statusColor = '#D1FAE5';
+                        } else if (isOverdue) {
+                            statusHtml = '<span style="color: #FF3B30; font-weight: 600;">⚠ Overdue</span>';
+                            statusColor = '#FEE2E2';
+                        } else {
+                            statusHtml = '<span style="color: #FF9500; font-weight: 600;">⏳ Pending</span>';
+                            statusColor = '#FEF3C7';
+                        }
+                        
+                        const descriptionHtml = hw.description ? 
+                            `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
+                                <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${hw.description}</p>
+                            </div>` : '';
+                        
+                        homeworkHtml += `
+                            <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : isOverdue ? '#FF3B30' : '#E5E5EA'};">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                    <div>
+                                        <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay} Homework</h3>
+                                        <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
+                                    </div>
+                                    <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
+                                        ${statusHtml}
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 16px; background: #F8F9FA; border-radius: 12px; margin-bottom: 16px;">
+                                    <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay}</h4>
+                                    <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
+                                </div>
+                                
+                                ${descriptionHtml}
+                            </div>
+                        `;
                     });
-                    
-                    const typeDisplay = latestHomework.type.charAt(0).toUpperCase() + latestHomework.type.slice(1);
-                    let typeDescription = '';
-                    
-                    switch(latestHomework.type) {
-                        case 'sabak':
-                            typeDescription = 'Practice new lessons learned recently';
-                            break;
-                        case 'para':
-                            typeDescription = 'Review previous lessons and chapters';
-                            break;
-                        case 'dhor':
-                            typeDescription = 'Revise and strengthen memorized portions';
-                            break;
-                    }
-                    
-                    const descriptionHtml = latestHomework.description ? 
-                        `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
-                            <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
-                            <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${latestHomework.description}</p>
-                        </div>` : '';
                     
                     content.innerHTML = `
                         <div style="padding: 20px;">
                             <div style="text-align: center; margin-bottom: 24px;">
                                 <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
-                                <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">${typeDisplay} Homework</h3>
-                                <p style="color: #8E8E93; font-size: 14px; margin-top: 8px;">Due: ${dueDateStr}</p>
+                                <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Your Homework</h3>
+                                <p style="color: #8E8E93; font-size: 14px;">Review your assigned homework below</p>
                             </div>
                             
-                            <div style="margin-bottom: 16px; padding: 16px; background: #F8F9FA; border-radius: 12px;">
-                                <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay}</h4>
-                                <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
-                            </div>
-                            
-                            ${descriptionHtml}
+                            ${homeworkHtml}
                         </div>
                     `;
                     
-                    // Add parent review section
-                    const parentReviewHtml = `
-                        <div style="border-top: 1px solid #F2F2F7; padding: 16px 20px; background: #F8F9FA;">
-                            <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">Parent Review</h4>
-                            <button onclick="markHomeworkReviewed('${latestHomework.id}')" style="
-                                background: #34C759; color: white; border: none; 
-                                padding: 12px 16px; border-radius: 8px; 
-                                font-size: 14px; font-weight: 600; 
-                                cursor: pointer; width: 100%;
-                            " id="homeworkReviewButton">✓ Mark as Reviewed</button>
-                        </div>
-                    `;
-                    
-                    content.innerHTML += parentReviewHtml;
+                    // Add parent acknowledgment section only for pending homework
+                    const pendingHomework = homework.filter(hw => !hw.completed);
+                    if (pendingHomework.length > 0) {
+                        const parentReviewHtml = `
+                            <div style="border-top: 1px solid #F2F2F7; padding: 16px 20px; background: #F8F9FA;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">Parent Acknowledgment</h4>
+                                <p style="font-size: 14px; color: #8E8E93; margin-bottom: 12px;">Mark when you have reviewed the homework with your child</p>
+                                <button onclick="acknowledgeHomework()" style="
+                                    background: #34C759; color: white; border: none; 
+                                    padding: 12px 16px; border-radius: 8px; 
+                                    font-size: 14px; font-weight: 600; 
+                                    cursor: pointer; width: 100%;
+                                " id="acknowledgeHomeworkButton">✓ Acknowledge Homework</button>
+                            </div>
+                        `;
+                        
+                        content.innerHTML += parentReviewHtml;
+                    }
                 }
                 
                 document.getElementById('viewHomeworkModal').style.display = 'block';
@@ -2871,6 +3242,41 @@
             } catch (error) {
                 console.error('Error fetching homework:', error);
                 alert('Error loading homework: ' + error.message);
+            }
+        }
+
+        async function acknowledgeHomework() {
+            try {
+                // For simplicity, we'll just show a confirmation
+                // In a real app, you might want to track acknowledgments separately
+                alert('Thank you for acknowledging the homework! Please help your child complete it by the due date.');
+                closeModal('viewHomeworkModal');
+                
+            } catch (error) {
+                console.error('Error acknowledging homework:', error);
+                alert('Error acknowledging homework: ' + error.message);
+            }
+        }
+
+        async function markHomeworkReviewed(homeworkId) {
+            try {
+                const { updateDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await updateDoc(doc(db, 'homework', homeworkId), {
+                    reviewed: true,
+                    reviewedDate: new Date().toISOString()
+                });
+                
+                closeModal('viewHomeworkModal');
+                alert('Homework marked as reviewed!');
+                
+                // Refresh homework check
+                await checkForHomework();
+                
+            } catch (error) {
+                console.error('Error marking homework as reviewed:', error);
+                alert('Error marking homework as reviewed: ' + error.message);
             }
         }
 
@@ -3411,8 +3817,8 @@
             
             grid.innerHTML = '';
             
-            // Only show Monday to Friday
-            const dayHeaders = ['M', 'T', 'W', 'T', 'F'];
+            // Show all 7 days of the week including weekends
+            const dayHeaders = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
             dayHeaders.forEach(header => {
                 const headerEl = document.createElement('div');
                 headerEl.className = 'day-header';
@@ -3424,41 +3830,56 @@
             const lastDay = new Date(currentDisplayYear, currentDisplayMonth, 0);
             const daysInMonth = lastDay.getDate();
             
+            // Get the first Monday of the calendar grid
+            const startDate = new Date(firstDay);
+            const dayOfWeek = firstDay.getDay();
+            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Monday = 0, Sunday = 6
+            startDate.setDate(firstDay.getDate() - daysToSubtract);
+            
             const today = new Date();
             const isCurrentMonth = today.getFullYear() === currentDisplayYear && 
                                   today.getMonth() + 1 === currentDisplayMonth;
             const todayDate = today.getDate();
             
-            // Generate calendar for weekdays only
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(currentDisplayYear, currentDisplayMonth - 1, day);
-                const dayOfWeek = date.getDay();
+            // Generate calendar grid (6 weeks = 42 days)
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
                 
-                // Skip weekends (Saturday = 6, Sunday = 0)
-                if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+                const day = currentDate.getDate();
+                const isCurrentMonthDay = currentDate.getMonth() + 1 === currentDisplayMonth;
+                const dayOfWeek = currentDate.getDay();
+                const isWeekendDay = (dayOfWeek === 0 || dayOfWeek === 6); // Saturday = 6, Sunday = 0
                 
                 const dayEl = document.createElement('div');
                 dayEl.className = 'calendar-day';
-                dayEl.innerHTML = `<div>${day}</div>`;
+                dayEl.innerHTML = `<div style="opacity: ${isCurrentMonthDay ? '1' : '0.3'}">${day}</div>`;
                 
-                // Add click handler
-                dayEl.style.cursor = 'pointer';
-                dayEl.addEventListener('click', function() {
-                    openDayModal(day);
-                });
+                // Add click handler only for current month days
+                if (isCurrentMonthDay) {
+                    dayEl.style.cursor = 'pointer';
+                    dayEl.addEventListener('click', function() {
+                        openDayModal(day);
+                    });
+                }
                 
-                const dateKey = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                // Style weekends
+                if (isWeekendDay && isCurrentMonthDay) {
+                    dayEl.classList.add('weekend');
+                }
                 
                 // Check if it's a holiday
-                if (isHolidayDate(date)) {
+                if (isCurrentMonthDay && isHolidayDate(currentDate)) {
                     dayEl.classList.add('holiday');
-                    const holidayInfo = getHolidayInfo(date);
+                    const holidayInfo = getHolidayInfo(currentDate);
                     if (holidayInfo) {
                         dayEl.title = `Holiday: ${holidayInfo.name}`;
                     }
                 }
                 
-                if (currentStudent) {
+                if (currentStudent && isCurrentMonthDay) {
                     window.getStudentData(currentStudent).then(studentData => {
                         const dayData = studentData[dateKey];
                         
@@ -3473,14 +3894,16 @@
                                 const indicators = document.createElement('div');
                                 indicators.className = 'day-indicators';
                                 
-                                // Show progress indicators
-                                progressTypes.forEach(type => {
-                                    if (dayData[type]) {
-                                        const indicator = document.createElement('div');
-                                        indicator.className = `indicator ${type}`;
-                                        indicators.appendChild(indicator);
-                                    }
-                                });
+                                // Show progress indicators (only for weekdays)
+                                if (!isWeekendDay) {
+                                    progressTypes.forEach(type => {
+                                        if (dayData[type]) {
+                                            const indicator = document.createElement('div');
+                                            indicator.className = `indicator ${type}`;
+                                            indicators.appendChild(indicator);
+                                        }
+                                    });
+                                }
                                 
                                 // Add parent check indicator (blue tick)
                                 if (dayData.parentChecked) {
@@ -3497,7 +3920,7 @@
                     });
                 }
                 
-                if (isCurrentMonth && day === todayDate) {
+                if (isCurrentMonth && day === todayDate && isCurrentMonthDay) {
                     dayEl.classList.add('today');
                 }
                 
@@ -4163,7 +4586,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
+            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -4238,6 +4661,11 @@
         window.showAssignHomeworkModal = showAssignHomeworkModal;
         window.assignHomework = assignHomework;
         window.showViewHomeworkModal = showViewHomeworkModal;
+        window.showViewAllHomeworkModal = showViewAllHomeworkModal;
+        window.loadAllHomework = loadAllHomework;
+        window.toggleHomeworkCompletion = toggleHomeworkCompletion;
+        window.deleteHomework = deleteHomework;
+        window.acknowledgeHomework = acknowledgeHomework;
         window.markHomeworkReviewed = markHomeworkReviewed;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
