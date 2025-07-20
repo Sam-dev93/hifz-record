@@ -925,33 +925,35 @@
             cursor: not-allowed;
         }
 
-        .weekend-homework-button {
-            background: #3B82F6;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: 8px;
-        }
-
-        @media (min-width: 768px) {
-            .weekend-homework-button {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-        }
-
-        .weekend-homework-button:hover {
-            background: #2563EB;
-        }
-        
         .today-progress.absent { 
             opacity: 0.5; 
             pointer-events: none; 
+        }
+
+        /* Homework Button */
+        .homework-button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .homework-button:hover {
+            background: #2563EB;
+        }
+
+        @media (min-width: 768px) {
+            .homework-button {
+                font-size: 16px;
+                padding: 16px 32px;
+            }
         }
 
         /* Calendar styles */
@@ -1587,30 +1589,34 @@
             cursor: pointer;
         }
 
-        /* View Weekend Homework Button */
-        .view-weekend-homework-button {
-            background: #3B82F6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 14px;
+        /* Homework notification styles */
+        .homework-notification {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3B82F6;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .homework-notification-title {
+            font-size: 16px;
             font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            transition: all 0.3s ease;
+            color: #1E40AF;
+            margin-bottom: 8px;
         }
 
-        .view-weekend-homework-button:hover {
-            background: #2563EB;
+        .homework-notification-desc {
+            font-size: 14px;
+            color: #1E40AF;
+            margin-bottom: 12px;
         }
 
-        @media (min-width: 768px) {
-            .view-weekend-homework-button {
-                font-size: 16px;
-                padding: 16px 32px;
-            }
+        .homework-due-date {
+            font-size: 12px;
+            color: #1E40AF;
+            font-weight: 600;
+            margin-bottom: 16px;
         }
     </style>
 </head>
@@ -1716,6 +1722,18 @@
                     </div>
                 </div>
 
+                <!-- Homework Section (for Parents) -->
+                <div class="section" id="homeworkSection" style="display: none;">
+                    <div id="homeworkNotification" class="homework-notification">
+                        <div class="homework-notification-title">📚 New Homework Assigned</div>
+                        <div class="homework-notification-desc" id="homeworkNotificationDesc">You have new homework from your teacher</div>
+                        <div class="homework-due-date" id="homeworkDueDate">Due: Tomorrow</div>
+                        <button class="homework-button" onclick="showViewHomeworkModal()">
+                            📖 View Homework
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Today's Progress -->
                 <div class="section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -1723,9 +1741,6 @@
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <button class="absent-button" onclick="toggleAbsent()" id="absentButton" style="display: none;">
                                 🔴 Absent
-                            </button>
-                            <button class="weekend-homework-button" onclick="showWeekendHomeworkModal()" id="weekendHomeworkButton" style="display: none;">
-                                📚 Weekend Homework
                             </button>
                         </div>
                     </div>
@@ -1810,6 +1825,7 @@
                         <div id="teacherControls" style="display: none;">
                             <button class="control-button" onclick="showAddStudentModal()">➕ Add New Student</button>
                             <button class="control-button" onclick="showRemoveStudentModal()">➖ Remove Student</button>
+                            <button class="control-button" onclick="showAssignHomeworkModal()">📚 Assign Homework</button>
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="pdfSpinner"></div>
@@ -1874,57 +1890,50 @@
         </div>
     </div>
 
-    <!-- Weekend Homework Modal -->
-    <div id="weekendHomeworkModal" class="modal">
+    <!-- Assign Homework Modal -->
+    <div id="assignHomeworkModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Weekend Homework</h2>
-                <span class="close" onclick="closeModal('weekendHomeworkModal')">&times;</span>
+                <h2 class="modal-title">Assign Homework</h2>
+                <span class="close" onclick="closeModal('assignHomeworkModal')">&times;</span>
             </div>
             <div class="entry-form">
                 <div class="form-group">
-                    <label class="form-label">Select what the student should practice over the weekend:</label>
-                    <div class="homework-checkbox-group">
-                        <label class="homework-checkbox">
-                            <input type="checkbox" id="homeworkSabak">
-                            <div class="homework-checkbox-content">
-                                <div class="homework-checkbox-title">Sabak</div>
-                                <div class="homework-checkbox-desc">Practice new lessons learned this week</div>
-                            </div>
-                        </label>
-                        <label class="homework-checkbox">
-                            <input type="checkbox" id="homeworkPara">
-                            <div class="homework-checkbox-content">
-                                <div class="homework-checkbox-title">Sabak Para</div>
-                                <div class="homework-checkbox-desc">Review previous lessons and chapters</div>
-                            </div>
-                        </label>
-                        <label class="homework-checkbox">
-                            <input type="checkbox" id="homeworkDhor">
-                            <div class="homework-checkbox-content">
-                                <div class="homework-checkbox-title">Dhor</div>
-                                <div class="homework-checkbox-desc">Revise and strengthen memorized portions</div>
-                            </div>
-                        </label>
-                    </div>
+                    <label class="form-label">Select Student</label>
+                    <select class="form-select" id="homeworkStudentSelect">
+                        <option value="">Choose student</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Additional Instructions (Optional)</label>
-                    <textarea class="homework-description" id="homeworkDescription" placeholder="Add specific instructions or details for the weekend homework..."></textarea>
+                    <label class="form-label">Homework Type</label>
+                    <select class="form-select" id="homeworkTypeSelect">
+                        <option value="">Select homework type</option>
+                        <option value="sabak">Sabak - New Lessons</option>
+                        <option value="para">Sabak Para - Previous Lessons</option>
+                        <option value="dhor">Dhor - Revision</option>
+                    </select>
                 </div>
-                <button class="save-button" onclick="saveWeekendHomework()">Save Weekend Homework</button>
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input type="date" class="form-input" id="homeworkDueDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="homework-description" id="homeworkDescriptionInput" placeholder="Enter homework details and instructions..."></textarea>
+                </div>
+                <button class="save-button" onclick="assignHomework()">Assign Homework</button>
             </div>
         </div>
     </div>
 
-    <!-- View Weekend Homework Modal -->
-    <div id="viewWeekendHomeworkModal" class="modal">
+    <!-- View Homework Modal -->
+    <div id="viewHomeworkModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Weekend Homework</h2>
-                <span class="close" onclick="closeModal('viewWeekendHomeworkModal')">&times;</span>
+                <h2 class="modal-title">Your Homework</h2>
+                <span class="close" onclick="closeModal('viewHomeworkModal')">&times;</span>
             </div>
-            <div id="weekendHomeworkContent">
+            <div id="homeworkContent">
                 <!-- Content will be populated dynamically -->
             </div>
         </div>
@@ -2409,8 +2418,6 @@
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('appControls').style.display = 'block';
             
-            // Permission notice removed for cleaner interface
-            
             // Update UI based on user type
             updateUIForUserType();
             updateUserInfo();
@@ -2420,7 +2427,6 @@
         function updateUIForUserType() {
             const container = document.querySelector('.container');
             const absentButton = document.getElementById('absentButton');
-            const weekendHomeworkButton = document.getElementById('weekendHomeworkButton');
             const teacherControls = document.getElementById('teacherControls');
             const officeControls = document.getElementById('officeControls');
             const parentControls = document.getElementById('parentControls');
@@ -2439,7 +2445,6 @@
             switch(currentUserType) {
                 case 'teacher':
                     absentButton.style.display = 'inline-block';
-                    weekendHomeworkButton.style.display = 'none'; // Will be shown on Fridays
                     teacherControls.style.display = 'block';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'none';
@@ -2448,7 +2453,6 @@
                     
                 case 'office':
                     absentButton.style.display = 'none';
-                    weekendHomeworkButton.style.display = 'none';
                     teacherControls.style.display = 'none';
                     officeControls.style.display = 'block';
                     parentControls.style.display = 'none';
@@ -2464,7 +2468,6 @@
                 case 'parent':
                     container.classList.add('parent-mode');
                     absentButton.style.display = 'none';
-                    weekendHomeworkButton.style.display = 'none';
                     teacherControls.style.display = 'none';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'block';
@@ -2517,6 +2520,8 @@
                     if (currentStudent) {
                         await setupStudentListeners([currentStudent]);
                         selectStudent(currentStudent);
+                        // Check for homework
+                        await checkForHomework();
                     }
                 } else {
                     // Teachers and office see all students
@@ -2584,6 +2589,10 @@
                             updateTodaysProgress();
                             updateStats();
                             generateCalendar();
+                            // Check for homework if parent
+                            if (currentUserType === 'parent') {
+                                checkForHomework();
+                            }
                         }
                     }
                 });
@@ -2614,6 +2623,277 @@
             updateTodaysProgress();
             updateStats();
             generateCalendar();
+            
+            // Check for homework if parent
+            if (currentUserType === 'parent') {
+                await checkForHomework();
+            }
+        }
+
+        // Homework Functions
+        async function checkForHomework() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const homework = await getStudentHomework(currentStudent);
+                const homeworkSection = document.getElementById('homeworkSection');
+                
+                if (homework && homework.length > 0) {
+                    // Check if there's any pending (incomplete) homework
+                    const pendingHomework = homework.filter(hw => !hw.completed);
+                    
+                    if (pendingHomework.length > 0) {
+                        const latestHomework = pendingHomework[0]; // Get the latest homework
+                        
+                        // Update homework notification
+                        const dueDateObj = new Date(latestHomework.dueDate);
+                        const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            month: 'short', 
+                            day: 'numeric' 
+                        });
+                        
+                        document.getElementById('homeworkNotificationDesc').textContent = 
+                            `${latestHomework.type.charAt(0).toUpperCase() + latestHomework.type.slice(1)} homework assigned`;
+                        document.getElementById('homeworkDueDate').textContent = `Due: ${dueDateStr}`;
+                        
+                        homeworkSection.style.display = 'block';
+                        return;
+                    }
+                }
+                
+                // No homework found
+                homeworkSection.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error checking for homework:', error);
+                document.getElementById('homeworkSection').style.display = 'none';
+            }
+        }
+
+        function showAssignHomeworkModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Populate student dropdown
+            window.getStudents().then(students => {
+                const select = document.getElementById('homeworkStudentSelect');
+                select.innerHTML = '<option value="">Choose student</option>';
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            });
+            
+            // Reset form
+            document.getElementById('homeworkTypeSelect').value = '';
+            document.getElementById('homeworkDueDate').value = '';
+            document.getElementById('homeworkDescriptionInput').value = '';
+            
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('homeworkDueDate').value = tomorrow.toISOString().split('T')[0];
+            
+            document.getElementById('assignHomeworkModal').style.display = 'block';
+        }
+
+        async function assignHomework() {
+            if (currentUserType !== 'teacher') return;
+            
+            const studentId = document.getElementById('homeworkStudentSelect').value;
+            const type = document.getElementById('homeworkTypeSelect').value;
+            const dueDate = document.getElementById('homeworkDueDate').value;
+            const description = document.getElementById('homeworkDescriptionInput').value.trim();
+            
+            if (!studentId || !type || !dueDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            try {
+                const homeworkData = {
+                    studentId: studentId,
+                    type: type,
+                    dueDate: dueDate,
+                    description: description,
+                    assignedDate: new Date().toISOString(),
+                    assignedBy: 'Ustaadh',
+                    completed: false,
+                    reviewed: false
+                };
+                
+                // Save homework assignment
+                await saveHomeworkAssignment(homeworkData);
+                
+                closeModal('assignHomeworkModal');
+                
+                const students = await window.getStudents();
+                const student = students.find(s => s.id === studentId);
+                const studentName = student ? student.name : 'Student';
+                const typeDisplay = type.charAt(0).toUpperCase() + type.slice(1);
+                
+                alert(`${typeDisplay} homework assigned to ${studentName} successfully!`);
+                
+            } catch (error) {
+                console.error('Error assigning homework:', error);
+                alert('Error assigning homework: ' + error.message);
+            }
+        }
+
+        async function saveHomeworkAssignment(homeworkData) {
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                // Create unique ID for homework
+                const homeworkId = `${homeworkData.studentId}_${Date.now()}`;
+                
+                await setDoc(doc(db, 'homework', homeworkId), homeworkData);
+                console.log('Homework assignment saved:', homeworkId);
+            } catch (error) {
+                console.error('Error saving homework assignment:', error);
+                throw error;
+            }
+        }
+
+        async function getStudentHomework(studentId) {
+            try {
+                const { getDocs, collection, query, where } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const q = query(
+                    collection(db, 'homework'), 
+                    where('studentId', '==', studentId)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const homework = [];
+                
+                querySnapshot.forEach((doc) => {
+                    homework.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by assigned date (newest first)
+                homework.sort((a, b) => new Date(b.assignedDate) - new Date(a.assignedDate));
+                
+                return homework;
+            } catch (error) {
+                console.error('Error fetching student homework:', error);
+                return [];
+            }
+        }
+
+        async function showViewHomeworkModal() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const homework = await getStudentHomework(currentStudent);
+                const content = document.getElementById('homeworkContent');
+                
+                if (!homework || homework.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
+                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">No Homework Assigned</h3>
+                            <p style="color: #8E8E93; font-size: 14px;">No homework has been assigned yet.</p>
+                        </div>
+                    `;
+                } else {
+                    // Show the latest homework
+                    const latestHomework = homework.find(hw => !hw.completed) || homework[0];
+                    
+                    const dueDateObj = new Date(latestHomework.dueDate);
+                    const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    
+                    const typeDisplay = latestHomework.type.charAt(0).toUpperCase() + latestHomework.type.slice(1);
+                    let typeDescription = '';
+                    
+                    switch(latestHomework.type) {
+                        case 'sabak':
+                            typeDescription = 'Practice new lessons learned recently';
+                            break;
+                        case 'para':
+                            typeDescription = 'Review previous lessons and chapters';
+                            break;
+                        case 'dhor':
+                            typeDescription = 'Revise and strengthen memorized portions';
+                            break;
+                    }
+                    
+                    const descriptionHtml = latestHomework.description ? 
+                        `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
+                            <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
+                            <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${latestHomework.description}</p>
+                        </div>` : '';
+                    
+                    content.innerHTML = `
+                        <div style="padding: 20px;">
+                            <div style="text-align: center; margin-bottom: 24px;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+                                <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">${typeDisplay} Homework</h3>
+                                <p style="color: #8E8E93; font-size: 14px; margin-top: 8px;">Due: ${dueDateStr}</p>
+                            </div>
+                            
+                            <div style="margin-bottom: 16px; padding: 16px; background: #F8F9FA; border-radius: 12px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay}</h4>
+                                <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
+                            </div>
+                            
+                            ${descriptionHtml}
+                        </div>
+                    `;
+                    
+                    // Add parent review section
+                    const parentReviewHtml = `
+                        <div style="border-top: 1px solid #F2F2F7; padding: 16px 20px; background: #F8F9FA;">
+                            <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">Parent Review</h4>
+                            <button onclick="markHomeworkReviewed('${latestHomework.id}')" style="
+                                background: #34C759; color: white; border: none; 
+                                padding: 12px 16px; border-radius: 8px; 
+                                font-size: 14px; font-weight: 600; 
+                                cursor: pointer; width: 100%;
+                            " id="homeworkReviewButton">✓ Mark as Reviewed</button>
+                        </div>
+                    `;
+                    
+                    content.innerHTML += parentReviewHtml;
+                }
+                
+                document.getElementById('viewHomeworkModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error fetching homework:', error);
+                alert('Error loading homework: ' + error.message);
+            }
+        }
+
+        async function markHomeworkReviewed(homeworkId) {
+            try {
+                const { updateDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await updateDoc(doc(db, 'homework', homeworkId), {
+                    reviewed: true,
+                    reviewedDate: new Date().toISOString()
+                });
+                
+                closeModal('viewHomeworkModal');
+                alert('Homework marked as reviewed!');
+                
+                // Refresh homework check
+                await checkForHomework();
+                
+            } catch (error) {
+                console.error('Error marking homework as reviewed:', error);
+                alert('Error marking homework as reviewed: ' + error.message);
+            }
         }
 
         // Firebase Helper Functions
@@ -2693,16 +2973,6 @@
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
-        function isFriday(date = new Date()) {
-            return date.getDay() === 5; // Friday = 5
-        }
-
-        // Check if current date is weekend (Friday to Sunday)
-        function isWeekendPeriod(date = new Date()) {
-            const day = date.getDay();
-            return day === 5 || day === 6 || day === 0; // Friday = 5, Saturday = 6, Sunday = 0
-        }
-
         async function updateTodaysProgress() {
             if (!currentStudent) return;
             
@@ -2715,21 +2985,11 @@
             const isWeekendToday = isWeekend(today);
             const isHolidayToday = isHolidayDate(today);
             const holidayInfo = getHolidayInfo(today);
-            const isFridayToday = isFriday(today);
-            const isWeekendPeriodToday = isWeekendPeriod(today);
             
             // Get UI elements
             const progressSectionTitle = document.getElementById('progressSectionTitle');
             const progressContainer = document.getElementById('todayProgressContainer');
             const absentButton = document.getElementById('absentButton');
-            const weekendHomeworkButton = document.getElementById('weekendHomeworkButton');
-            
-            // Show weekend homework button ONLY for teachers on Fridays (and not holidays)
-            if (currentUserType === 'teacher' && isFridayToday && !isHolidayToday) {
-                weekendHomeworkButton.style.display = 'inline-block';
-            } else {
-                weekendHomeworkButton.style.display = 'none';
-            }
             
             if (isWeekendToday) {
                 // Weekend mode - show mosque closed message
@@ -2738,22 +2998,6 @@
                 // Hide buttons
                 if (absentButton) {
                     absentButton.style.display = 'none';
-                }
-                if (weekendHomeworkButton) {
-                    weekendHomeworkButton.style.display = 'none';
-                }
-                
-                // Check for weekend homework for parents during weekend period
-                let weekendHomeworkHtml = '';
-                if (currentUserType === 'parent' && isWeekendPeriodToday) {
-                    const currentWeekHomework = await getWeekendHomework(currentStudent);
-                    if (currentWeekHomework) {
-                        weekendHomeworkHtml = `
-                            <button onclick="showViewWeekendHomeworkModal()" class="view-weekend-homework-button">
-                                📚 View Weekend Homework
-                            </button>
-                        `;
-                    }
                 }
                 
                 // Show weekend closed message instead of progress
@@ -2765,7 +3009,6 @@
                         <div style="margin-top: 20px; padding: 12px; background: #E8F4FD; border-radius: 8px; font-size: 14px; color: #1E40AF;">
                             Classes resume on Monday
                         </div>
-                        ${weekendHomeworkHtml}
                     </div>
                 `;
                 
@@ -2783,9 +3026,6 @@
                 // Hide buttons
                 if (absentButton) {
                     absentButton.style.display = 'none';
-                }
-                if (weekendHomeworkButton) {
-                    weekendHomeworkButton.style.display = 'none';
                 }
                 
                 // Show holiday message instead of progress
@@ -3158,147 +3398,6 @@
                 const day = parseInt(targetDate.split('-')[2]);
                 setTimeout(() => openDayModal(day), 100);
             }
-        }
-
-        // Weekend Homework Functions
-        function showWeekendHomeworkModal() {
-            if (currentUserType !== 'teacher') return;
-            
-            // Reset form
-            document.getElementById('homeworkSabak').checked = false;
-            document.getElementById('homeworkPara').checked = false;
-            document.getElementById('homeworkDhor').checked = false;
-            document.getElementById('homeworkDescription').value = '';
-            
-            document.getElementById('weekendHomeworkModal').style.display = 'block';
-        }
-
-        async function saveWeekendHomework() {
-            if (currentUserType !== 'teacher' || !currentStudent) return;
-            
-            const sabakChecked = document.getElementById('homeworkSabak').checked;
-            const paraChecked = document.getElementById('homeworkPara').checked;
-            const dhorChecked = document.getElementById('homeworkDhor').checked;
-            const description = document.getElementById('homeworkDescription').value.trim();
-            
-            if (!sabakChecked && !paraChecked && !dhorChecked) {
-                alert('Please select at least one homework type');
-                return;
-            }
-            
-            const homeworkData = {
-                sabak: sabakChecked,
-                para: paraChecked,
-                dhor: dhorChecked,
-                description: description,
-                assignedDate: new Date().toISOString(),
-                weekOf: getWeekOfDate(new Date())
-            };
-            
-            try {
-                const { setDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                const weekKey = getWeekOfDate(new Date());
-                await setDoc(doc(db, 'weekend_homework', `${currentStudent}_${weekKey}`), homeworkData);
-                
-                closeModal('weekendHomeworkModal');
-                alert('Weekend homework assigned successfully!');
-            } catch (error) {
-                console.error('Error saving weekend homework:', error);
-                alert('Error saving weekend homework: ' + error.message);
-            }
-        }
-
-        async function getWeekendHomework(studentId) {
-            try {
-                const { getDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                const weekKey = getWeekOfDate(new Date());
-                const homeworkDoc = await getDoc(doc(db, 'weekend_homework', `${studentId}_${weekKey}`));
-                
-                if (homeworkDoc.exists()) {
-                    return homeworkDoc.data();
-                }
-                return null;
-            } catch (error) {
-                console.error('Error fetching weekend homework:', error);
-                return null;
-            }
-        }
-
-        async function showViewWeekendHomeworkModal() {
-            if (currentUserType !== 'parent' || !currentStudent) return;
-            
-            const homeworkData = await getWeekendHomework(currentStudent);
-            const content = document.getElementById('weekendHomeworkContent');
-            
-            if (!homeworkData) {
-                content.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
-                        <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">No Homework Assigned</h3>
-                        <p style="color: #8E8E93; font-size: 14px;">No weekend homework has been assigned this week.</p>
-                    </div>
-                `;
-            } else {
-                // Only show homework items that were actually assigned (checked)
-                let homeworkItems = [];
-                if (homeworkData.sabak) homeworkItems.push('📖 Sabak - Practice new lessons learned this week');
-                if (homeworkData.para) homeworkItems.push('🔄 Sabak Para - Review previous lessons and chapters');
-                if (homeworkData.dhor) homeworkItems.push('💭 Dhor - Revise and strengthen memorized portions');
-                
-                const homeworkListHtml = homeworkItems.map(item => 
-                    `<div style="padding: 12px; background: #F8F9FA; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">${item}</div>`
-                ).join('');
-                
-                const descriptionHtml = homeworkData.description ? 
-                    `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
-                        <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Additional Instructions:</h4>
-                        <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${homeworkData.description}</p>
-                    </div>` : '';
-                
-                content.innerHTML = `
-                    <div style="padding: 20px;">
-                        <div style="text-align: center; margin-bottom: 24px;">
-                            <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
-                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Weekend Homework</h3>
-                            <p style="color: #8E8E93; font-size: 14px;">Practice the following during the weekend:</p>
-                        </div>
-                        
-                        <div style="margin-bottom: 16px;">
-                            ${homeworkListHtml}
-                        </div>
-                        
-                        ${descriptionHtml}
-                    </div>
-                `;
-            }
-            
-            // Add parent review section
-            const parentReviewHtml = `
-                <div style="border-top: 1px solid #F2F2F7; padding: 16px 20px; background: #F8F9FA;">
-                    <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">Parent Review</h4>
-                    <button onclick="toggleParentCheck()" style="
-                        background: #34C759; color: white; border: none; 
-                        padding: 12px 16px; border-radius: 8px; 
-                        font-size: 14px; font-weight: 600; 
-                        cursor: pointer; width: 100%;
-                    " id="weekendParentCheckButton">✓ Mark as Reviewed</button>
-                </div>
-            `;
-            
-            content.innerHTML += parentReviewHtml;
-            
-            document.getElementById('viewWeekendHomeworkModal').style.display = 'block';
-        }
-
-        function getWeekOfDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-week${Math.ceil(day / 7)}`;
         }
 
         function generateCalendar() {
@@ -4012,729 +4111,13 @@
             return holiday || null;
         }
 
-        // Enhanced PDF Export Functions with Professional Design
+        // PDF Export Functions (simplified for this demo)
         function exportStudentPDF() {
-            // Only teachers and office can export PDFs
-            if (currentUserType === 'parent') {
-                alert('PDF export is not available for parent accounts');
-                return;
-            }
-            
-            window.getStudents().then(students => {
-                const select = document.getElementById('pdfStudentSelect');
-                select.innerHTML = '<option value="">Choose student for PDF report</option>';
-                
-                if (currentUserType === 'teacher' || currentUserType === 'office') {
-                    select.innerHTML += '<option value="all">All Students (Combined Report)</option>';
-                    students.forEach(student => {
-                        const option = document.createElement('option');
-                        option.value = student.id;
-                        option.textContent = student.name;
-                        select.appendChild(option);
-                    });
-                }
-                
-                document.getElementById('exportPDFModal').style.display = 'block';
-            });
+            alert('PDF export functionality would be implemented here');
         }
 
-        async function generateSelectedPDF() {
-            const studentSelect = document.getElementById('pdfStudentSelect');
-            const reportType = document.getElementById('pdfReportType').value;
-            const selectedStudent = studentSelect.value;
-            
-            if (!selectedStudent) {
-                alert('Please select a student');
-                return;
-            }
-
-            const btn = document.getElementById('generatePDFBtn');
-            const btnText = document.getElementById('modalPdfBtnText');
-            const spinner = document.getElementById('modalPdfSpinner');
-            
-            const originalText = btnText.textContent;
-            btnText.textContent = 'Generating PDF...';
-            spinner.style.display = 'block';
-            btn.disabled = true;
-
-            try {
-                if (typeof window.jspdf === 'undefined') {
-                    throw new Error('PDF library not loaded. Please refresh the page and try again.');
-                }
-
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                if (selectedStudent === 'all') {
-                    await generateAllStudentsPDF(doc, reportType);
-                } else {
-                    await generateSingleStudentPDF(doc, selectedStudent, reportType);
-                }
-                
-                closeModal('exportPDFModal');
-                
-                // Reset button state
-                btnText.textContent = originalText;
-                spinner.style.display = 'none';
-                btn.disabled = false;
-                
-                setTimeout(() => {
-                    alert('PDF report generated successfully!');
-                }, 500);
-
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('Error generating PDF: ' + error.message);
-                
-                // Reset button state
-                btnText.textContent = originalText;
-                spinner.style.display = 'none';
-                btn.disabled = false;
-            }
-        }
-
-        // Enhanced PDF generation functions with professional formatting
-        async function generateSingleStudentPDF(doc, studentId, reportType) {
-            const students = await window.getStudents();
-            const student = students.find(s => s.id === studentId);
-            const studentData = await window.getStudentData(studentId);
-            
-            if (!student) {
-                throw new Error('Student not found');
-            }
-
-            // Clean header design like divorce form
-            doc.setFillColor(248, 249, 250);
-            doc.rect(0, 0, 210, 40, 'F');
-            
-            // Green accent line
-            doc.setFillColor(16, 163, 127);
-            doc.rect(0, 0, 210, 3, 'F');
-            
-            // Header text
-            doc.setTextColor(31, 41, 55);
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            doc.text('HIFZ RECORD MANAGEMENT SYSTEM', 105, 15, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.setTextColor(75, 85, 99);
-            doc.text('Progress Tracking Report', 105, 22, { align: 'center' });
-            
-            doc.setTextColor(107, 114, 128);
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'normal');
-            const generatedDate = new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            doc.text(`Generated on ${generatedDate}`, 105, 28, { align: 'center' });
-            doc.text(`Student: ${student.name} | ${student.quranType || 13} Line Quran`, 105, 35, { align: 'center' });
-
-            // Title
-            doc.setTextColor(31, 41, 55);
-            doc.setFontSize(18);
-            doc.setFont(undefined, 'bold');
-            
-            let reportTitle = '';
-            switch(reportType) {
-                case 'current-month':
-                    reportTitle = 'Monthly Progress Report';
-                    break;
-                case 'yearly-summary':
-                    reportTitle = 'Yearly Summary Report';
-                    break;
-                case 'yearly-detailed':
-                    reportTitle = 'Yearly Detailed Report';
-                    break;
-            }
-            
-            doc.text(reportTitle, 105, 50, { align: 'center' });
-
-            let yPos = 60;
-
-            // Clean flat section headers like divorce form
-            function createFlatHeader(text, x, y, width) {
-                doc.setFillColor(16, 163, 127);
-                doc.roundedRect(x, y, width, 8, 2, 2, 'F');
-                
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'bold');
-                doc.text(text, x + 3, y + 5.5);
-            }
-
-            // Professional table styling
-            const professionalTableStyles = {
-                theme: 'grid',
-                bodyStyles: { 
-                    fontSize: 8, 
-                    cellPadding: 3,
-                    lineColor: [226, 232, 240],
-                    lineWidth: 0.5,
-                    fillColor: [255, 255, 255]
-                },
-                columnStyles: { 
-                    0: { 
-                        cellWidth: 24, 
-                        fontStyle: 'bold', 
-                        fontSize: 7, 
-                        fillColor: [248, 250, 252],
-                        textColor: [100, 116, 139]
-                    }, 
-                    1: { 
-                        cellWidth: 65, 
-                        fontSize: 8,
-                        textColor: [31, 41, 55]
-                    } 
-                }
-            };
-
-            // Student Information
-            createFlatHeader('Student Information', 15, yPos, 89);
-            createFlatHeader('Report Details', 106, yPos, 89);
-
-            yPos += 12;
-
-            // Student table
-            doc.autoTable({
-                startY: yPos,
-                body: [
-                    ['Name', student.name],
-                    ['Quran Type', `${student.quranType || 13} Line`],
-                    ['ID', student.id],
-                    ['Email', student.parentEmail || 'N/A']
-                ],
-                ...professionalTableStyles,
-                margin: { left: 15, right: 106 }
-            });
-
-            // Report details table
-            doc.autoTable({
-                startY: yPos,
-                body: [
-                    ['Report Type', reportTitle],
-                    ['Period', reportType === 'current-month' ? 
-                        new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 
-                        `Academic Year ${new Date().getFullYear()}`],
-                    ['Generated', generatedDate.split(',')[0]],
-                    ['Access Code', student.accessCode || 'N/A']
-                ],
-                ...professionalTableStyles,
-                margin: { left: 106, right: 15 }
-            });
-
-            yPos += 45;
-
-            if (reportType === 'yearly-summary' || reportType === 'yearly-detailed') {
-                // Achievement Summary
-                const sabakStats = calculateSabakAchievement(studentData, student.quranType || 13);
-                
-                createFlatHeader('Achievement Summary', 15, yPos, 180);
-                yPos += 12;
-
-                const achievements = [
-                    ['Total Lines Memorized', sabakStats.totalLines.toString()],
-                    ['Pages Completed', sabakStats.totalPages.toFixed(1)],
-                    ['Juz Progress', sabakStats.juzFraction],
-                    ['Current Level', sabakStats.juzFraction || 'In Progress']
-                ];
-
-                doc.autoTable({
-                    startY: yPos,
-                    body: achievements,
-                    theme: 'grid',
-                    bodyStyles: { 
-                        fontSize: 8, 
-                        cellPadding: 4,
-                        lineColor: [226, 232, 240],
-                        lineWidth: 0.5
-                    },
-                    columnStyles: { 
-                        0: { 
-                            cellWidth: 45, 
-                            fontStyle: 'bold', 
-                            fontSize: 8, 
-                            fillColor: [248, 250, 252],
-                            textColor: [100, 116, 139]
-                        }, 
-                        1: { 
-                            cellWidth: 135, 
-                            fontSize: 9,
-                            textColor: [31, 41, 55],
-                            fontStyle: 'bold'
-                        } 
-                    },
-                    margin: { left: 15, right: 15 }
-                });
-
-                yPos += 35;
-            }
-
-            if (reportType === 'current-month' || reportType === 'yearly-detailed') {
-                // Monthly Progress Summary
-                if (reportType === 'yearly-detailed') {
-                    createFlatHeader('Monthly Summary', 15, yPos, 180);
-                    yPos += 12;
-
-                    const monthlySummary = calculateMonthlySummary(studentData);
-                    
-                    if (monthlySummary.length > 0) {
-                        const monthlyHeaders = ['Month', 'Sabak Days', 'Para Days', 'Dhor Days', 'Absent Days'];
-                        
-                        doc.autoTable({
-                            startY: yPos,
-                            head: [monthlyHeaders],
-                            body: monthlySummary,
-                            theme: 'grid',
-                            styles: {
-                                fontSize: 9,
-                                cellPadding: 6
-                            },
-                            headStyles: { 
-                                fillColor: [16, 163, 127], 
-                                textColor: 255, 
-                                fontSize: 10, 
-                                fontStyle: 'bold'
-                            },
-                            alternateRowStyles: {
-                                fillColor: [248, 250, 252]
-                            }
-                        });
-
-                        yPos = doc.lastAutoTable.finalY + 20;
-                    }
-                }
-
-                // Progress breakdown
-                const progressStats = calculateStudentStats(studentData, reportType);
-                
-                if (yPos > 200) {
-                    doc.addPage();
-                    yPos = 30;
-                }
-                
-                createFlatHeader('Progress Breakdown', 15, yPos, 180);
-                yPos += 12;
-
-                const statsData = [
-                    ['Sabak Days', progressStats.sabak.toString()],
-                    ['Para Days', progressStats.para.toString()],
-                    ['Dhor Days', progressStats.dhor.toString()],
-                    ['Absent Days', progressStats.absent.toString()]
-                ];
-
-                doc.autoTable({
-                    startY: yPos,
-                    body: statsData,
-                    theme: 'grid',
-                    bodyStyles: { 
-                        fontSize: 9, 
-                        cellPadding: 4,
-                        lineColor: [226, 232, 240],
-                        lineWidth: 0.5
-                    },
-                    columnStyles: { 
-                        0: { 
-                            cellWidth: 45, 
-                            fontStyle: 'bold', 
-                            fontSize: 8, 
-                            fillColor: [248, 250, 252],
-                            textColor: [100, 116, 139]
-                        }, 
-                        1: { 
-                            cellWidth: 135, 
-                            fontSize: 9,
-                            textColor: [31, 41, 55]
-                        } 
-                    },
-                    margin: { left: 15, right: 15 }
-                });
-
-                yPos += 35;
-
-                // Daily Progress Table
-                const dailyData = prepareDailyProgressData(studentData, reportType);
-                
-                if (dailyData.length > 0) {
-                    if (yPos > 180) {
-                        doc.addPage();
-                        yPos = 30;
-                    }
-                    
-                    createFlatHeader('Daily Progress Log', 15, yPos, 180);
-                    yPos += 12;
-
-                    const headers = ['Date', 'Sabak', 'Para', 'Dhor', 'Status'];
-                    
-                    doc.autoTable({
-                        startY: yPos,
-                        head: [headers],
-                        body: dailyData.map(row => row.data),
-                        theme: 'grid',
-                        styles: {
-                            fontSize: 8,
-                            cellPadding: 4
-                        },
-                        headStyles: { 
-                            fillColor: [16, 163, 127], 
-                            textColor: 255, 
-                            fontSize: 9, 
-                            fontStyle: 'bold'
-                        },
-                        bodyStyles: { 
-                            fontSize: 8, 
-                            halign: 'center'
-                        },
-                        columnStyles: {
-                            0: { cellWidth: 25, halign: 'center' },
-                            1: { cellWidth: 40, halign: 'center' },
-                            2: { cellWidth: 30, halign: 'center' },
-                            3: { cellWidth: 30, halign: 'center' },
-                            4: { cellWidth: 25, halign: 'center' }
-                        },
-                        didParseCell: function(data) {
-                            const rowIndex = data.row.index;
-                            if (rowIndex < dailyData.length && dailyData[rowIndex].isAbsent) {
-                                data.cell.styles.fillColor = [254, 242, 242];
-                                data.cell.styles.textColor = [185, 28, 28];
-                            } else if (data.row.index % 2 === 0) {
-                                data.cell.styles.fillColor = [248, 250, 252];
-                            }
-                        }
-                    });
-                }
-            }
-
-            // Professional footer like divorce form
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                
-                doc.setFillColor(248, 250, 252);
-                doc.rect(10, 275, 190, 15, 'F');
-                
-                doc.setTextColor(107, 114, 128);
-                doc.setFontSize(8);
-                doc.setFont(undefined, 'normal');
-                doc.text('🕌 Hifz Record Management System', 20, 285);
-                doc.text(`Page ${i} of ${pageCount}`, 180, 285, { align: 'right' });
-                doc.text(generatedDate, 105, 285, { align: 'center' });
-            }
-            
-            const fileName = `${student.name.replace(/\s+/g, '_')}_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
-            doc.save(fileName);
-        }
-
-        async function generateAllStudentsPDF(doc, reportType) {
-            const students = await window.getStudents();
-            
-            // Professional header like divorce form
-            doc.setFillColor(248, 249, 250);
-            doc.rect(0, 0, 210, 40, 'F');
-            
-            doc.setFillColor(16, 163, 127);
-            doc.rect(0, 0, 210, 3, 'F');
-            
-            doc.setTextColor(31, 41, 55);
-            doc.setFontSize(20);
-            doc.setFont(undefined, 'bold');
-            doc.text('📊 CLASS PERFORMANCE REPORT', 105, 15, { align: 'center' });
-            
-            doc.setFontSize(14);
-            doc.setTextColor(75, 85, 99);
-            doc.text('All Students Overview', 105, 25, { align: 'center' });
-            
-            doc.setTextColor(107, 114, 128);
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            const generatedDate = new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            doc.text(`Generated by ${currentUserType.charAt(0).toUpperCase() + currentUserType.slice(1)} • ${generatedDate}`, 105, 35, { align: 'center' });
-
-            let yPos = 50;
-
-            // Clean flat header function
-            function createFlatHeader(text, x, y, width) {
-                doc.setFillColor(16, 163, 127);
-                doc.roundedRect(x, y, width, 8, 2, 2, 'F');
-                
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'bold');
-                doc.text(text, x + 3, y + 5.5);
-            }
-
-            // Class statistics summary
-            createFlatHeader('Class Overview', 15, yPos, 180);
-            yPos += 15;
-
-            const classData = [];
-            let totalSabak = 0, totalPara = 0, totalDhor = 0, totalAbsent = 0;
-            let totalLines = 0;
-
-            for (const student of students) {
-                const studentData = await window.getStudentData(student.id);
-                const stats = calculateStudentStats(studentData, reportType);
-                const sabakStats = calculateSabakAchievement(studentData, student.quranType || 13);
-                
-                totalSabak += stats.sabak;
-                totalPara += stats.para;
-                totalDhor += stats.dhor;
-                totalAbsent += stats.absent;
-                totalLines += sabakStats.totalLines;
-                
-                classData.push([
-                    student.name,
-                    `${student.quranType || 13}L`,
-                    stats.sabak.toString(),
-                    stats.para.toString(),
-                    stats.dhor.toString(),
-                    stats.absent.toString(),
-                    sabakStats.totalLines.toString(),
-                    sabakStats.juzFraction
-                ]);
-            }
-
-            // Class summary using clean table design
-            const classSummaryData = [
-                ['Total Students', students.length.toString()],
-                ['Total Sabak Days', totalSabak.toString()],
-                ['Total Lines', totalLines.toString()],
-                ['Average per Student', Math.round(totalLines / students.length).toString()]
-            ];
-
-            doc.autoTable({
-                startY: yPos,
-                body: classSummaryData,
-                theme: 'grid',
-                bodyStyles: { 
-                    fontSize: 9, 
-                    cellPadding: 4,
-                    lineColor: [226, 232, 240],
-                    lineWidth: 0.5
-                },
-                columnStyles: { 
-                    0: { 
-                        cellWidth: 45, 
-                        fontStyle: 'bold', 
-                        fontSize: 8, 
-                        fillColor: [248, 250, 252],
-                        textColor: [100, 116, 139]
-                    }, 
-                    1: { 
-                        cellWidth: 135, 
-                        fontSize: 9,
-                        textColor: [31, 41, 55],
-                        fontStyle: 'bold'
-                    } 
-                },
-                margin: { left: 15, right: 15 }
-            });
-
-            yPos = doc.lastAutoTable.finalY + 20;
-
-            // Student performance table
-            createFlatHeader('Individual Student Performance', 15, yPos, 180);
-            yPos += 15;
-
-            const headers = ['Student', 'Type', 'Sabak', 'Para', 'Dhor', 'Absent', 'Lines', 'Progress'];
-            
-            doc.autoTable({
-                startY: yPos,
-                head: [headers],
-                body: classData,
-                theme: 'grid',
-                styles: {
-                    fontSize: 8,
-                    cellPadding: 6
-                },
-                headStyles: { 
-                    fillColor: [16, 163, 127], 
-                    textColor: 255, 
-                    fontSize: 9, 
-                    fontStyle: 'bold',
-                    halign: 'center'
-                },
-                bodyStyles: { 
-                    fontSize: 8, 
-                    halign: 'center'
-                },
-                columnStyles: {
-                    0: { cellWidth: 35, halign: 'left', fontStyle: 'bold' },
-                    1: { cellWidth: 15, halign: 'center' },
-                    2: { cellWidth: 18, halign: 'center' },
-                    3: { cellWidth: 18, halign: 'center' },
-                    4: { cellWidth: 18, halign: 'center' },
-                    5: { cellWidth: 18, halign: 'center' },
-                    6: { cellWidth: 20, halign: 'center' },
-                    7: { cellWidth: 35, halign: 'center' }
-                },
-                alternateRowStyles: {
-                    fillColor: [248, 250, 252]
-                }
-            });
-
-            // Professional footer like divorce form
-            doc.setFillColor(248, 250, 252);
-            doc.rect(10, 275, 190, 15, 'F');
-            
-            doc.setTextColor(107, 114, 128);
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'normal');
-            doc.text('🕌 Hifz Record Management System', 20, 285);
-            doc.text('Page 1 of 1', 180, 285, { align: 'right' });
-            doc.text(generatedDate, 105, 285, { align: 'center' });
-
-            const fileName = `class_report_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
-            doc.save(fileName);
-        }
-
-        // Helper functions for PDF generation (keeping original logic)
-        function calculateStudentStats(studentData, reportType) {
-            const stats = { sabak: 0, para: 0, dhor: 0, absent: 0 };
-            const now = new Date();
-            
-            let filterDate;
-            if (reportType === 'current-month') {
-                filterDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            } else {
-                // For yearly reports, include all data
-                filterDate = '';
-            }
-            
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                if (!filterDate || date.startsWith(filterDate)) {
-                    const dateObj = new Date(date);
-                    
-                    if (dayData.absent) {
-                        stats.absent++;
-                    } else {
-                        // Only count weekday progress
-                        if (!isWeekend(dateObj) && !isHolidayDate(dateObj)) {
-                            progressTypes.forEach(type => {
-                                if (dayData[type]) {
-                                    stats[type]++;
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-            
-            return stats;
-        }
-
-        function calculateSabakAchievement(studentData, quranType) {
-            let totalLines = 0;
-            
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                if (dayData.sabak && dayData.sabak.lines && !dayData.absent) {
-                    totalLines += dayData.sabak.lines;
-                }
-            });
-            
-            const conversion = convertLinesToPagesAndJuz(totalLines, quranType);
-            
-            return {
-                totalLines,
-                totalPages: conversion.pages,
-                totalJuz: conversion.juz,
-                juzFraction: conversion.fraction
-            };
-        }
-
-        function calculateMonthlySummary(studentData) {
-            const monthlySummary = {};
-            
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                const month = date.substring(0, 7); // YYYY-MM
-                const dateObj = new Date(date);
-                
-                if (!monthlySummary[month]) {
-                    monthlySummary[month] = { sabak: 0, para: 0, dhor: 0, absent: 0 };
-                }
-                
-                if (dayData.absent) {
-                    monthlySummary[month].absent++;
-                } else if (!isWeekend(dateObj)) {
-                    progressTypes.forEach(type => {
-                        if (dayData[type]) {
-                            monthlySummary[month][type]++;
-                        }
-                    });
-                }
-            });
-            
-            return Object.entries(monthlySummary)
-                .sort(([a], [b]) => a.localeCompare(b))
-                .map(([month, stats]) => [
-                    new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-                    stats.sabak,
-                    stats.para,
-                    stats.dhor,
-                    stats.absent
-                ]);
-        }
-
-        function prepareDailyProgressData(studentData, reportType) {
-            const dailyData = [];
-            const now = new Date();
-            
-            let filterDate;
-            if (reportType === 'current-month') {
-                filterDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            }
-            
-            const sortedDates = Object.keys(studentData).sort();
-            
-            sortedDates.forEach(date => {
-                if (!filterDate || date.startsWith(filterDate)) {
-                    const dayData = studentData[date];
-                    const dateObj = new Date(date);
-                    const isWeekendDay = isWeekend(dateObj);
-                    
-                    let sabakText = '-';
-                    let paraText = '-';
-                    let dhorText = '-';
-                    let statusText = 'Present';
-                    let isAbsent = false;
-                    
-                    if (dayData.absent) {
-                        statusText = 'Absent';
-                        isAbsent = true;
-                    } else if (isWeekendDay) {
-                        statusText = 'Weekend';
-                    } else {
-                        // Regular weekday
-                        if (dayData.sabak) {
-                            sabakText = dayData.sabak.lines ? 
-                                `${dayData.sabak.lines}L` : 
-                                dayData.sabak.amount;
-                        }
-                        if (dayData.para) paraText = dayData.para.amount;
-                        if (dayData.dhor) dhorText = dayData.dhor.amount;
-                    }
-                    
-                    const formattedDate = dateObj.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                    
-                    dailyData.push({
-                        data: [formattedDate, sabakText, paraText, dhorText, statusText],
-                        isAbsent
-                    });
-                }
-            });
-            
-            return dailyData;
+        function generateSelectedPDF() {
+            alert('PDF generation functionality would be implemented here');
         }
 
         function showResetModal() {
@@ -4780,7 +4163,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'weekendHomeworkModal', 'viewWeekendHomeworkModal'];
+            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -4852,9 +4235,10 @@
         window.showHolidayModal = showHolidayModal;
         window.addHoliday = addHoliday;
         window.removeHoliday = removeHoliday;
-        window.showWeekendHomeworkModal = showWeekendHomeworkModal;
-        window.saveWeekendHomework = saveWeekendHomework;
-        window.showViewWeekendHomeworkModal = showViewWeekendHomeworkModal;
+        window.showAssignHomeworkModal = showAssignHomeworkModal;
+        window.assignHomework = assignHomework;
+        window.showViewHomeworkModal = showViewHomeworkModal;
+        window.markHomeworkReviewed = markHomeworkReviewed;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
         window.showResetModal = showResetModal;
