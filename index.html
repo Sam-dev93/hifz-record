@@ -2962,6 +2962,21 @@
                             day: 'numeric' 
                         });
                         
+                        const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                        let typeDescription = '';
+                        
+                        switch(hw.type) {
+                            case 'sabak':
+                                typeDescription = 'Practice new lessons learned recently';
+                                break;
+                            case 'para':
+                                typeDescription = 'Review previous lessons and chapters';
+                                break;
+                            case 'dhor':
+                                typeDescription = 'Revise and strengthen memorized portions';
+                                break;
+                        }
+                        
                         let statusHtml = '';
                         let statusColor = '';
                         if (hw.completed) {
@@ -3331,6 +3346,21 @@
                                 month: 'long', 
                                 day: 'numeric' 
                             });
+                            
+                            const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                            let typeDescription = '';
+                            
+                            switch(hw.type) {
+                                case 'sabak':
+                                    typeDescription = 'Practice new lessons learned recently';
+                                    break;
+                                case 'para':
+                                    typeDescription = 'Review previous lessons and chapters';
+                                    break;
+                                case 'dhor':
+                                    typeDescription = 'Revise and strengthen memorized portions';
+                                    break;
+                            }
                             
                             let statusHtml = '';
                             let statusColor = '';
