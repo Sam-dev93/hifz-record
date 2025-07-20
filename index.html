@@ -1660,6 +1660,11 @@
             border-color: #FF3B30;
         }
 
+        .homework-item.not-given {
+            background: #FEF3C7;
+            border-color: #F59E0B;
+        }
+
         .homework-header {
             display: flex;
             justify-content: space-between;
@@ -1715,6 +1720,7 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .homework-toggle {
@@ -1731,6 +1737,10 @@
 
         .homework-toggle.incomplete {
             background: #FF3B30;
+        }
+
+        .homework-toggle.not-given {
+            background: #F59E0B;
         }
 
         .homework-toggle:hover {
@@ -1757,6 +1767,11 @@
         .homework-status.overdue {
             background: #FEE2E2;
             color: #991B1B;
+        }
+
+        .homework-status.not-given {
+            background: #FEF3C7;
+            color: #92400E;
         }
 
         .homework-filters {
@@ -1788,6 +1803,80 @@
             text-align: center;
             padding: 40px 20px;
             color: #8E8E93;
+        }
+
+        /* Homework summary styles */
+        .homework-summary-section {
+            background: #F8F9FA;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E5E5EA;
+        }
+
+        .homework-summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .homework-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .homework-summary-stat {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5E5EA;
+        }
+
+        .homework-summary-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .homework-summary-label {
+            font-size: 12px;
+            color: #8E8E93;
+            font-weight: 600;
+        }
+
+        /* Not given homework section */
+        .not-given-section {
+            margin-top: 20px;
+            padding: 16px;
+            background: #FEF3C7;
+            border-radius: 12px;
+            border: 1px solid #F59E0B;
+        }
+
+        .not-given-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #92400E;
+            margin-bottom: 12px;
+        }
+
+        .not-given-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .not-given-item {
+            font-size: 14px;
+            color: #92400E;
+            padding: 8px 12px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -1903,8 +1992,8 @@
                             <button class="homework-button" onclick="showViewHomeworkModal()" style="flex: 1; margin-top: 0;">
                                 View Homework
                             </button>
-                            <button class="homework-button" onclick="showParentAllHomeworkModal()" style="flex: 1; margin-top: 0; background: #8E44AD;">
-                                All Homework
+                            <button class="homework-button" onclick="showHomeworkSummaryModal()" style="flex: 1; margin-top: 0; background: #8E44AD;">
+                                Homework Summary
                             </button>
                         </div>
                     </div>
@@ -2021,7 +2110,7 @@
 
                         <!-- Parent Controls -->
                         <div id="parentControls" style="display: none;">
-                            <p style="color: #8E8E93; font-size: 14px; margin-bottom: 16px;">Parent access - view your child's progress</p>
+                            <button class="control-button" onclick="showHomeworkSummaryModal()">📊 Homework Summary</button>
                         </div>
 
                         <button class="logout-button" onclick="logout()">Logout</button>
@@ -2137,15 +2226,15 @@
         </div>
     </div>
 
-    <!-- Parent All Homework Modal -->
-    <div id="parentAllHomeworkModal" class="modal">
+    <!-- Homework Summary Modal (Parent) -->
+    <div id="homeworkSummaryModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">All Your Child's Homework</h2>
-                <span class="close" onclick="closeModal('parentAllHomeworkModal')">&times;</span>
+                <h2 class="modal-title">Homework Summary</h2>
+                <span class="close" onclick="closeModal('homeworkSummaryModal')">&times;</span>
             </div>
             <div class="modal-body">
-                <div id="parentAllHomeworkContent">
+                <div id="homeworkSummaryContent">
                     <!-- Content will be populated dynamically -->
                 </div>
             </div>
@@ -2415,6 +2504,17 @@
             } else {
                 conversionDisplay.style.display = 'none';
             }
+        }
+
+        // Overdue check with 8PM cutoff
+        function isHomeworkOverdue(dueDate) {
+            const now = new Date();
+            const dueDateObj = new Date(dueDate);
+            
+            // Set due date to 8 PM (20:00) on the due date
+            dueDateObj.setHours(20, 0, 0, 0);
+            
+            return now > dueDateObj;
         }
 
         // Initialize app
@@ -2862,8 +2962,8 @@
                 const homeworkSection = document.getElementById('homeworkSection');
                 
                 if (homework && homework.length > 0) {
-                    // Check if there's any pending (incomplete) homework
-                    const pendingHomework = homework.filter(hw => !hw.completed);
+                    // Check if there's any pending (incomplete and not marked as not given) homework
+                    const pendingHomework = homework.filter(hw => !hw.completed && hw.status !== 'not-given');
                     
                     if (pendingHomework.length > 0) {
                         const latestHomework = pendingHomework[0]; // Get the latest homework
@@ -2901,13 +3001,13 @@
             document.getElementById('viewAllHomeworkModal').style.display = 'block';
         }
 
-        // Parent All Homework Modal function
-        async function showParentAllHomeworkModal() {
+        // Homework Summary Modal function for parents
+        async function showHomeworkSummaryModal() {
             if (currentUserType !== 'parent' || !currentStudent) return;
             
             try {
                 const homework = await getStudentHomework(currentStudent);
-                const content = document.getElementById('parentAllHomeworkContent');
+                const content = document.getElementById('homeworkSummaryContent');
                 
                 if (!homework || homework.length === 0) {
                     content.innerHTML = `
@@ -2921,32 +3021,37 @@
                     // Show all homework with summary at top
                     const totalHomework = homework.length;
                     const completedHomework = homework.filter(hw => hw.completed).length;
-                    const pendingHomework = homework.filter(hw => !hw.completed).length;
-                    const today = new Date();
-                    const overdueHomework = homework.filter(hw => !hw.completed && new Date(hw.dueDate) < today).length;
+                    const pendingHomework = homework.filter(hw => !hw.completed && hw.status !== 'not-given').length;
+                    const notGivenHomework = homework.filter(hw => hw.status === 'not-given').length;
+                    const overdueHomework = homework.filter(hw => !hw.completed && hw.status !== 'not-given' && isHomeworkOverdue(hw.dueDate)).length;
                     
                     let homeworkHtml = `
                         <!-- Summary Section -->
-                        <div style="background: #F8F9FA; border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid #E5E5EA;">
-                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">📊 Homework Summary</h3>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700; color: #1C1C1E;">${totalHomework}</div>
-                                    <div style="font-size: 14px; color: #8E8E93;">Total</div>
+                        <div class="homework-summary-section">
+                            <h3 class="homework-summary-title">📊 Homework Summary</h3>
+                            <div class="homework-summary-grid">
+                                <div class="homework-summary-stat">
+                                    <div class="homework-summary-number" style="color: #1C1C1E;">${totalHomework}</div>
+                                    <div class="homework-summary-label">Total</div>
                                 </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700; color: #34C759;">${completedHomework}</div>
-                                    <div style="font-size: 14px; color: #8E8E93;">Completed</div>
+                                <div class="homework-summary-stat">
+                                    <div class="homework-summary-number" style="color: #34C759;">${completedHomework}</div>
+                                    <div class="homework-summary-label">Completed</div>
                                 </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700; color: #FF9500;">${pendingHomework}</div>
-                                    <div style="font-size: 14px; color: #8E8E93;">Pending</div>
+                                <div class="homework-summary-stat">
+                                    <div class="homework-summary-number" style="color: #FF9500;">${pendingHomework}</div>
+                                    <div class="homework-summary-label">Pending</div>
                                 </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 24px; font-weight: 700; color: #FF3B30;">${overdueHomework}</div>
-                                    <div style="font-size: 14px; color: #8E8E93;">Overdue</div>
+                                <div class="homework-summary-stat">
+                                    <div class="homework-summary-number" style="color: #FF3B30;">${overdueHomework}</div>
+                                    <div class="homework-summary-label">Overdue</div>
                                 </div>
                             </div>
+                            ${notGivenHomework > 0 ? `
+                                <div style="margin-top: 12px; padding: 12px; background: #FEF3C7; border-radius: 8px; text-align: center;">
+                                    <span style="color: #92400E; font-weight: 600;">${notGivenHomework} homework(s) marked as not given</span>
+                                </div>
+                            ` : ''}
                         </div>
                         
                         <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">All Homework</h3>
@@ -2954,7 +3059,7 @@
                     
                     homework.forEach((hw, index) => {
                         const dueDateObj = new Date(hw.dueDate);
-                        const isOverdue = !hw.completed && dueDateObj < today;
+                        const isOverdue = !hw.completed && hw.status !== 'not-given' && isHomeworkOverdue(hw.dueDate);
                         
                         const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
                             weekday: 'long', 
@@ -2963,23 +3068,13 @@
                         });
                         
                         const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
-                        let typeDescription = '';
-                        
-                        switch(hw.type) {
-                            case 'sabak':
-                                typeDescription = 'Practice new lessons learned recently';
-                                break;
-                            case 'para':
-                                typeDescription = 'Review previous lessons and chapters';
-                                break;
-                            case 'dhor':
-                                typeDescription = 'Revise and strengthen memorized portions';
-                                break;
-                        }
                         
                         let statusHtml = '';
                         let statusColor = '';
-                        if (hw.completed) {
+                        if (hw.status === 'not-given') {
+                            statusHtml = '<span style="color: #F59E0B; font-weight: 600;">📝 Not Given</span>';
+                            statusColor = '#FEF3C7';
+                        } else if (hw.completed) {
                             statusHtml = '<span style="color: #34C759; font-weight: 600;">✓ Completed by Teacher</span>';
                             statusColor = '#D1FAE5';
                         } else if (isOverdue) {
@@ -2997,7 +3092,7 @@
                             </div>` : '';
                         
                         homeworkHtml += `
-                            <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : isOverdue ? '#FF3B30' : '#E5E5EA'};">
+                            <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : hw.status === 'not-given' ? '#FEF3C7' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : hw.status === 'not-given' ? '#F59E0B' : isOverdue ? '#FF3B30' : '#E5E5EA'};">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                                     <div>
                                         <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay} Homework</h3>
@@ -3010,7 +3105,6 @@
                                 
                                 <div style="padding: 16px; background: #F8F9FA; border-radius: 12px; margin-bottom: 16px;">
                                     <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay}</h4>
-                                    <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
                                 </div>
                                 
                                 ${descriptionHtml}
@@ -3021,11 +3115,11 @@
                     content.innerHTML = homeworkHtml;
                 }
                 
-                document.getElementById('parentAllHomeworkModal').style.display = 'block';
+                document.getElementById('homeworkSummaryModal').style.display = 'block';
                 
             } catch (error) {
-                console.error('Error fetching all homework:', error);
-                alert('Error loading homework: ' + error.message);
+                console.error('Error fetching homework summary:', error);
+                alert('Error loading homework summary: ' + error.message);
             }
         }
 
@@ -3050,22 +3144,23 @@
                 // Filter homework based on selection
                 let filteredHomework = allHomework;
                 if (filter === 'pending') {
-                    filteredHomework = allHomework.filter(hw => !hw.completed);
+                    filteredHomework = allHomework.filter(hw => !hw.completed && hw.status !== 'not-given');
                 } else if (filter === 'completed') {
                     filteredHomework = allHomework.filter(hw => hw.completed);
                 } else if (filter === 'overdue') {
-                    const today = new Date();
-                    filteredHomework = allHomework.filter(hw => !hw.completed && new Date(hw.dueDate) < today);
+                    filteredHomework = allHomework.filter(hw => !hw.completed && hw.status !== 'not-given' && isHomeworkOverdue(hw.dueDate));
+                } else if (filter === 'not-given') {
+                    filteredHomework = allHomework.filter(hw => hw.status === 'not-given');
                 }
                 
-                displayAllHomework(filteredHomework, students, filter);
+                displayAllHomework(filteredHomework, students, filter, allHomework);
                 
             } catch (error) {
                 console.error('Error loading homework:', error);
             }
         }
 
-        function displayAllHomework(homework, students, currentFilter) {
+        function displayAllHomework(homework, students, currentFilter, allHomework) {
             const content = document.getElementById('allHomeworkContent');
             
             const filtersHtml = `
@@ -3074,11 +3169,47 @@
                     <button class="filter-button ${currentFilter === 'pending' ? 'active' : ''}" onclick="loadAllHomework('pending')">Pending</button>
                     <button class="filter-button ${currentFilter === 'completed' ? 'active' : ''}" onclick="loadAllHomework('completed')">Completed</button>
                     <button class="filter-button ${currentFilter === 'overdue' ? 'active' : ''}" onclick="loadAllHomework('overdue')">Overdue</button>
+                    <button class="filter-button ${currentFilter === 'not-given' ? 'active' : ''}" onclick="loadAllHomework('not-given')">Not Given</button>
+                </div>
+            `;
+            
+            // Add summary for teachers
+            const totalCount = allHomework.length;
+            const completedCount = allHomework.filter(hw => hw.completed).length;
+            const pendingCount = allHomework.filter(hw => !hw.completed && hw.status !== 'not-given').length;
+            const overdueCount = allHomework.filter(hw => !hw.completed && hw.status !== 'not-given' && isHomeworkOverdue(hw.dueDate)).length;
+            const notGivenCount = allHomework.filter(hw => hw.status === 'not-given').length;
+            
+            const summaryHtml = `
+                <div class="homework-summary-section">
+                    <h3 class="homework-summary-title">📊 Overall Homework Summary</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #1C1C1E;">${totalCount}</div>
+                            <div class="homework-summary-label">Total</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #34C759;">${completedCount}</div>
+                            <div class="homework-summary-label">Completed</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #FF9500;">${pendingCount}</div>
+                            <div class="homework-summary-label">Pending</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #FF3B30;">${overdueCount}</div>
+                            <div class="homework-summary-label">Overdue</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #F59E0B;">${notGivenCount}</div>
+                            <div class="homework-summary-label">Not Given</div>
+                        </div>
+                    </div>
                 </div>
             `;
             
             if (homework.length === 0) {
-                content.innerHTML = filtersHtml + `
+                content.innerHTML = summaryHtml + filtersHtml + `
                     <div class="no-homework">
                         <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
                         <h3 style="font-size: 18px; margin-bottom: 8px;">No Homework Found</h3>
@@ -3095,8 +3226,7 @@
                 const studentName = student ? student.name : 'Unknown Student';
                 
                 const dueDateObj = new Date(hw.dueDate);
-                const today = new Date();
-                const isOverdue = !hw.completed && dueDateObj < today;
+                const isOverdue = !hw.completed && hw.status !== 'not-given' && isHomeworkOverdue(hw.dueDate);
                 
                 const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
                     weekday: 'short', 
@@ -3107,10 +3237,16 @@
                 const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
                 
                 let statusHtml = '';
-                if (hw.completed) {
+                let itemClass = '';
+                if (hw.status === 'not-given') {
+                    statusHtml = '<span class="homework-status not-given">📝 Not Given</span>';
+                    itemClass = 'not-given';
+                } else if (hw.completed) {
                     statusHtml = '<span class="homework-status completed">✓ Completed</span>';
+                    itemClass = 'completed';
                 } else if (isOverdue) {
                     statusHtml = '<span class="homework-status overdue">⚠ Overdue</span>';
+                    itemClass = 'overdue';
                 } else {
                     statusHtml = '<span class="homework-status pending">⏳ Pending</span>';
                 }
@@ -3118,8 +3254,49 @@
                 const descriptionHtml = hw.description ? 
                     `<div class="homework-description">${hw.description}</div>` : '';
                 
+                // Action buttons based on status
+                let actionButtonsHtml = '';
+                if (hw.status === 'not-given') {
+                    actionButtonsHtml = `
+                        <button class="homework-toggle" onclick="updateHomeworkStatus('${hw.id}', 'pending')" 
+                                style="background: #10A37F;">
+                            ✓ Mark as Given
+                        </button>
+                        <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
+                                style="background: #FF3B30;">
+                            🗑️ Delete
+                        </button>
+                    `;
+                } else if (hw.completed) {
+                    actionButtonsHtml = `
+                        <button class="homework-toggle incomplete" onclick="toggleHomeworkCompletion('${hw.id}', false)">
+                            ↩️ Mark Incomplete
+                        </button>
+                        <button class="homework-toggle not-given" onclick="updateHomeworkStatus('${hw.id}', 'not-given')">
+                            📝 Mark Not Given
+                        </button>
+                        <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
+                                style="background: #FF3B30;">
+                            🗑️ Delete
+                        </button>
+                    `;
+                } else {
+                    actionButtonsHtml = `
+                        <button class="homework-toggle" onclick="toggleHomeworkCompletion('${hw.id}', true)">
+                            ✓ Mark Complete
+                        </button>
+                        <button class="homework-toggle not-given" onclick="updateHomeworkStatus('${hw.id}', 'not-given')">
+                            📝 Not Given
+                        </button>
+                        <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
+                                style="background: #FF3B30;">
+                            🗑️ Delete
+                        </button>
+                    `;
+                }
+                
                 homeworkListHtml += `
-                    <div class="homework-item ${hw.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                    <div class="homework-item ${itemClass}">
                         <div class="homework-header">
                             <div>
                                 <div class="homework-student-name">${studentName}</div>
@@ -3136,20 +3313,37 @@
                         ${descriptionHtml}
                         
                         <div class="homework-actions">
-                            <button class="homework-toggle ${hw.completed ? 'complete' : 'incomplete'}" 
-                                    onclick="toggleHomeworkCompletion('${hw.id}', ${!hw.completed})">
-                                ${hw.completed ? '✓ Mark Incomplete' : '✓ Mark Complete'}
-                            </button>
-                            <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
-                                    style="background: #FF3B30;">
-                                🗑️ Delete
-                            </button>
+                            ${actionButtonsHtml}
                         </div>
                     </div>
                 `;
             });
             
-            content.innerHTML = filtersHtml + homeworkListHtml;
+            content.innerHTML = summaryHtml + filtersHtml + homeworkListHtml;
+        }
+
+        async function updateHomeworkStatus(homeworkId, status) {
+            try {
+                const { updateDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const updateData = { status: status };
+                if (status === 'not-given') {
+                    updateData.notGivenDate = new Date().toISOString();
+                } else if (status === 'pending') {
+                    updateData.notGivenDate = null;
+                }
+                
+                await updateDoc(doc(db, 'homework', homeworkId), updateData);
+                
+                // Reload the homework list
+                const activeFilter = document.querySelector('.filter-button.active').textContent.toLowerCase().replace(' ', '-');
+                loadAllHomework(activeFilter);
+                
+            } catch (error) {
+                console.error('Error updating homework status:', error);
+                alert('Error updating homework: ' + error.message);
+            }
         }
 
         async function toggleHomeworkCompletion(homeworkId, completed) {
@@ -3163,7 +3357,8 @@
                 });
                 
                 // Reload the homework list
-                loadAllHomework(document.querySelector('.filter-button.active').textContent.toLowerCase());
+                const activeFilter = document.querySelector('.filter-button.active').textContent.toLowerCase().replace(' ', '-');
+                loadAllHomework(activeFilter);
                 
             } catch (error) {
                 console.error('Error updating homework completion:', error);
@@ -3183,7 +3378,8 @@
                 await deleteDoc(doc(db, 'homework', homeworkId));
                 
                 // Reload the homework list
-                loadAllHomework(document.querySelector('.filter-button.active').textContent.toLowerCase());
+                const activeFilter = document.querySelector('.filter-button.active').textContent.toLowerCase().replace(' ', '-');
+                loadAllHomework(activeFilter);
                 
             } catch (error) {
                 console.error('Error deleting homework:', error);
@@ -3242,7 +3438,7 @@
                     assignedDate: new Date().toISOString(),
                     assignedBy: 'Ustaadh',
                     completed: false,
-                    reviewed: false
+                    status: 'pending'
                 };
                 
                 // Save homework assignment
@@ -3322,8 +3518,8 @@
                         </div>
                     `;
                 } else {
-                    // Show only current/pending homework
-                    const currentHomework = homework.filter(hw => !hw.completed);
+                    // Show only current/pending homework (not completed and not marked as not given)
+                    const currentHomework = homework.filter(hw => !hw.completed && hw.status !== 'not-given');
                     
                     if (currentHomework.length === 0) {
                         content.innerHTML = `
@@ -3338,8 +3534,7 @@
                         
                         currentHomework.forEach((hw, index) => {
                             const dueDateObj = new Date(hw.dueDate);
-                            const today = new Date();
-                            const isOverdue = dueDateObj < today;
+                            const isOverdue = isHomeworkOverdue(hw.dueDate);
                             
                             const dueDateStr = dueDateObj.toLocaleDateString('en-US', { 
                                 weekday: 'long', 
@@ -3348,19 +3543,6 @@
                             });
                             
                             const typeDisplay = hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
-                            let typeDescription = '';
-                            
-                            switch(hw.type) {
-                                case 'sabak':
-                                    typeDescription = 'Practice new lessons learned recently';
-                                    break;
-                                case 'para':
-                                    typeDescription = 'Review previous lessons and chapters';
-                                    break;
-                                case 'dhor':
-                                    typeDescription = 'Revise and strengthen memorized portions';
-                                    break;
-                            }
                             
                             let statusHtml = '';
                             let statusColor = '';
@@ -3392,7 +3574,6 @@
                                     
                                     <div style="padding: 16px; background: #F8F9FA; border-radius: 12px; margin-bottom: 16px;">
                                         <h4 style="font-size: 16px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay}</h4>
-                                        <p style="color: #8E8E93; font-size: 14px;">${typeDescription}</p>
                                     </div>
                                     
                                     ${descriptionHtml}
@@ -3400,14 +3581,7 @@
                             `;
                         });
                         
-                        content.innerHTML = `
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Current Homework</h3>
-                                <p style="color: #8E8E93; font-size: 14px;">Complete these assignments on time</p>
-                            </div>
-                            
-                            ${homeworkHtml}
-                        `;
+                        content.innerHTML = homeworkHtml;
                     }
                 }
                 
@@ -3416,41 +3590,6 @@
             } catch (error) {
                 console.error('Error fetching homework:', error);
                 alert('Error loading homework: ' + error.message);
-            }
-        }
-
-        async function acknowledgeHomework() {
-            try {
-                // For simplicity, we'll just show a confirmation
-                // In a real app, you might want to track acknowledgments separately
-                alert('Thank you for acknowledging the homework! Please help your child complete it by the due date.');
-                closeModal('viewHomeworkModal');
-                
-            } catch (error) {
-                console.error('Error acknowledging homework:', error);
-                alert('Error acknowledging homework: ' + error.message);
-            }
-        }
-
-        async function markHomeworkReviewed(homeworkId) {
-            try {
-                const { updateDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                await updateDoc(doc(db, 'homework', homeworkId), {
-                    reviewed: true,
-                    reviewedDate: new Date().toISOString()
-                });
-                
-                closeModal('viewHomeworkModal');
-                alert('Homework marked as reviewed!');
-                
-                // Refresh homework check
-                await checkForHomework();
-                
-            } catch (error) {
-                console.error('Error marking homework as reviewed:', error);
-                alert('Error marking homework as reviewed: ' + error.message);
             }
         }
 
@@ -4779,9 +4918,9 @@
                 
                 const totalHomework = homework.length;
                 const completedHomework = homework.filter(hw => hw.completed).length;
-                const pendingHomework = homework.filter(hw => !hw.completed).length;
-                const today = new Date();
-                const overdueHomework = homework.filter(hw => !hw.completed && new Date(hw.dueDate) < today).length;
+                const pendingHomework = homework.filter(hw => !hw.completed && hw.status !== 'not-given').length;
+                const notGivenHomework = homework.filter(hw => hw.status === 'not-given').length;
+                const overdueHomework = homework.filter(hw => !hw.completed && hw.status !== 'not-given' && isHomeworkOverdue(hw.dueDate)).length;
                 
                 pdf.setFontSize(12);
                 pdf.text(`Total Homework Assigned: ${totalHomework}`, 25, yPosition);
@@ -4791,6 +4930,8 @@
                 pdf.text(`Pending: ${pendingHomework}`, 25, yPosition);
                 yPosition += 8;
                 pdf.text(`Overdue: ${overdueHomework}`, 25, yPosition);
+                yPosition += 8;
+                pdf.text(`Not Given: ${notGivenHomework}`, 25, yPosition);
                 yPosition += 8;
                 
                 const completionRate = totalHomework > 0 ? Math.round((completedHomework / totalHomework) * 100) : 0;
@@ -4873,10 +5014,11 @@
                 if (homework && homework.length > 0) {
                     const totalHomework = homework.length;
                     const completedHomework = homework.filter(hw => hw.completed).length;
+                    const notGivenHomework = homework.filter(hw => hw.status === 'not-given').length;
                     const completionRate = Math.round((completedHomework / totalHomework) * 100);
                     
                     pdf.setFontSize(10);
-                    pdf.text(`Homework: ${completedHomework}/${totalHomework} (${completionRate}%)`, 25, yPosition);
+                    pdf.text(`Homework: ${completedHomework}/${totalHomework} (${completionRate}%) | Not Given: ${notGivenHomework}`, 25, yPosition);
                     yPosition += 8;
                 } else {
                     pdf.setFontSize(10);
@@ -4899,7 +5041,7 @@
                     }
                 });
                 
-                pdf.text(`Progress: Sabak(${progressStats.sabak}) Para(${progressStats.para}) Dhor(${progressStats.dhor}) - Total: ${totalDays} days`, 25, yPosition);
+                pdf.text(`Progress: Sabak(${progressStats.sabak}) Sabak Para(${progressStats.para}) Dhor(${progressStats.dhor}) - Total: ${totalDays} days`, 25, yPosition);
                 yPosition += 15;
             }
             
@@ -4950,7 +5092,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'parentAllHomeworkModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
+            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -5025,13 +5167,12 @@
         window.showAssignHomeworkModal = showAssignHomeworkModal;
         window.assignHomework = assignHomework;
         window.showViewHomeworkModal = showViewHomeworkModal;
-        window.showParentAllHomeworkModal = showParentAllHomeworkModal;
+        window.showHomeworkSummaryModal = showHomeworkSummaryModal;
         window.showViewAllHomeworkModal = showViewAllHomeworkModal;
         window.loadAllHomework = loadAllHomework;
+        window.updateHomeworkStatus = updateHomeworkStatus;
         window.toggleHomeworkCompletion = toggleHomeworkCompletion;
         window.deleteHomework = deleteHomework;
-        window.acknowledgeHomework = acknowledgeHomework;
-        window.markHomeworkReviewed = markHomeworkReviewed;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
         window.showResetModal = showResetModal;
