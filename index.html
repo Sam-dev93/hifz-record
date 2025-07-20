@@ -1148,7 +1148,7 @@
             }
         }
 
-        /* Modal styles - REDUCED INNER PADDING */
+        /* Modal styles - UPDATED WITH FIXED CLOSE BUTTON */
         .modal { 
             display: none; 
             position: fixed; 
@@ -1164,20 +1164,19 @@
         .modal-content { 
             background: white; 
             margin: 5% auto; 
-            padding: 25px; 
+            padding: 0; /* Remove default padding */
             border-radius: 20px; 
             width: 95%; 
             max-width: 600px; 
             position: relative; 
             max-height: 85vh; 
-            overflow-y: auto; 
+            overflow: hidden; /* Changed from auto to prevent double scroll */
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
         }
 
         @media (min-width: 768px) {
             .modal-content {
                 max-width: 800px;
-                padding: 35px;
                 margin: 3% auto;
                 width: 90%;
             }
@@ -1187,15 +1186,31 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            margin-bottom: 35px; 
-            padding-bottom: 20px; 
+            padding: 25px 25px 20px 25px; 
             border-bottom: 1px solid #F2F2F7; 
+            background: white;
+            position: sticky; /* Make header sticky */
+            top: 0;
+            z-index: 1001;
+            border-radius: 20px 20px 0 0;
         }
 
         @media (min-width: 768px) {
             .modal-header {
-                margin-bottom: 45px;
-                padding-bottom: 25px;
+                padding: 35px 35px 25px 35px;
+            }
+        }
+
+        .modal-body {
+            padding: 35px 25px 25px 25px;
+            max-height: calc(85vh - 100px); /* Adjust based on header height */
+            overflow-y: auto;
+        }
+
+        @media (min-width: 768px) {
+            .modal-body {
+                padding: 45px 35px 35px 35px;
+                max-height: calc(85vh - 120px);
             }
         }
         
@@ -1219,12 +1234,18 @@
             transition: color 0.3s ease; 
             padding: 8px; 
             line-height: 1; 
+            position: relative;
+            z-index: 1002;
         }
 
         @media (min-width: 768px) {
             .close {
                 font-size: 36px;
             }
+        }
+
+        .close:hover {
+            color: #1C1C1E;
         }
         
         .entry-form { 
@@ -1875,15 +1896,15 @@
                 <!-- Homework Section (for Parents) -->
                 <div class="section" id="homeworkSection" style="display: none;">
                     <div id="homeworkNotification" class="homework-notification">
-                        <div class="homework-notification-title">📚 New Homework Assigned</div>
+                        <div class="homework-notification-title">New Homework Assigned</div>
                         <div class="homework-notification-desc" id="homeworkNotificationDesc">You have new homework from your teacher</div>
                         <div class="homework-due-date" id="homeworkDueDate">Due: Tomorrow</div>
                         <div style="display: flex; gap: 8px;">
                             <button class="homework-button" onclick="showViewHomeworkModal()" style="flex: 1; margin-top: 0;">
-                                📖 View Homework
+                                View Homework
                             </button>
                             <button class="homework-button" onclick="showParentAllHomeworkModal()" style="flex: 1; margin-top: 0; background: #8E44AD;">
-                                📋 All Homework
+                                All Homework
                             </button>
                         </div>
                     </div>
@@ -2021,27 +2042,29 @@
                 <h2 class="modal-title" id="modalTitle">Enter Progress</h2>
                 <span class="close" onclick="closeModal('progressModal')">&times;</span>
             </div>
-            <div class="entry-form">
-                <div class="form-group" id="linesInputGroup">
-                    <label class="form-label">Lines (will auto-convert to pages & Juz)</label>
-                    <input type="number" class="form-input" id="linesInput" placeholder="e.g., 26 lines" min="1">
-                    <div id="conversionDisplay" style="margin-top: 8px; font-size: 12px; color: #10A37F;"></div>
-                </div>
-                <div class="form-group" id="amountInputGroup" style="display: none;">
-                    <label class="form-label">Amount/Pages</label>
-                    <input type="text" class="form-input" id="amountInput" placeholder="e.g., 5 lines, 1 page">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Grade</label>
-                    <div class="grade-buttons">
-                        <div class="grade-button" data-grade="excellent" onclick="selectGrade('excellent')">Excellent</div>
-                        <div class="grade-button" data-grade="good" onclick="selectGrade('good')">Good</div>
-                        <div class="grade-button" data-grade="okay" onclick="selectGrade('okay')">Okay</div>
-                        <div class="grade-button" data-grade="poor" onclick="selectGrade('poor')">Poor</div>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group" id="linesInputGroup">
+                        <label class="form-label">Lines (will auto-convert to pages & Juz)</label>
+                        <input type="number" class="form-input" id="linesInput" placeholder="e.g., 26 lines" min="1">
+                        <div id="conversionDisplay" style="margin-top: 8px; font-size: 12px; color: #10A37F;"></div>
                     </div>
+                    <div class="form-group" id="amountInputGroup" style="display: none;">
+                        <label class="form-label">Amount/Pages</label>
+                        <input type="text" class="form-input" id="amountInput" placeholder="e.g., 5 lines, 1 page">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Grade</label>
+                        <div class="grade-buttons">
+                            <div class="grade-button" data-grade="excellent" onclick="selectGrade('excellent')">Excellent</div>
+                            <div class="grade-button" data-grade="good" onclick="selectGrade('good')">Good</div>
+                            <div class="grade-button" data-grade="okay" onclick="selectGrade('okay')">Okay</div>
+                            <div class="grade-button" data-grade="poor" onclick="selectGrade('poor')">Poor</div>
+                        </div>
+                    </div>
+                    <button class="save-button" onclick="saveProgress()">Save Progress</button>
+                    <button class="clear-button" onclick="clearProgress()">Clear Entry</button>
                 </div>
-                <button class="save-button" onclick="saveProgress()">Save Progress</button>
-                <button class="clear-button" onclick="clearProgress()">Clear Entry</button>
             </div>
         </div>
     </div>
@@ -2053,31 +2076,33 @@
                 <h2 class="modal-title">Assign Homework</h2>
                 <span class="close" onclick="closeModal('assignHomeworkModal')">&times;</span>
             </div>
-            <div class="entry-form">
-                <div class="form-group">
-                    <label class="form-label">Select Student</label>
-                    <select class="form-select" id="homeworkStudentSelect">
-                        <option value="">Choose student</option>
-                    </select>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Select Student</label>
+                        <select class="form-select" id="homeworkStudentSelect">
+                            <option value="">Choose student</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Homework Type</label>
+                        <select class="form-select" id="homeworkTypeSelect">
+                            <option value="">Select homework type</option>
+                            <option value="sabak">Sabak - New Lessons</option>
+                            <option value="para">Sabak Para - Previous Lessons</option>
+                            <option value="dhor">Dhor - Revision</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-input" id="homeworkDueDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="homework-description" id="homeworkDescriptionInput" placeholder="Enter homework details and instructions..."></textarea>
+                    </div>
+                    <button class="save-button" onclick="assignHomework()">Assign Homework</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Homework Type</label>
-                    <select class="form-select" id="homeworkTypeSelect">
-                        <option value="">Select homework type</option>
-                        <option value="sabak">Sabak - New Lessons</option>
-                        <option value="para">Sabak Para - Previous Lessons</option>
-                        <option value="dhor">Dhor - Revision</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Due Date</label>
-                    <input type="date" class="form-input" id="homeworkDueDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="homework-description" id="homeworkDescriptionInput" placeholder="Enter homework details and instructions..."></textarea>
-                </div>
-                <button class="save-button" onclick="assignHomework()">Assign Homework</button>
             </div>
         </div>
     </div>
@@ -2089,8 +2114,10 @@
                 <h2 class="modal-title">All Homework Assignments</h2>
                 <span class="close" onclick="closeModal('viewAllHomeworkModal')">&times;</span>
             </div>
-            <div id="allHomeworkContent">
-                <!-- Content will be populated dynamically -->
+            <div class="modal-body">
+                <div id="allHomeworkContent">
+                    <!-- Content will be populated dynamically -->
+                </div>
             </div>
         </div>
     </div>
@@ -2102,8 +2129,10 @@
                 <h2 class="modal-title">Your Homework</h2>
                 <span class="close" onclick="closeModal('viewHomeworkModal')">&times;</span>
             </div>
-            <div id="homeworkContent">
-                <!-- Content will be populated dynamically -->
+            <div class="modal-body">
+                <div id="homeworkContent">
+                    <!-- Content will be populated dynamically -->
+                </div>
             </div>
         </div>
     </div>
@@ -2115,8 +2144,10 @@
                 <h2 class="modal-title">All Your Child's Homework</h2>
                 <span class="close" onclick="closeModal('parentAllHomeworkModal')">&times;</span>
             </div>
-            <div id="parentAllHomeworkContent">
-                <!-- Content will be populated dynamically -->
+            <div class="modal-body">
+                <div id="parentAllHomeworkContent">
+                    <!-- Content will be populated dynamically -->
+                </div>
             </div>
         </div>
     </div>
@@ -2128,23 +2159,25 @@
                 <h2 class="modal-title">Add New Student</h2>
                 <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
             </div>
-            <div class="entry-form">
-                <div class="form-group">
-                    <label class="form-label">Student Name</label>
-                    <input type="text" class="form-input" id="newStudentName" placeholder="Enter student name">
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Student Name</label>
+                        <input type="text" class="form-input" id="newStudentName" placeholder="Enter student name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quran Type</label>
+                        <select class="form-select" id="newQuranType">
+                            <option value="13">13 Line Quran (26 pages = 1 Juz)</option>
+                            <option value="15">15 Line Quran (20 pages = 1 Juz)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Parent Access Code</label>
+                        <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code (8 characters)">
+                    </div>
+                    <button class="save-button" onclick="addStudent()">Add Student</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Quran Type</label>
-                    <select class="form-select" id="newQuranType">
-                        <option value="13">13 Line Quran (26 pages = 1 Juz)</option>
-                        <option value="15">15 Line Quran (20 pages = 1 Juz)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Parent Access Code</label>
-                    <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code (8 characters)">
-                </div>
-                <button class="save-button" onclick="addStudent()">Add Student</button>
             </div>
         </div>
     </div>
@@ -2156,17 +2189,19 @@
                 <h2 class="modal-title">Remove Student</h2>
                 <span class="close" onclick="closeModal('removeStudentModal')">&times;</span>
             </div>
-            <div class="entry-form">
-                <div class="form-group">
-                    <label class="form-label">Select Student to Remove</label>
-                    <select class="form-select" id="removeStudentSelect">
-                        <option value="">Choose student to remove</option>
-                    </select>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Select Student to Remove</label>
+                        <select class="form-select" id="removeStudentSelect">
+                            <option value="">Choose student to remove</option>
+                        </select>
+                    </div>
+                    <div style="background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; color: #856404;">
+                        ⚠️ <strong>Warning:</strong> This will keep the data in Firebase but remove from active student list.
+                    </div>
+                    <button class="save-button" style="background: #FF3B30;" onclick="removeStudent()">Remove Student</button>
                 </div>
-                <div style="background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; color: #856404;">
-                    ⚠️ <strong>Warning:</strong> This will keep the data in Firebase but remove from active student list.
-                </div>
-                <button class="save-button" style="background: #FF3B30;" onclick="removeStudent()">Remove Student</button>
             </div>
         </div>
     </div>
@@ -2178,23 +2213,25 @@
                 <h2 class="modal-title">Manage Holidays</h2>
                 <span class="close" onclick="closeModal('holidayModal')">&times;</span>
             </div>
-            <div class="entry-form">
-                <div class="form-group">
-                    <label class="form-label">Holiday Name</label>
-                    <input type="text" class="form-input" id="holidayName" placeholder="e.g., Eid al-Fitr">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-input" id="holidayStartDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-input" id="holidayEndDate">
-                </div>
-                <button class="save-button" onclick="addHoliday()">Add Holiday</button>
-                
-                <div id="holidayList" class="holiday-list">
-                    <!-- Holiday list will be populated here -->
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Holiday Name</label>
+                        <input type="text" class="form-input" id="holidayName" placeholder="e.g., Eid al-Fitr">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-input" id="holidayStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-input" id="holidayEndDate">
+                    </div>
+                    <button class="save-button" onclick="addHoliday()">Add Holiday</button>
+                    
+                    <div id="holidayList" class="holiday-list">
+                        <!-- Holiday list will be populated here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -2207,27 +2244,29 @@
                 <h2 class="modal-title" id="dayModalTitle">Day Progress</h2>
                 <span class="close" onclick="closeModal('dayModal')">&times;</span>
             </div>
-            <div id="dayProgressList"></div>
-            
-            <!-- Legend for colored dots -->
-            <div style="margin-top: 24px; padding: 16px; background: #F8F9FA; border-radius: 12px; border-top: 1px solid #E5E5EA;">
-                <div style="font-size: 12px; font-weight: 600; color: #8E8E93; margin-bottom: 12px; text-align: center;">Progress Indicators</div>
-                <div style="display: flex; justify-content: center; gap: 20px; font-size: 11px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="width: 12px; height: 12px; background: #34C759; border-radius: 50%; display: inline-block;"></span>
-                        <span style="color: #8E8E93;">Excellent</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="width: 12px; height: 12px; background: #10A37F; border-radius: 50%; display: inline-block;"></span>
-                        <span style="color: #8E8E93;">Good</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="width: 12px; height: 12px; background: #FF9500; border-radius: 50%; display: inline-block;"></span>
-                        <span style="color: #8E8E93;">Okay</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="width: 12px; height: 12px; background: #FF3B30; border-radius: 50%; display: inline-block;"></span>
-                        <span style="color: #8E8E93;">Poor</span>
+            <div class="modal-body">
+                <div id="dayProgressList"></div>
+                
+                <!-- Legend for colored dots -->
+                <div style="margin-top: 24px; padding: 16px; background: #F8F9FA; border-radius: 12px; border-top: 1px solid #E5E5EA;">
+                    <div style="font-size: 12px; font-weight: 600; color: #8E8E93; margin-bottom: 12px; text-align: center;">Progress Indicators</div>
+                    <div style="display: flex; justify-content: center; gap: 20px; font-size: 11px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="width: 12px; height: 12px; background: #34C759; border-radius: 50%; display: inline-block;"></span>
+                            <span style="color: #8E8E93;">Excellent</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="width: 12px; height: 12px; background: #10A37F; border-radius: 50%; display: inline-block;"></span>
+                            <span style="color: #8E8E93;">Good</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="width: 12px; height: 12px; background: #FF9500; border-radius: 50%; display: inline-block;"></span>
+                            <span style="color: #8E8E93;">Okay</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="width: 12px; height: 12px; background: #FF3B30; border-radius: 50%; display: inline-block;"></span>
+                            <span style="color: #8E8E93;">Poor</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2240,26 +2279,28 @@
                 <h2 class="modal-title">Export Student PDF Report</h2>
                 <span class="close" onclick="closeModal('exportPDFModal')">&times;</span>
             </div>
-            <div class="entry-form">
-                <div class="form-group">
-                    <label class="form-label">Select Student</label>
-                    <select class="form-select" id="pdfStudentSelect">
-                        <option value="">Choose student for PDF report</option>
-                        <option value="all">All Students (Combined Report)</option>
-                    </select>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Select Student</label>
+                        <select class="form-select" id="pdfStudentSelect">
+                            <option value="">Choose student for PDF report</option>
+                            <option value="all">All Students (Combined Report)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select" id="pdfReportType">
+                            <option value="current-month">Current Month Progress</option>
+                            <option value="yearly-summary">Yearly Summary</option>
+                            <option value="yearly-detailed">Yearly Detailed</option>
+                        </select>
+                    </div>
+                    <button class="save-button pdf-export-button" onclick="generateSelectedPDF()" id="generatePDFBtn">
+                        <div class="loading-spinner" id="modalPdfSpinner"></div>
+                        <span id="modalPdfBtnText">📄 Generate PDF Report</span>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Report Type</label>
-                    <select class="form-select" id="pdfReportType">
-                        <option value="current-month">Current Month Progress</option>
-                        <option value="yearly-summary">Yearly Summary</option>
-                        <option value="yearly-detailed">Yearly Detailed</option>
-                    </select>
-                </div>
-                <button class="save-button pdf-export-button" onclick="generateSelectedPDF()" id="generatePDFBtn">
-                    <div class="loading-spinner" id="modalPdfSpinner"></div>
-                    <span id="modalPdfBtnText">📄 Generate PDF Report</span>
-                </button>
             </div>
         </div>
     </div>
@@ -2908,7 +2949,7 @@
                             </div>
                         </div>
                         
-                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">📋 All Homework</h3>
+                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">All Homework</h3>
                     `;
                     
                     homework.forEach((hw, index) => {
@@ -2959,7 +3000,7 @@
                             <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : isOverdue ? '#FF3B30' : '#E5E5EA'};">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                                     <div>
-                                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay} Homework</h3>
+                                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay} Homework</h3>
                                         <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
                                     </div>
                                     <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
@@ -3341,7 +3382,7 @@
                                 <div style="padding: 20px; margin-bottom: 16px; background: white; border-radius: 16px; border: 1px solid ${isOverdue ? '#FF3B30' : '#E5E5EA'};">
                                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                                         <div>
-                                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">📖 ${typeDisplay} Homework</h3>
+                                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay} Homework</h3>
                                             <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
                                         </div>
                                         <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
@@ -3360,15 +3401,12 @@
                         });
                         
                         content.innerHTML = `
-                            <div style="padding: 20px;">
-                                <div style="text-align: center; margin-bottom: 24px;">
-                                    <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
-                                    <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Current Homework</h3>
-                                    <p style="color: #8E8E93; font-size: 14px;">Complete these assignments on time</p>
-                                </div>
-                                
-                                ${homeworkHtml}
+                            <div style="text-align: center; margin-bottom: 24px;">
+                                <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E;">Current Homework</h3>
+                                <p style="color: #8E8E93; font-size: 14px;">Complete these assignments on time</p>
                             </div>
+                            
+                            ${homeworkHtml}
                         `;
                     }
                 }
