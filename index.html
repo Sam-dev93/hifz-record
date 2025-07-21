@@ -1879,6 +1879,228 @@
             background: rgba(255, 59, 48, 0.1); /* Light red background */
             border-radius: 8px;
         }
+
+        /* NEW STYLES FOR JUZ OVERVIEW AND PROGRESS */
+        .juz-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .juz-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+
+        .juz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E5E5EA;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .juz-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .juz-card.completed {
+            border-color: #34C759;
+            background: #F0FDF4;
+        }
+
+        .juz-card.current {
+            border-color: #3B82F6;
+            background: #EFF6FF;
+        }
+
+        .juz-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1C1C1E;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .juz-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .juz-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .juz-status.current {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .juz-status.not-started {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .juz-dates {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.4;
+        }
+
+        .juz-duration {
+            font-size: 16px;
+            font-weight: 600;
+            color: #10A37F;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .date-input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .date-input-row label {
+            min-width: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+        }
+
+        .date-input-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: #F9FAFB;
+            color: #1C1C1E;
+            font-size: 14px;
+        }
+
+        .date-input-row input:focus {
+            outline: none;
+            border-color: #10A37F;
+            background: white;
+        }
+
+        .hifz-duration-card {
+            background: linear-gradient(135deg, #10A37F, #0D7A5F);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(16, 163, 127, 0.3);
+        }
+
+        .hifz-duration-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .hifz-duration-time {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .hifz-duration-date {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E5E5EA;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-item.completed {
+            border-left: 4px solid #34C759;
+        }
+
+        .progress-item.current {
+            border-left: 4px solid #3B82F6;
+        }
+
+        .progress-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-item-juz {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1C1C1E;
+        }
+
+        .progress-item-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .progress-item-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .progress-item-status.current {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .progress-item-details {
+            color: #6B7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .progress-item-duration {
+            font-weight: 600;
+            color: #10A37F;
+            margin-top: 8px;
+        }
+
+        /* Update modal styles for larger content */
+        .large-modal .modal-content {
+            max-width: 1000px;
+            max-height: 90vh;
+        }
+
+        .large-modal .modal-body {
+            max-height: calc(90vh - 120px);
+        }
     </style>
 </head>
 <body>
@@ -1899,7 +2121,7 @@
                     <div class="profile-icon">📖</div>
                     <div class="profile-info">
                         <h3>Ustaadh</h3>
-                        <p>Add/edit progress, manage students, reports</p>
+                        <p>Manage students, generate reports</p>
                     </div>
                 </div>
 
@@ -1915,7 +2137,7 @@
                     <div class="profile-icon">👨‍👩‍👧‍👦</div>
                     <div class="profile-info">
                         <h3>Parent</h3>
-                        <p>View your child's progress only</p>
+                        <p>View your child's progress</p>
                     </div>
                 </div>
 
@@ -2091,6 +2313,7 @@
                         <div id="teacherControls" style="display: none;">
                             <button class="control-button" onclick="showAddStudentModal()">➕ Add New Student</button>
                             <button class="control-button" onclick="showRemoveStudentModal()">➖ Remove Student</button>
+                            <button class="control-button" onclick="showUpdateStudentOverviewModal()">📊 Update Student Overview</button>
                             <button class="control-button" onclick="showAssignHomeworkModal()">📚 Assign Homework</button>
                             <button class="control-button" onclick="showViewAllHomeworkModal()">📋 View All Homework</button>
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
@@ -2112,6 +2335,7 @@
                         <!-- Parent Controls -->
                         <div id="parentControls" style="display: none;">
                             <button class="control-button" onclick="showHomeworkSummaryModal()">📊 Homework Summary</button>
+                            <button class="control-button" onclick="showOverallProgressModal()">📈 Overall Progress</button>
                         </div>
 
                         <button class="logout-button" onclick="logout()">Logout</button>
@@ -2154,6 +2378,56 @@
                     </div>
                     <button class="save-button" onclick="saveProgress()">Save Progress</button>
                     <button class="clear-button" onclick="clearProgress()">Clear Entry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Student Overview Modal -->
+    <div id="updateStudentOverviewModal" class="modal large-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Student Overview</h2>
+                <span class="close" onclick="closeModal('updateStudentOverviewModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Select Student</label>
+                        <select class="form-select" id="overviewStudentSelect">
+                            <option value="">Choose student</option>
+                        </select>
+                    </div>
+                    
+                    <div id="overviewForm" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Hifz Start Date</label>
+                            <input type="date" class="form-input" id="hifzStartDate">
+                        </div>
+                        
+                        <h3 style="margin: 30px 0 20px 0; font-size: 20px; font-weight: 600; color: #1C1C1E;">Juz Progress (1-30)</h3>
+                        
+                        <div id="juzProgressContainer">
+                            <!-- Juz cards will be generated here -->
+                        </div>
+                        
+                        <button class="save-button" onclick="saveStudentOverview()">Save Overview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Progress Modal (Parents) -->
+    <div id="overallProgressModal" class="modal large-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Overall Progress</h2>
+                <span class="close" onclick="closeModal('overallProgressModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="overallProgressContent">
+                    <!-- Content will be populated dynamically -->
                 </div>
             </div>
         </div>
@@ -2967,6 +3241,379 @@
             }
         }
 
+        // NEW FUNCTIONS FOR JUZ OVERVIEW
+
+        // Calculate duration between two dates
+        function calculateDuration(startDate, endDate = null) {
+            const start = new Date(startDate);
+            const end = endDate ? new Date(endDate) : new Date();
+            
+            let years = end.getFullYear() - start.getFullYear();
+            let months = end.getMonth() - start.getMonth();
+            let days = end.getDate() - start.getDate();
+            
+            if (days < 0) {
+                months--;
+                days += new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+            }
+            
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            return { years, months, days };
+        }
+
+        function formatDuration(duration) {
+            const { years, months, days } = duration;
+            return `${years} Years ${months} Months ${days} Days`;
+        }
+
+        function showUpdateStudentOverviewModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Populate student dropdown
+            window.getStudents().then(students => {
+                const select = document.getElementById('overviewStudentSelect');
+                select.innerHTML = '<option value="">Choose student</option>';
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            });
+            
+            // Reset form
+            document.getElementById('overviewForm').style.display = 'none';
+            document.getElementById('hifzStartDate').value = '';
+            
+            document.getElementById('updateStudentOverviewModal').style.display = 'block';
+        }
+
+        async function onOverviewStudentChange() {
+            const studentId = document.getElementById('overviewStudentSelect').value;
+            const overviewForm = document.getElementById('overviewForm');
+            
+            if (!studentId) {
+                overviewForm.style.display = 'none';
+                return;
+            }
+            
+            // Load existing data
+            const juzData = await getStudentJuzProgress(studentId);
+            
+            // Show form
+            overviewForm.style.display = 'block';
+            
+            // Set Hifz start date if available
+            if (juzData.hifzStartDate) {
+                document.getElementById('hifzStartDate').value = juzData.hifzStartDate;
+            }
+            
+            // Generate Juz cards
+            generateJuzCards(juzData.juzProgress || {});
+        }
+
+        function generateJuzCards(juzProgress) {
+            const container = document.getElementById('juzProgressContainer');
+            container.innerHTML = '';
+            
+            // Create cards for all 30 Juz
+            for (let juzNumber = 1; juzNumber <= 30; juzNumber++) {
+                const juzData = juzProgress[juzNumber] || {};
+                
+                const card = document.createElement('div');
+                card.className = 'juz-card';
+                card.id = `juz-${juzNumber}`;
+                
+                let statusClass = 'not-started';
+                let statusText = 'Not Started';
+                let durationHtml = '';
+                
+                if (juzData.startDate && juzData.finishDate) {
+                    statusClass = 'completed';
+                    statusText = 'Completed';
+                    const duration = calculateDuration(juzData.startDate, juzData.finishDate);
+                    durationHtml = `<div class="juz-duration">${formatDuration(duration)}</div>`;
+                } else if (juzData.startDate) {
+                    statusClass = 'current';
+                    statusText = 'Currently On';
+                    const duration = calculateDuration(juzData.startDate);
+                    durationHtml = `<div class="juz-duration">${formatDuration(duration)} (ongoing)</div>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="juz-number">Juz ${juzNumber}</div>
+                    <div class="juz-status ${statusClass}">${statusText}</div>
+                    <div class="date-input-group">
+                        <div class="date-input-row">
+                            <label>Start:</label>
+                            <input type="date" id="juz-${juzNumber}-start" value="${juzData.startDate || ''}" 
+                                   onchange="updateJuzDate(${juzNumber}, 'startDate', this.value)">
+                        </div>
+                        <div class="date-input-row">
+                            <label>Finish:</label>
+                            <input type="date" id="juz-${juzNumber}-finish" value="${juzData.finishDate || ''}"
+                                   onchange="updateJuzDate(${juzNumber}, 'finishDate', this.value)">
+                        </div>
+                    </div>
+                    ${durationHtml}
+                `;
+                
+                container.appendChild(card);
+            }
+        }
+
+        function updateJuzDate(juzNumber, dateType, value) {
+            const card = document.getElementById(`juz-${juzNumber}`);
+            const startInput = document.getElementById(`juz-${juzNumber}-start`);
+            const finishInput = document.getElementById(`juz-${juzNumber}-finish`);
+            
+            const startDate = startInput.value;
+            const finishDate = finishInput.value;
+            
+            // Debug logging
+            console.log(`Updating Juz ${juzNumber} ${dateType} to: ${value}`);
+            console.log(`Current values - Start: ${startDate}, Finish: ${finishDate}`);
+            
+            // Update status and duration
+            let statusClass = 'not-started';
+            let statusText = 'Not Started';
+            let durationHtml = '';
+            
+            if (startDate && finishDate) {
+                statusClass = 'completed';
+                statusText = 'Completed';
+                const duration = calculateDuration(startDate, finishDate);
+                durationHtml = `<div class="juz-duration">${formatDuration(duration)}</div>`;
+            } else if (startDate) {
+                statusClass = 'current';
+                statusText = 'Currently On';
+                const duration = calculateDuration(startDate);
+                durationHtml = `<div class="juz-duration">${formatDuration(duration)} (ongoing)</div>`;
+            }
+            
+            // Update card appearance
+            card.className = `juz-card ${statusClass}`;
+            card.querySelector('.juz-status').className = `juz-status ${statusClass}`;
+            card.querySelector('.juz-status').textContent = statusText;
+            
+            // Update duration display
+            const existingDuration = card.querySelector('.juz-duration');
+            if (existingDuration) {
+                existingDuration.remove();
+            }
+            
+            if (durationHtml) {
+                card.insertAdjacentHTML('beforeend', durationHtml);
+            }
+        }
+
+        async function saveStudentOverview() {
+            const studentId = document.getElementById('overviewStudentSelect').value;
+            const hifzStartDate = document.getElementById('hifzStartDate').value;
+            
+            if (!studentId) {
+                alert('Please select a student');
+                return;
+            }
+            
+            if (!hifzStartDate) {
+                alert('Please set the Hifz start date');
+                return;
+            }
+            
+            // Collect all Juz data using specific IDs
+            const juzProgress = {};
+            
+            for (let juzNumber = 1; juzNumber <= 30; juzNumber++) {
+                const startInput = document.getElementById(`juz-${juzNumber}-start`);
+                const finishInput = document.getElementById(`juz-${juzNumber}-finish`);
+                
+                const startDate = startInput ? startInput.value : '';
+                const finishDate = finishInput ? finishInput.value : '';
+                
+                // Debug logging
+                console.log(`Juz ${juzNumber}: Start="${startDate}", Finish="${finishDate}"`);
+                
+                if (startDate || finishDate) {
+                    juzProgress[juzNumber] = {};
+                    if (startDate) juzProgress[juzNumber].startDate = startDate;
+                    if (finishDate) juzProgress[juzNumber].finishDate = finishDate;
+                }
+            }
+            
+            // Debug the final data structure
+            console.log('Final juzProgress data:', juzProgress);
+            
+            // Save to Firebase
+            try {
+                await saveStudentJuzProgress(studentId, {
+                    hifzStartDate: hifzStartDate,
+                    juzProgress: juzProgress,
+                    lastUpdated: new Date().toISOString()
+                });
+                
+                closeModal('updateStudentOverviewModal');
+                alert('Student overview updated successfully!');
+                
+            } catch (error) {
+                console.error('Error saving student overview:', error);
+                alert('Error saving overview: ' + error.message);
+            }
+        }
+
+        async function saveStudentJuzProgress(studentId, data) {
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await setDoc(doc(db, 'juzProgress', studentId), data);
+                console.log(`Juz progress saved for ${studentId}`);
+            } catch (error) {
+                console.error('Error saving juz progress:', error);
+                throw error;
+            }
+        }
+
+        async function getStudentJuzProgress(studentId) {
+            try {
+                const { getDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const juzDoc = await getDoc(doc(db, 'juzProgress', studentId));
+                if (juzDoc.exists()) {
+                    return juzDoc.data();
+                }
+                return { hifzStartDate: null, juzProgress: {} };
+            } catch (error) {
+                console.error('Error fetching juz progress:', error);
+                return { hifzStartDate: null, juzProgress: {} };
+            }
+        }
+
+        async function showOverallProgressModal() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const juzData = await getStudentJuzProgress(currentStudent);
+                const students = await window.getStudents();
+                const student = students.find(s => s.id === currentStudent);
+                
+                const content = document.getElementById('overallProgressContent');
+                
+                if (!juzData.hifzStartDate) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">No Hifz Data Available</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set up your Hifz progress tracking yet.</p>
+                        </div>
+                    `;
+                } else {
+                    // Calculate total Hifz duration
+                    const totalDuration = calculateDuration(juzData.hifzStartDate);
+                    
+                    // Generate progress content
+                    let progressHtml = `
+                        <!-- Hifz Duration Card -->
+                        <div class="hifz-duration-card">
+                            <div class="hifz-duration-title">HIFZ DURATION</div>
+                            <div class="hifz-duration-time">${formatDuration(totalDuration)}</div>
+                            <div class="hifz-duration-date">As of ${new Date().toLocaleDateString('en-US', { 
+                                weekday: 'long', 
+                                month: 'long', 
+                                day: 'numeric',
+                                year: 'numeric'
+                            })}</div>
+                        </div>
+                        
+                        <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 20px;">📖 Juz Progress</h3>
+                        
+                        <div class="progress-list">
+                    `;
+                    
+                    // Process Juz data - only show ones with dates
+                    const juzEntries = [];
+                    
+                    for (let juzNumber = 1; juzNumber <= 30; juzNumber++) {
+                        const juzInfo = juzData.juzProgress[juzNumber];
+                        if (juzInfo && juzInfo.startDate) {
+                            juzEntries.push({ number: juzNumber, ...juzInfo });
+                        }
+                    }
+                    
+                    // Sort by start date
+                    juzEntries.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                    
+                    if (juzEntries.length === 0) {
+                        progressHtml += `
+                            <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
+                                <div style="font-size: 40px; margin-bottom: 16px;">📚</div>
+                                <h3 style="font-size: 18px; margin-bottom: 8px;">No Juz Progress Yet</h3>
+                                <p>Your teacher will update your Juz progress as you advance.</p>
+                            </div>
+                        `;
+                    } else {
+                        juzEntries.forEach(juz => {
+                            const isCompleted = juz.startDate && juz.finishDate;
+                            const statusClass = isCompleted ? 'completed' : 'current';
+                            const statusText = isCompleted ? 'Completed' : 'Currently On';
+                            
+                            const startDateStr = new Date(juz.startDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                            });
+                            
+                            let dateRangeHtml = `Started: ${startDateStr}`;
+                            let durationHtml = '';
+                            
+                            if (isCompleted) {
+                                const finishDateStr = new Date(juz.finishDate).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                });
+                                dateRangeHtml = `${startDateStr} - ${finishDateStr}`;
+                                
+                                const duration = calculateDuration(juz.startDate, juz.finishDate);
+                                durationHtml = `<div class="progress-item-duration">Time Taken: ${formatDuration(duration)}</div>`;
+                            } else {
+                                const duration = calculateDuration(juz.startDate);
+                                durationHtml = `<div class="progress-item-duration">Duration: ${formatDuration(duration)} (ongoing)</div>`;
+                            }
+                            
+                            progressHtml += `
+                                <div class="progress-item ${statusClass}">
+                                    <div class="progress-item-header">
+                                        <div class="progress-item-juz">Juz ${juz.number}</div>
+                                        <div class="progress-item-status ${statusClass}">${statusText}</div>
+                                    </div>
+                                    <div class="progress-item-details">
+                                        ${dateRangeHtml}
+                                        ${durationHtml}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    progressHtml += '</div>';
+                    content.innerHTML = progressHtml;
+                }
+                
+                document.getElementById('overallProgressModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading overall progress:', error);
+                alert('Error loading progress: ' + error.message);
+            }
+        }
+
         // Homework Functions
         async function checkForHomework() {
             if (currentUserType !== 'parent' || !currentStudent) return;
@@ -3136,43 +3783,6 @@
             } catch (error) {
                 console.error('Error fetching homework summary:', error);
                 alert('Error loading homework summary: ' + error.message);
-            }
-        }
-
-        async function loadAllHomework(filter = 'all') {
-            try {
-                const { getDocs, collection } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                const querySnapshot = await getDocs(collection(db, 'homework'));
-                const allHomework = [];
-                
-                querySnapshot.forEach((doc) => {
-                    allHomework.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Sort by assigned date (newest first)
-                allHomework.sort((a, b) => new Date(b.assignedDate) - new Date(a.assignedDate));
-                
-                // Get student names
-                const students = await window.getStudents();
-                
-                // Filter homework based on selection
-                let filteredHomework = allHomework;
-                if (filter === 'pending') {
-                    filteredHomework = allHomework.filter(hw => !hw.completed && hw.status !== 'did-not-give');
-                } else if (filter === 'completed') {
-                    filteredHomework = allHomework.filter(hw => hw.completed);
-                } else if (filter === 'overdue') {
-                    filteredHomework = allHomework.filter(hw => !hw.completed && hw.status !== 'did-not-give' && isHomeworkOverdue(hw.dueDate));
-                } else if (filter === 'did-not-give') {
-                    filteredHomework = allHomework.filter(hw => hw.status === 'did-not-give');
-                }
-                
-                displayAllHomework(filteredHomework, students, filter, allHomework);
-                
-            } catch (error) {
-                console.error('Error loading homework:', error);
             }
         }
 
@@ -3648,6 +4258,21 @@
                 alert('Error loading homework: ' + error.message);
             }
         }
+
+        // Add event listener for overview student select
+        document.addEventListener('DOMContentLoaded', function() {
+            const overviewSelect = document.getElementById('overviewStudentSelect');
+            if (overviewSelect) {
+                overviewSelect.addEventListener('change', onOverviewStudentChange);
+            }
+        });
+
+        // Make functions available globally
+        window.showUpdateStudentOverviewModal = showUpdateStudentOverviewModal;
+        window.onOverviewStudentChange = onOverviewStudentChange;
+        window.updateJuzDate = updateJuzDate;
+        window.saveStudentOverview = saveStudentOverview;
+        window.showOverallProgressModal = showOverallProgressModal;
 
         // Firebase Helper Functions
         window.getStudents = async function() {
@@ -5154,7 +5779,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal'];
+            const modals = ['progressModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'addStudentModal', 'removeStudentModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -5223,6 +5848,11 @@
         window.addStudent = addStudent;
         window.showRemoveStudentModal = showRemoveStudentModal;
         window.removeStudent = removeStudent;
+        window.showUpdateStudentOverviewModal = showUpdateStudentOverviewModal;
+        window.onOverviewStudentChange = onOverviewStudentChange;
+        window.updateJuzDate = updateJuzDate;
+        window.saveStudentOverview = saveStudentOverview;
+        window.showOverallProgressModal = showOverallProgressModal;
         window.showHolidayModal = showHolidayModal;
         window.addHoliday = addHoliday;
         window.removeHoliday = removeHoliday;
