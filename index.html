@@ -3936,16 +3936,16 @@
                         let statusHtml = '';
                         let statusColor = '';
                         if (hw.status === 'did-not-give') {
-                            statusHtml = '<span style="color: #991B1B; font-weight: 600; font-size: 10px;">📝 Did Not Give</span>';
+                            statusHtml = '<span style="color: #991B1B; font-weight: 600; font-size: 10px;">Did Not Give</span>';
                             statusColor = '#FEF2F2';
                         } else if (hw.completed) {
-                            statusHtml = '<span style="color: #34C759; font-weight: 600; font-size: 10px;">✓ Completed</span>';
+                            statusHtml = '<span style="color: #34C759; font-weight: 600; font-size: 10px;">Completed</span>';
                             statusColor = '#D1FAE5';
                         } else if (isOverdue) {
-                            statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 10px;">⚠ Overdue</span>';
+                            statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 10px;">Overdue</span>';
                             statusColor = '#FFE4CC';
                         } else {
-                            statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 10px;">⏳ Pending</span>';
+                            statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 10px;">Pending</span>';
                             statusColor = '#FED7AA';
                         }
                         
@@ -4103,16 +4103,16 @@
                 let statusHtml = '';
                 let itemClass = '';
                 if (hw.status === 'did-not-give') {
-                    statusHtml = '<span class="homework-status did-not-give">📝 Did Not Give</span>';
+                    statusHtml = '<span class="homework-status did-not-give">Did Not Give</span>';
                     itemClass = 'did-not-give';
                 } else if (hw.completed) {
-                    statusHtml = '<span class="homework-status completed">✓ Completed</span>';
+                    statusHtml = '<span class="homework-status completed">Completed</span>';
                     itemClass = 'completed';
                 } else if (isOverdue) {
-                    statusHtml = '<span class="homework-status overdue">⚠ Overdue</span>';
+                    statusHtml = '<span class="homework-status overdue">Overdue</span>';
                     itemClass = 'overdue';
                 } else {
-                    statusHtml = '<span class="homework-status pending">⏳ Pending</span>';
+                    statusHtml = '<span class="homework-status pending">Pending</span>';
                 }
                 
                 const descriptionHtml = hw.description ? 
@@ -4137,7 +4137,7 @@
                             ↩️ Mark Incomplete
                         </button>
                         <button class="homework-toggle did-not-give" onclick="updateHomeworkStatus('${hw.id}', 'did-not-give')">
-                            📝 Did Not Give
+                            🚫 Did Not Give
                         </button>
                         <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
                                 style="background: #FF3B30;">
@@ -4150,7 +4150,7 @@
                             ✓ Mark Complete
                         </button>
                         <button class="homework-toggle did-not-give" onclick="updateHomeworkStatus('${hw.id}', 'did-not-give')">
-                            📝 Did Not Give
+                            🚫 Did Not Give
                         </button>
                         <button class="homework-toggle incomplete" onclick="deleteHomework('${hw.id}')" 
                                 style="background: #FF3B30;">
