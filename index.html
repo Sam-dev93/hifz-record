@@ -822,7 +822,7 @@
         }
         
         .grade-badge.good { 
-            background: #10A37F; 
+            background: #8E44AD; 
         }
         
         .grade-badge.okay { 
@@ -1360,33 +1360,56 @@
             background: white; 
         }
 
-        /* Homework checkbox styles */
+        /* UPDATED - Homework Modal Styles to Match App Theme */
+        .homework-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E5E5EA;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .homework-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1C1C1E;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* UPDATED - Homework checkbox styles to match app theme */
         .homework-checkbox-group {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         .homework-checkbox {
             display: flex;
             align-items: flex-start;
             gap: 16px;
-            padding: 20px;
+            padding: 16px;
             border: 1px solid #E5E5EA;
-            border-radius: 16px;
+            border-radius: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
-        }
-
-        .homework-checkbox:hover {
             background: #F8F9FA;
         }
 
+        .homework-checkbox:hover {
+            background: #F2F2F7;
+            border-color: #10A37F;
+        }
+
         .homework-checkbox input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             margin: 0;
             cursor: pointer;
+            accent-color: #10A37F;
         }
 
         .homework-checkbox-content {
@@ -1394,14 +1417,14 @@
         }
 
         .homework-checkbox-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #1C1C1E;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .homework-checkbox-desc {
-            font-size: 16px;
+            font-size: 14px;
             color: #8E8E93;
         }
 
@@ -1416,12 +1439,351 @@
             font-size: 16px;
             resize: vertical;
             margin-top: 12px;
+            font-family: inherit;
         }
 
         .homework-description:focus {
             outline: none;
             border-color: #10A37F;
             background: white;
+        }
+
+        /* UPDATED - Orange homework notification styling */
+        .homework-notification {
+            background: #FFF4E6; /* Light orange background */
+            border: 2px solid #EA580C; /* Dark orange border */
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(234, 88, 12, 0.15); /* Orange shadow */
+        }
+
+        .homework-notification-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #C2410C; /* Dark orange text */
+            margin-bottom: 8px;
+        }
+
+        .homework-notification-desc {
+            font-size: 14px;
+            color: #9A3412; /* Medium orange text */
+            margin-bottom: 12px;
+        }
+
+        .homework-due-date {
+            font-size: 12px;
+            color: #EA580C; /* Dark orange for due date */
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* UPDATED - Homework management styles with app theme */
+        .homework-item {
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .homework-item.completed {
+            background: #F0FDF4;
+            border-color: #34C759;
+        }
+
+        .homework-item.overdue {
+            background: #FFF8F0;
+            border-color: #FFB84D;
+        }
+
+        .homework-item.did-not-give {
+            background: #FEF2F2;
+            border-color: #FF3B30;
+        }
+
+        .homework-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .homework-student-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 6px;
+        }
+
+        .homework-type-badge {
+            background: #3B82F6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .homework-type-badge.sabak {
+            background: #10A37F;
+        }
+
+        .homework-type-badge.para {
+            background: #8E44AD;
+        }
+
+        .homework-type-badge.dhor {
+            background: #FF9500;
+        }
+
+        .homework-details {
+            color: #8E8E93;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .homework-description-display {
+            background: #F8F9FA;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #1C1C1E;
+            margin-bottom: 16px;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .homework-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* UPDATED - Smaller homework action buttons */
+        .homework-toggle {
+            background: #34C759;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .homework-toggle.incomplete {
+            background: #FF3B30;
+        }
+
+        .homework-toggle.did-not-give {
+            background: #FF3B30;
+        }
+
+        .homework-toggle:hover {
+            opacity: 0.8;
+        }
+
+        /* UPDATED - Homework status badges to match app theme */
+        .homework-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .homework-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .homework-status.pending {
+            background: #FED7AA;
+            color: #C2410C;
+        }
+
+        .homework-status.overdue {
+            background: #FFE4CC;
+            color: #EA580C;
+        }
+
+        .homework-status.did-not-give {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .homework-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-button {
+            background: #F2F2F7;
+            border: 1px solid #E5E5EA;
+            color: #8E8E93;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-button.active {
+            background: #10A37F;
+            border-color: #10A37F;
+            color: white;
+        }
+
+        .no-homework {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8E8E93;
+        }
+
+        /* UPDATED - Homework summary to match app theme */
+        .homework-summary-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E5E5EA;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .homework-summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .homework-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .homework-summary-stat {
+            text-align: center;
+            padding: 16px;
+            background: #F8F9FA;
+            border-radius: 12px;
+            border: 1px solid #E5E5EA;
+        }
+
+        .homework-summary-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .homework-summary-label {
+            font-size: 12px;
+            color: #8E8E93;
+            font-weight: 600;
+        }
+
+        /* UPDATED - Overall Progress Modal to match app theme */
+        .hifz-duration-card {
+            background: linear-gradient(135deg, #10A37F, #0D7A5F);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(16, 163, 127, 0.3);
+        }
+
+        .hifz-duration-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .hifz-duration-time {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .hifz-duration-date {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E5E5EA;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-item.completed {
+            border-left: 4px solid #34C759;
+        }
+
+        .progress-item.current {
+            border-left: 4px solid #3B82F6;
+        }
+
+        .progress-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-item-juz {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1C1C1E;
+        }
+
+        .progress-item-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .progress-item-status.completed {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .progress-item-status.current {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .progress-item-details {
+            color: #6B7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .progress-item-duration {
+            font-weight: 600;
+            color: #10A37F;
+            margin-top: 8px;
         }
 
         /* Controls */
@@ -1610,276 +1972,6 @@
             cursor: pointer;
         }
 
-        /* Homework notification styles */
-        .homework-notification {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid #3B82F6;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .homework-notification-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1E40AF;
-            margin-bottom: 8px;
-        }
-
-        .homework-notification-desc {
-            font-size: 14px;
-            color: #1E40AF;
-            margin-bottom: 12px;
-        }
-
-        .homework-due-date {
-            font-size: 12px;
-            color: #1E40AF;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        /* UPDATED Homework management styles with new colors */
-        .homework-item {
-            background: white;
-            border: 1px solid #E5E5EA;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .homework-item.completed {
-            background: #F0F9FF;
-            border-color: #34C759;
-        }
-
-        .homework-item.overdue {
-            background: #FFF8F0; /* Light orange background */
-            border-color: #FFB84D; /* Light orange border */
-        }
-
-        .homework-item.did-not-give {
-            background: #FEF2F2; /* Red background */
-            border-color: #FF3B30; /* Red border */
-        }
-
-        .homework-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .homework-student-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1C1C1E;
-            margin-bottom: 4px;
-        }
-
-        .homework-type-badge {
-            background: #3B82F6;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .homework-type-badge.sabak {
-            background: #10A37F;
-        }
-
-        .homework-type-badge.para {
-            background: #8E44AD;
-        }
-
-        .homework-type-badge.dhor {
-            background: #FF9500;
-        }
-
-        .homework-details {
-            color: #8E8E93;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .homework-description {
-            background: #F8F9FA;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #1C1C1E;
-            margin-bottom: 12px;
-        }
-
-        .homework-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .homework-toggle {
-            background: #34C759;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .homework-toggle.incomplete {
-            background: #FF3B30; /* Red for incomplete/delete actions */
-        }
-
-        .homework-toggle.did-not-give {
-            background: #FF3B30; /* Red for "Did Not Give" */
-        }
-
-        .homework-toggle:hover {
-            opacity: 0.8;
-        }
-
-        /* UPDATED Homework status colors */
-        .homework-status {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        .homework-status.completed {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-
-        .homework-status.pending {
-            background: #FED7AA; /* Orange background */
-            color: #C2410C; /* Orange text */
-        }
-
-        .homework-status.overdue {
-            background: #FFE4CC; /* Light orange background */
-            color: #EA580C; /* Light orange text */
-        }
-
-        .homework-status.did-not-give {
-            background: #FEE2E2; /* Red background */
-            color: #991B1B; /* Red text */
-        }
-
-        .homework-filters {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-button {
-            background: #F2F2F7;
-            border: 1px solid #E5E5EA;
-            color: #8E8E93;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-button.active {
-            background: #10A37F;
-            border-color: #10A37F;
-            color: white;
-        }
-
-        .no-homework {
-            text-align: center;
-            padding: 40px 20px;
-            color: #8E8E93;
-        }
-
-        /* Homework summary styles */
-        .homework-summary-section {
-            background: #F8F9FA;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #E5E5EA;
-        }
-
-        .homework-summary-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1C1C1E;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .homework-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .homework-summary-stat {
-            text-align: center;
-            padding: 12px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #E5E5EA;
-        }
-
-        .homework-summary-number {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .homework-summary-label {
-            font-size: 12px;
-            color: #8E8E93;
-            font-weight: 600;
-        }
-
-        /* Did Not Give homework section */
-        .did-not-give-section {
-            margin-top: 20px;
-            padding: 16px;
-            background: #FEF2F2; /* Red background */
-            border-radius: 12px;
-            border: 1px solid #FF3B30; /* Red border */
-        }
-
-        .did-not-give-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #991B1B; /* Red text */
-            margin-bottom: 12px;
-        }
-
-        .did-not-give-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .did-not-give-item {
-            font-size: 14px;
-            color: #991B1B; /* Red text */
-            padding: 8px 12px;
-            background: rgba(255, 59, 48, 0.1); /* Light red background */
-            border-radius: 8px;
-        }
-
         /* NEW STYLES FOR JUZ OVERVIEW AND PROGRESS */
         .juz-grid {
             display: grid;
@@ -2000,98 +2092,6 @@
             background: white;
         }
 
-        .hifz-duration-card {
-            background: linear-gradient(135deg, #10A37F, #0D7A5F);
-            color: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(16, 163, 127, 0.3);
-        }
-
-        .hifz-duration-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            opacity: 0.9;
-        }
-
-        .hifz-duration-time {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .hifz-duration-date {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .progress-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .progress-item {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid #E5E5EA;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .progress-item.completed {
-            border-left: 4px solid #34C759;
-        }
-
-        .progress-item.current {
-            border-left: 4px solid #3B82F6;
-        }
-
-        .progress-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .progress-item-juz {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1C1C1E;
-        }
-
-        .progress-item-status {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-
-        .progress-item-status.completed {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-
-        .progress-item-status.current {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .progress-item-details {
-            color: #6B7280;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .progress-item-duration {
-            font-weight: 600;
-            color: #10A37F;
-            margin-top: 8px;
-        }
-
         /* Update modal styles for larger content */
         .large-modal .modal-content {
             max-width: 1000px;
@@ -2208,7 +2208,7 @@
                 <!-- Homework Section (for Parents) -->
                 <div class="section" id="homeworkSection" style="display: none;">
                     <div id="homeworkNotification" class="homework-notification">
-                        <div class="homework-notification-title">New Homework Assigned</div>
+                        <div class="homework-notification-title">📚 New Homework Assigned</div>
                         <div class="homework-notification-desc" id="homeworkNotificationDesc">You have new homework from your teacher</div>
                         <div class="homework-due-date" id="homeworkDueDate">Due: Tomorrow</div>
                         <div style="display: flex; gap: 8px;">
@@ -2326,6 +2326,7 @@
 
                         <!-- Office Controls -->
                         <div id="officeControls" style="display: none;">
+                            <button class="control-button" onclick="showOverallProgressModal()">📈 Overall Progress</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="officePdfSpinner"></div>
                                 <span id="officePdfBtnText">📄 Export Student PDF</span>
@@ -2418,7 +2419,7 @@
         </div>
     </div>
 
-    <!-- Overall Progress Modal (Parents) -->
+    <!-- Overall Progress Modal (Parents & Office) -->
     <div id="overallProgressModal" class="modal large-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2437,35 +2438,40 @@
     <div id="assignHomeworkModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Assign Homework</h2>
+                <h2 class="modal-title">📚 Assign Homework</h2>
                 <span class="close" onclick="closeModal('assignHomeworkModal')">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="entry-form">
-                    <div class="form-group">
-                        <label class="form-label">Select Student</label>
-                        <select class="form-select" id="homeworkStudentSelect">
-                            <option value="">Choose student</option>
-                        </select>
+                <div class="homework-section">
+                    <div class="homework-section-title">
+                        📝 Homework Details
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Homework Type</label>
-                        <select class="form-select" id="homeworkTypeSelect">
-                            <option value="">Select homework type</option>
-                            <option value="sabak">Sabak - New Lessons</option>
-                            <option value="para">Sabak Para - Previous Lessons</option>
-                            <option value="dhor">Dhor - Revision</option>
-                        </select>
+                    <div class="entry-form">
+                        <div class="form-group">
+                            <label class="form-label">Select Student</label>
+                            <select class="form-select" id="homeworkStudentSelect">
+                                <option value="">Choose student</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Homework Type</label>
+                            <select class="form-select" id="homeworkTypeSelect">
+                                <option value="">Select homework type</option>
+                                <option value="sabak">Sabak - New Lessons</option>
+                                <option value="para">Sabak Para - Previous Lessons</option>
+                                <option value="dhor">Dhor - Revision</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" class="form-input" id="homeworkDueDate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="homework-description" id="homeworkDescriptionInput" placeholder="Enter homework details and instructions..."></textarea>
+                        </div>
+                        <button class="save-button" onclick="assignHomework()">Assign Homework</button>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Due Date</label>
-                        <input type="date" class="form-input" id="homeworkDueDate">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea class="homework-description" id="homeworkDescriptionInput" placeholder="Enter homework details and instructions..."></textarea>
-                    </div>
-                    <button class="save-button" onclick="assignHomework()">Assign Homework</button>
                 </div>
             </div>
         </div>
@@ -2475,7 +2481,7 @@
     <div id="viewAllHomeworkModal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2 class="modal-title">All Homework Assignments</h2>
+                <h2 class="modal-title">📋 All Homework Assignments</h2>
                 <span class="close" onclick="closeModal('viewAllHomeworkModal')">&times;</span>
             </div>
             <div class="modal-body">
@@ -2490,7 +2496,7 @@
     <div id="viewHomeworkModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Your Homework</h2>
+                <h2 class="modal-title">📚 Your Homework</h2>
                 <span class="close" onclick="closeModal('viewHomeworkModal')">&times;</span>
             </div>
             <div class="modal-body">
@@ -2505,7 +2511,7 @@
     <div id="homeworkSummaryModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Homework Summary</h2>
+                <h2 class="modal-title">📊 Homework Summary</h2>
                 <span class="close" onclick="closeModal('homeworkSummaryModal')">&times;</span>
             </div>
             <div class="modal-body">
@@ -2620,7 +2626,7 @@
                             <span style="color: #8E8E93;">Excellent</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="width: 12px; height: 12px; background: #10A37F; border-radius: 50%; display: inline-block;"></span>
+                            <span style="width: 12px; height: 12px; background: #8E44AD; border-radius: 50%; display: inline-block;"></span>
                             <span style="color: #8E8E93;">Good</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px;">
@@ -3495,13 +3501,53 @@
             }
         }
 
+        // UPDATED - Overall Progress Modal for Parents & Office with dropdown selector
         async function showOverallProgressModal() {
-            if (currentUserType !== 'parent' || !currentStudent) return;
+            if (currentUserType === 'parent' && !currentStudent) return;
             
             try {
-                const juzData = await getStudentJuzProgress(currentStudent);
-                const students = await window.getStudents();
-                const student = students.find(s => s.id === currentStudent);
+                let students = [];
+                let targetStudentId = currentStudent;
+                
+                // Office users can see all students with dropdown selector
+                if (currentUserType === 'office') {
+                    students = await window.getStudents();
+                    if (students.length === 0) {
+                        alert('No students found');
+                        return;
+                    }
+                    
+                    // Show modal with student selector first
+                    const content = document.getElementById('overallProgressContent');
+                    content.innerHTML = `
+                        <div class="homework-section">
+                            <div class="homework-section-title">
+                                👤 Select Student
+                            </div>
+                            <div class="entry-form">
+                                <div class="form-group">
+                                    <label class="form-label">Choose Student to View Progress</label>
+                                    <select class="form-select" id="officeStudentSelect" onchange="loadSelectedStudentProgress()">
+                                        <option value="">Select a student...</option>
+                                        ${students.map(student => `<option value="${student.id}">${student.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="selectedStudentProgress" style="display: none;">
+                            <!-- Student progress will be loaded here -->
+                        </div>
+                    `;
+                    
+                    document.getElementById('overallProgressModal').style.display = 'block';
+                    return;
+                } else if (currentUserType === 'parent') {
+                    students = await window.getStudents();
+                }
+                
+                const student = students.find(s => s.id === targetStudentId);
+                const juzData = await getStudentJuzProgress(targetStudentId);
                 
                 const content = document.getElementById('overallProgressContent');
                 
@@ -3509,8 +3555,8 @@
                     content.innerHTML = `
                         <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
-                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">No Hifz Data Available</h3>
-                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set up your Hifz progress tracking yet.</p>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Hifz Data Available</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set up ${student ? student.name + "'s" : 'this student\'s'} Hifz progress tracking yet.</p>
                         </div>
                     `;
                 } else {
@@ -3521,7 +3567,7 @@
                     let progressHtml = `
                         <!-- Hifz Duration Card -->
                         <div class="hifz-duration-card">
-                            <div class="hifz-duration-title">HIFZ DURATION</div>
+                            <div class="hifz-duration-title">📖 ${student ? student.name + "'s" : 'Student'} HIFZ DURATION</div>
                             <div class="hifz-duration-time">${formatDuration(totalDuration)}</div>
                             <div class="hifz-duration-date">As of ${new Date().toLocaleDateString('en-US', { 
                                 weekday: 'long', 
@@ -3531,9 +3577,11 @@
                             })}</div>
                         </div>
                         
-                        <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 20px;">📖 Juz Progress</h3>
-                        
-                        <div class="progress-list">
+                        <div class="homework-section">
+                            <div class="homework-section-title">
+                                📖 Juz Progress Overview
+                            </div>
+                            <div class="progress-list">
                     `;
                     
                     // Process Juz data - only show ones with dates
@@ -3553,8 +3601,8 @@
                         progressHtml += `
                             <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
                                 <div style="font-size: 40px; margin-bottom: 16px;">📚</div>
-                                <h3 style="font-size: 18px; margin-bottom: 8px;">No Juz Progress Yet</h3>
-                                <p>Your teacher will update your Juz progress as you advance.</p>
+                                <h3 style="font-size: 18px; margin-bottom: 8px; font-weight: 600; color: #1C1C1E;">No Juz Progress Yet</h3>
+                                <p>The teacher will update Juz progress as the student advances.</p>
                             </div>
                         `;
                     } else {
@@ -3602,7 +3650,7 @@
                         });
                     }
                     
-                    progressHtml += '</div>';
+                    progressHtml += '</div></div>';
                     content.innerHTML = progressHtml;
                 }
                 
@@ -3612,6 +3660,152 @@
                 console.error('Error loading overall progress:', error);
                 alert('Error loading progress: ' + error.message);
             }
+        }
+
+        // NEW - Function to load selected student progress for Office users
+        async function loadSelectedStudentProgress() {
+            const selectedStudentId = document.getElementById('officeStudentSelect').value;
+            const progressContainer = document.getElementById('selectedStudentProgress');
+            
+            if (!selectedStudentId) {
+                progressContainer.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const students = await window.getStudents();
+                const student = students.find(s => s.id === selectedStudentId);
+                const juzData = await getStudentJuzProgress(selectedStudentId);
+                
+                if (!juzData.hifzStartDate) {
+                    progressContainer.innerHTML = `
+                        <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Hifz Data Available</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set up ${student.name}'s Hifz progress tracking yet.</p>
+                        </div>
+                    `;
+                } else {
+                    // Calculate total Hifz duration
+                    const totalDuration = calculateDuration(juzData.hifzStartDate);
+                    
+                    // Generate progress content
+                    let progressHtml = `
+                        <!-- Hifz Duration Card -->
+                        <div class="hifz-duration-card">
+                            <div class="hifz-duration-title">📖 ${student.name}'s HIFZ DURATION</div>
+                            <div class="hifz-duration-time">${formatDuration(totalDuration)}</div>
+                            <div class="hifz-duration-date">As of ${new Date().toLocaleDateString('en-US', { 
+                                weekday: 'long', 
+                                month: 'long', 
+                                day: 'numeric',
+                                year: 'numeric'
+                            })}</div>
+                        </div>
+                        
+                        <div class="homework-section">
+                            <div class="homework-section-title">
+                                📖 Juz Progress Overview
+                            </div>
+                            <div class="progress-list">
+                    `;
+                    
+                    // Process Juz data - only show ones with dates
+                    const juzEntries = [];
+                    
+                    for (let juzNumber = 1; juzNumber <= 30; juzNumber++) {
+                        const juzInfo = juzData.juzProgress[juzNumber];
+                        if (juzInfo && juzInfo.startDate) {
+                            juzEntries.push({ number: juzNumber, ...juzInfo });
+                        }
+                    }
+                    
+                    // Sort by start date
+                    juzEntries.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                    
+                    if (juzEntries.length === 0) {
+                        progressHtml += `
+                            <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
+                                <div style="font-size: 40px; margin-bottom: 16px;">📚</div>
+                                <h3 style="font-size: 18px; margin-bottom: 8px; font-weight: 600; color: #1C1C1E;">No Juz Progress Yet</h3>
+                                <p>The teacher will update Juz progress as the student advances.</p>
+                            </div>
+                        `;
+                    } else {
+                        juzEntries.forEach(juz => {
+                            const isCompleted = juz.startDate && juz.finishDate;
+                            const statusClass = isCompleted ? 'completed' : 'current';
+                            const statusText = isCompleted ? 'Completed' : 'Currently On';
+                            
+                            const startDateStr = new Date(juz.startDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                            });
+                            
+                            let dateRangeHtml = `Started: ${startDateStr}`;
+                            let durationHtml = '';
+                            
+                            if (isCompleted) {
+                                const finishDateStr = new Date(juz.finishDate).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                });
+                                dateRangeHtml = `${startDateStr} - ${finishDateStr}`;
+                                
+                                const duration = calculateDuration(juz.startDate, juz.finishDate);
+                                durationHtml = `<div class="progress-item-duration">Time Taken: ${formatDuration(duration)}</div>`;
+                            } else {
+                                const duration = calculateDuration(juz.startDate);
+                                durationHtml = `<div class="progress-item-duration">Duration: ${formatDuration(duration)} (ongoing)</div>`;
+                            }
+                            
+                            progressHtml += `
+                                <div class="progress-item ${statusClass}">
+                                    <div class="progress-item-header">
+                                        <div class="progress-item-juz">Juz ${juz.number}</div>
+                                        <div class="progress-item-status ${statusClass}">${statusText}</div>
+                                    </div>
+                                    <div class="progress-item-details">
+                                        ${dateRangeHtml}
+                                        ${durationHtml}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    progressHtml += '</div></div>';
+                    progressContainer.innerHTML = progressHtml;
+                }
+                
+                progressContainer.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading student progress:', error);
+                alert('Error loading student progress: ' + error.message);
+            }
+        }
+
+        // Helper function for Office to select student
+        async function showStudentSelector(studentNames) {
+            return new Promise((resolve) => {
+                const selection = prompt(`Select a student:\n${studentNames.map((name, index) => `${index + 1}. ${name}`).join('\n')}\n\nEnter the number (1-${studentNames.length}) or cancel:`);
+                
+                if (selection === null) {
+                    resolve(-1); // User cancelled
+                    return;
+                }
+                
+                const index = parseInt(selection) - 1;
+                if (index >= 0 && index < studentNames.length) {
+                    resolve(index);
+                } else {
+                    alert('Invalid selection');
+                    resolve(-1);
+                }
+            });
         }
 
         // Homework Functions
@@ -3666,7 +3860,7 @@
             document.getElementById('viewAllHomeworkModal').style.display = 'block';
         }
 
-        // Homework Summary Modal function for parents
+        // UPDATED - Homework Summary Modal function for parents with better styling
         async function showHomeworkSummaryModal() {
             if (currentUserType !== 'parent' || !currentStudent) return;
             
@@ -3678,7 +3872,7 @@
                     content.innerHTML = `
                         <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
-                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">No Homework Assigned</h3>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Homework Assigned</h3>
                             <p style="color: #8E8E93; font-size: 16px;">No homework has been assigned yet.</p>
                         </div>
                     `;
@@ -3719,7 +3913,10 @@
                             ` : ''}
                         </div>
                         
-                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 16px;">All Homework</h3>
+                        <div class="homework-section">
+                            <div class="homework-section-title">
+                                📋 All Homework
+                            </div>
                     `;
                     
                     homework.forEach((hw, index) => {
@@ -3739,31 +3936,31 @@
                         let statusHtml = '';
                         let statusColor = '';
                         if (hw.status === 'did-not-give') {
-                            statusHtml = '<span style="color: #991B1B; font-weight: 600;">📝 Did Not Give</span>';
+                            statusHtml = '<span style="color: #991B1B; font-weight: 600; font-size: 11px;">📝 Did Not Give</span>';
                             statusColor = '#FEF2F2';
                         } else if (hw.completed) {
-                            statusHtml = '<span style="color: #34C759; font-weight: 600;">✓ Completed by Teacher</span>';
+                            statusHtml = '<span style="color: #34C759; font-weight: 600; font-size: 11px;">✓ Completed</span>';
                             statusColor = '#D1FAE5';
                         } else if (isOverdue) {
-                            statusHtml = '<span style="color: #EA580C; font-weight: 600;">⚠ Overdue</span>';
+                            statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 11px;">⚠ Overdue</span>';
                             statusColor = '#FFE4CC';
                         } else {
-                            statusHtml = '<span style="color: #C2410C; font-weight: 600;">⏳ Pending</span>';
+                            statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 11px;">⏳ Pending</span>';
                             statusColor = '#FED7AA';
                         }
                         
                         const descriptionHtml = hw.description ? 
-                            `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
-                                <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
-                                <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${hw.description}</p>
+                            `<div class="homework-description-display">
+                                <strong style="color: #1E40AF; font-size: 14px;">Instructions:</strong><br>
+                                ${hw.description}
                             </div>` : '';
                         
                         homeworkHtml += `
-                            <div style="padding: 20px; margin-bottom: 16px; background: ${hw.completed ? '#F0F9FF' : hw.status === 'did-not-give' ? '#FEF2F2' : 'white'}; border-radius: 16px; border: 1px solid ${hw.completed ? '#34C759' : hw.status === 'did-not-give' ? '#FF3B30' : isOverdue ? '#FFB84D' : '#E5E5EA'};">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                            <div class="homework-item ${hw.completed ? 'completed' : hw.status === 'did-not-give' ? 'did-not-give' : isOverdue ? 'overdue' : ''}">
+                                <div class="homework-header">
                                     <div>
-                                        <h3 style="font-size: 18px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay} Homework</h3>
-                                        <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
+                                        <h3 class="homework-student-name">${typeDisplay} Homework</h3>
+                                        <p class="homework-details">Due: ${dueDateStr}</p>
                                     </div>
                                     <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
                                         ${statusHtml}
@@ -3775,6 +3972,7 @@
                         `;
                     });
                     
+                    homeworkHtml += '</div>';
                     content.innerHTML = homeworkHtml;
                 }
                 
@@ -3823,6 +4021,7 @@
             }
         }
 
+        // UPDATED - Display homework with better styling
         function displayAllHomework(homework, students, currentFilter, allHomework) {
             const content = document.getElementById('allHomeworkContent');
             
@@ -3917,7 +4116,7 @@
                 }
                 
                 const descriptionHtml = hw.description ? 
-                    `<div class="homework-description">${hw.description}</div>` : '';
+                    `<div class="homework-description-display">${hw.description}</div>` : '';
                 
                 // Action buttons based on status
                 let actionButtonsHtml = '';
@@ -4170,6 +4369,7 @@
             }
         }
 
+        // UPDATED - View Homework Modal with better styling
         async function showViewHomeworkModal() {
             if (currentUserType !== 'parent' || !currentStudent) return;
             
@@ -4181,7 +4381,7 @@
                     content.innerHTML = `
                         <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
-                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">No Homework Assigned</h3>
+                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Homework Assigned</h3>
                             <p style="color: #8E8E93; font-size: 14px;">No homework has been assigned yet.</p>
                         </div>
                     `;
@@ -4193,12 +4393,12 @@
                         content.innerHTML = `
                             <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
                                 <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
-                                <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">All Homework Complete!</h3>
+                                <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">All Homework Complete!</h3>
                                 <p style="color: #8E8E93; font-size: 14px;">Great work! You have completed all assigned homework.</p>
                             </div>
                         `;
                     } else {
-                        let homeworkHtml = '';
+                        let homeworkHtml = '<div class="homework-section"><div class="homework-section-title">📚 Current Homework</div>';
                         
                         currentHomework.forEach((hw, index) => {
                             const dueDateObj = new Date(hw.dueDate);
@@ -4217,25 +4417,25 @@
                             let statusHtml = '';
                             let statusColor = '';
                             if (isOverdue) {
-                                statusHtml = '<span style="color: #EA580C; font-weight: 600;">⚠ Overdue</span>';
+                                statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 11px;">⚠ Overdue</span>';
                                 statusColor = '#FFE4CC';
                             } else {
-                                statusHtml = '<span style="color: #C2410C; font-weight: 600;">⏳ Pending</span>';
+                                statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 11px;">⏳ Pending</span>';
                                 statusColor = '#FED7AA';
                             }
                             
                             const descriptionHtml = hw.description ? 
-                                `<div style="margin-top: 16px; padding: 16px; background: #E8F4FD; border-radius: 12px; border-left: 4px solid #3B82F6;">
-                                    <h4 style="font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 8px;">Instructions:</h4>
-                                    <p style="color: #1E40AF; font-size: 14px; line-height: 1.5;">${hw.description}</p>
+                                `<div class="homework-description-display">
+                                    <strong style="color: #1E40AF; font-size: 14px;">Instructions:</strong><br>
+                                    ${hw.description}
                                 </div>` : '';
                             
                             homeworkHtml += `
-                                <div style="padding: 20px; margin-bottom: 16px; background: white; border-radius: 16px; border: 1px solid ${isOverdue ? '#FFB84D' : '#E5E5EA'};">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                <div class="homework-item ${isOverdue ? 'overdue' : ''}">
+                                    <div class="homework-header">
                                         <div>
-                                            <h3 style="font-size: 20px; font-weight: 600; color: #1C1C1E; margin-bottom: 8px;">${typeDisplay} Homework</h3>
-                                            <p style="color: #8E8E93; font-size: 14px; margin-bottom: 8px;">Due: ${dueDateStr}</p>
+                                            <h3 class="homework-student-name">${typeDisplay} Homework</h3>
+                                            <p class="homework-details">Due: ${dueDateStr}</p>
                                         </div>
                                         <div style="padding: 8px 12px; background: ${statusColor}; border-radius: 8px;">
                                             ${statusHtml}
@@ -4247,6 +4447,7 @@
                             `;
                         });
                         
+                        homeworkHtml += '</div>';
                         content.innerHTML = homeworkHtml;
                     }
                 }
@@ -5512,7 +5713,7 @@
             return holiday || null;
         }
 
-        // PDF Export Functions (simplified for this demo with homework summary)
+        // UPDATED - PDF Export Functions with better styling
         function exportStudentPDF() {
             document.getElementById('exportPDFModal').style.display = 'block';
             
@@ -5574,6 +5775,7 @@
             }
         }
 
+        // UPDATED - PDF Generation with app theme colors and styling
         async function generateSingleStudentPDF(studentId, reportType) {
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
@@ -5582,26 +5784,49 @@
             const studentData = await window.getStudentData(studentId);
             const homework = await getStudentHomework(studentId);
             
-            // Create PDF with homework summary
+            // Create PDF with improved styling
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF();
             
-            // Header
-            pdf.setFontSize(20);
+            // Set app colors
+            const primaryColor = '#10A37F';
+            const secondaryColor = '#8E8E93';
+            const textColor = '#1C1C1E';
+            
+            // Header with app styling
+            pdf.setFillColor(16, 163, 127); // Primary green
+            pdf.rect(0, 0, 210, 30, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(24);
+            pdf.setFont(undefined, 'bold');
             pdf.text('📖 Hifz Progress Report', 20, 20);
             
-            pdf.setFontSize(14);
-            pdf.text(`Student: ${student.name}`, 20, 35);
-            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 45);
-            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
+            // Student details section
+            pdf.setTextColor(28, 28, 30); // Dark text
+            pdf.setFontSize(16);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(`Student: ${student.name}`, 20, 45);
             
-            let yPosition = 75;
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 55);
+            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 65);
+            pdf.text(`Quran Type: ${student.quranType || 13} Line`, 20, 75);
+
+            let yPosition = 95;
             
-            // Homework Summary Section
+            // Homework Summary Section with app styling
             if (homework && homework.length > 0) {
+                // Section header
+                pdf.setFillColor(248, 249, 250); // Light gray background
+                pdf.rect(15, yPosition - 5, 180, 15, 'F');
+                
+                pdf.setTextColor(16, 163, 127);
                 pdf.setFontSize(16);
-                pdf.text('📚 Homework Summary', 20, yPosition);
-                yPosition += 15;
+                pdf.setFont(undefined, 'bold');
+                pdf.text('📚 Homework Summary', 20, yPosition + 5);
+                yPosition += 25;
                 
                 const totalHomework = homework.length;
                 const completedHomework = homework.filter(hw => hw.completed).length;
@@ -5609,34 +5834,65 @@
                 const didNotGiveHomework = homework.filter(hw => hw.status === 'did-not-give').length;
                 const overdueHomework = homework.filter(hw => !hw.completed && hw.status !== 'did-not-give' && isHomeworkOverdue(hw.dueDate)).length;
                 
+                pdf.setTextColor(28, 28, 30);
                 pdf.setFontSize(12);
-                pdf.text(`Total Homework Assigned: ${totalHomework}`, 25, yPosition);
-                yPosition += 8;
-                pdf.text(`Completed: ${completedHomework}`, 25, yPosition);
-                yPosition += 8;
-                pdf.text(`Pending: ${pendingHomework}`, 25, yPosition);
-                yPosition += 8;
-                pdf.text(`Overdue: ${overdueHomework}`, 25, yPosition);
-                yPosition += 8;
-                pdf.text(`Did Not Give: ${didNotGiveHomework}`, 25, yPosition);
-                yPosition += 8;
+                pdf.setFont(undefined, 'normal');
+                
+                // Create homework stats in a more visual way
+                const stats = [
+                    { label: 'Total Assigned', value: totalHomework, color: [28, 28, 30] },
+                    { label: 'Completed', value: completedHomework, color: [52, 199, 89] },
+                    { label: 'Pending', value: pendingHomework, color: [255, 149, 0] },
+                    { label: 'Overdue', value: overdueHomework, color: [255, 184, 77] },
+                    { label: 'Did Not Give', value: didNotGiveHomework, color: [255, 59, 48] }
+                ];
+                
+                stats.forEach((stat, index) => {
+                    const x = 25 + (index % 3) * 55;
+                    const y = yPosition + Math.floor(index / 3) * 15;
+                    
+                    pdf.setTextColor(stat.color[0], stat.color[1], stat.color[2]);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`${stat.value}`, x, y);
+                    
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text(stat.label, x + 15, y);
+                });
+                
+                yPosition += 30;
                 
                 const completionRate = totalHomework > 0 ? Math.round((completedHomework / totalHomework) * 100) : 0;
-                pdf.text(`Completion Rate: ${completionRate}%`, 25, yPosition);
-                yPosition += 20;
+                pdf.setTextColor(16, 163, 127);
+                pdf.setFont(undefined, 'bold');
+                pdf.text(`📊 Completion Rate: ${completionRate}%`, 25, yPosition);
+                yPosition += 25;
             } else {
+                pdf.setFillColor(248, 249, 250);
+                pdf.rect(15, yPosition - 5, 180, 15, 'F');
+                
+                pdf.setTextColor(16, 163, 127);
                 pdf.setFontSize(16);
-                pdf.text('📚 Homework Summary', 20, yPosition);
-                yPosition += 15;
+                pdf.setFont(undefined, 'bold');
+                pdf.text('📚 Homework Summary', 20, yPosition + 5);
+                yPosition += 25;
+                
+                pdf.setTextColor(142, 142, 147);
                 pdf.setFontSize(12);
+                pdf.setFont(undefined, 'normal');
                 pdf.text('No homework has been assigned yet.', 25, yPosition);
-                yPosition += 20;
+                yPosition += 25;
             }
             
             // Progress Summary Section
+            pdf.setFillColor(248, 249, 250);
+            pdf.rect(15, yPosition - 5, 180, 15, 'F');
+            
+            pdf.setTextColor(16, 163, 127);
             pdf.setFontSize(16);
-            pdf.text('📊 Progress Summary', 20, yPosition);
-            yPosition += 15;
+            pdf.setFont(undefined, 'bold');
+            pdf.text('📊 Daily Progress Summary', 20, yPosition + 5);
+            yPosition += 25;
             
             const progressStats = { sabak: 0, para: 0, dhor: 0 };
             let totalDays = 0;
@@ -5652,15 +5908,36 @@
                 }
             });
             
+            pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(12);
-            pdf.text(`Total Days Recorded: ${totalDays}`, 25, yPosition);
-            yPosition += 8;
-            pdf.text(`Sabak (New Lessons): ${progressStats.sabak} days`, 25, yPosition);
-            yPosition += 8;
-            pdf.text(`Sabak Para (Previous Lessons): ${progressStats.para} days`, 25, yPosition);
-            yPosition += 8;
-            pdf.text(`Dhor (Revision): ${progressStats.dhor} days`, 25, yPosition);
-            yPosition += 15;
+            pdf.setFont(undefined, 'normal');
+            pdf.text(`📅 Total Days Recorded: ${totalDays}`, 25, yPosition);
+            yPosition += 12;
+            
+            // Progress stats with colors
+            const progressItems = [
+                { label: 'Sabak (New Lessons)', value: progressStats.sabak, color: [16, 163, 127] },
+                { label: 'Sabak Para (Previous Lessons)', value: progressStats.para, color: [142, 68, 173] },
+                { label: 'Dhor (Revision)', value: progressStats.dhor, color: [255, 149, 0] }
+            ];
+            
+            progressItems.forEach((item, index) => {
+                pdf.setTextColor(item.color[0], item.color[1], item.color[2]);
+                pdf.setFont(undefined, 'bold');
+                pdf.text(`${item.value}`, 25, yPosition);
+                
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFont(undefined, 'normal');
+                pdf.text(`${item.label}`, 35, yPosition);
+                yPosition += 12;
+            });
+            
+            // Footer
+            yPosition += 20;
+            pdf.setTextColor(142, 142, 147);
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'italic');
+            pdf.text('Generated by Hifz Record App - Tracking Quranic Memorization Progress', 20, yPosition);
             
             // Save PDF
             pdf.save(`${student.name}_${reportType}_report.pdf`);
@@ -5669,19 +5946,26 @@
         async function generateAllStudentsPDF(reportType) {
             const students = await window.getStudents();
             
-            // Create PDF
+            // Create PDF with app styling
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF();
             
-            // Header
+            // Header with app styling
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 30, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
             pdf.setFontSize(20);
+            pdf.setFont(undefined, 'bold');
             pdf.text('📖 All Students Progress Report', 20, 20);
             
+            pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(14);
-            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 35);
-            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 45);
+            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
             
-            let yPosition = 65;
+            let yPosition = 75;
             
             for (const student of students) {
                 if (yPosition > 250) {
@@ -5692,10 +5976,15 @@
                 const studentData = await window.getStudentData(student.id);
                 const homework = await getStudentHomework(student.id);
                 
-                // Student header
+                // Student header with app styling
+                pdf.setFillColor(248, 249, 250);
+                pdf.rect(15, yPosition - 5, 180, 15, 'F');
+                
+                pdf.setTextColor(16, 163, 127);
                 pdf.setFontSize(16);
-                pdf.text(`👤 ${student.name}`, 20, yPosition);
-                yPosition += 12;
+                pdf.setFont(undefined, 'bold');
+                pdf.text(`👤 ${student.name}`, 20, yPosition + 5);
+                yPosition += 20;
                 
                 // Homework summary
                 if (homework && homework.length > 0) {
@@ -5704,13 +5993,17 @@
                     const didNotGiveHomework = homework.filter(hw => hw.status === 'did-not-give').length;
                     const completionRate = Math.round((completedHomework / totalHomework) * 100);
                     
+                    pdf.setTextColor(28, 28, 30);
                     pdf.setFontSize(10);
-                    pdf.text(`Homework: ${completedHomework}/${totalHomework} (${completionRate}%) | Did Not Give: ${didNotGiveHomework}`, 25, yPosition);
-                    yPosition += 8;
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text(`📚 Homework: ${completedHomework}/${totalHomework} (${completionRate}%) | Did Not Give: ${didNotGiveHomework}`, 25, yPosition);
+                    yPosition += 10;
                 } else {
+                    pdf.setTextColor(142, 142, 147);
                     pdf.setFontSize(10);
-                    pdf.text('Homework: No assignments', 25, yPosition);
-                    yPosition += 8;
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('📚 Homework: No assignments', 25, yPosition);
+                    yPosition += 10;
                 }
                 
                 // Progress summary
@@ -5728,9 +6021,18 @@
                     }
                 });
                 
-                pdf.text(`Progress: Sabak(${progressStats.sabak}) Sabak Para(${progressStats.para}) Dhor(${progressStats.dhor}) - Total: ${totalDays} days`, 25, yPosition);
-                yPosition += 15;
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(10);
+                pdf.text(`📊 Progress: Sabak(${progressStats.sabak}) Para(${progressStats.para}) Dhor(${progressStats.dhor}) - Total: ${totalDays} days`, 25, yPosition);
+                yPosition += 20;
             }
+            
+            // Footer
+            yPosition += 10;
+            pdf.setTextColor(142, 142, 147);
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'italic');
+            pdf.text('Generated by Hifz Record App - Comprehensive Student Progress Overview', 20, yPosition);
             
             // Save PDF
             pdf.save(`all_students_${reportType}_report.pdf`);
@@ -5867,6 +6169,7 @@
         window.deleteHomework = deleteHomework;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
+        window.loadSelectedStudentProgress = loadSelectedStudentProgress;
         window.showResetModal = showResetModal;
         window.logout = logout;
     </script>
