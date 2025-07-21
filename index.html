@@ -2663,8 +2663,33 @@
                         <select class="form-select" id="pdfReportType">
                             <option value="current-month">Current Month Progress</option>
                             <option value="yearly-summary">Yearly Summary</option>
-                            <option value="yearly-detailed">Yearly Detailed</option>
+                            <option value="monthly-detailed">Monthly Detailed</option>
+                            <option value="overall-progress">Overall Progress</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="monthYearPicker" style="display: none;">
+                        <label class="form-label">Select Month & Year</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select class="form-select" id="monthSelect" style="flex: 1;">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select class="form-select" id="yearSelect" style="flex: 1;">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
                     </div>
                     <button class="save-button pdf-export-button" onclick="generateSelectedPDF()" id="generatePDFBtn">
                         <div class="loading-spinner" id="modalPdfSpinner"></div>
@@ -5734,6 +5759,22 @@
                     select.appendChild(option);
                 });
             });
+            
+            // Add event listener for report type change
+            const reportTypeSelect = document.getElementById('pdfReportType');
+            const monthYearPicker = document.getElementById('monthYearPicker');
+            
+            reportTypeSelect.addEventListener('change', function() {
+                if (this.value === 'monthly-detailed') {
+                    monthYearPicker.style.display = 'block';
+                    // Set default to current month/year
+                    const now = new Date();
+                    document.getElementById('monthSelect').value = String(now.getMonth() + 1).padStart(2, '0');
+                    document.getElementById('yearSelect').value = now.getFullYear();
+                } else {
+                    monthYearPicker.style.display = 'none';
+                }
+            });
         }
 
         async function generateSelectedPDF() {
@@ -5743,6 +5784,17 @@
             if (!studentId) {
                 alert('Please select a student for PDF report');
                 return;
+            }
+            
+            // Check for monthly detailed specific requirements
+            if (reportType === 'monthly-detailed') {
+                const selectedMonth = document.getElementById('monthSelect').value;
+                const selectedYear = document.getElementById('yearSelect').value;
+                
+                if (!selectedMonth || !selectedYear) {
+                    alert('Please select month and year for monthly detailed report');
+                    return;
+                }
             }
             
             // Show loading
@@ -5758,7 +5810,17 @@
                 if (studentId === 'all') {
                     await generateAllStudentsPDF(reportType);
                 } else {
-                    await generateSingleStudentPDF(studentId, reportType);
+                    if (reportType === 'yearly-summary') {
+                        await generateYearlySummaryPDF(studentId);
+                    } else if (reportType === 'monthly-detailed') {
+                    const selectedMonth = document.getElementById('monthSelect').value;
+                    const selectedYear = document.getElementById('yearSelect').value;
+                    await generateMonthlyDetailedPDF(studentId, selectedYear, selectedMonth);
+                    } else if (reportType === 'overall-progress') {
+                        await generateOverallProgressPDF(studentId);
+                    } else {
+                        await generateSingleStudentPDF(studentId, reportType);
+                    }
                 }
                 
                 closeModal('exportPDFModal');
@@ -5776,7 +5838,7 @@
         }
 
         // UPDATED - PDF Generation with app theme colors and styling
-        async function generateSingleStudentPDF(studentId, reportType) {
+        async function generateSingleStudentPDF(studentId, reportType, providedPDF = null, skipSave = false) {
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -5784,258 +5846,1270 @@
             const studentData = await window.getStudentData(studentId);
             const homework = await getStudentHomework(studentId);
             
-            // Create PDF with improved styling
+            // Create PDF or use provided one
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
+            const pdf = providedPDF || new jsPDF();
             
-            // Set app colors
-            const primaryColor = '#10A37F';
-            const secondaryColor = '#8E8E93';
-            const textColor = '#1C1C1E';
-            
-            // Header with app styling
-            pdf.setFillColor(16, 163, 127); // Primary green
-            pdf.rect(0, 0, 210, 30, 'F');
-            
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(24);
-            pdf.setFont(undefined, 'bold');
-            pdf.text('📖 Hifz Progress Report', 20, 20);
-            
-            // Student details section
-            pdf.setTextColor(28, 28, 30); // Dark text
-            pdf.setFontSize(16);
-            pdf.setFont(undefined, 'bold');
-            pdf.text(`Student: ${student.name}`, 20, 45);
-            
-            pdf.setFontSize(12);
-            pdf.setFont(undefined, 'normal');
-            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 55);
-            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 65);
-            pdf.text(`Quran Type: ${student.quranType || 13} Line`, 20, 75);
-
-            let yPosition = 95;
-            
-            // Homework Summary Section with app styling
-            if (homework && homework.length > 0) {
-                // Section header
-                pdf.setFillColor(248, 249, 250); // Light gray background
-                pdf.rect(15, yPosition - 5, 180, 15, 'F');
-                
-                pdf.setTextColor(16, 163, 127);
-                pdf.setFontSize(16);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('📚 Homework Summary', 20, yPosition + 5);
-                yPosition += 25;
-                
-                const totalHomework = homework.length;
-                const completedHomework = homework.filter(hw => hw.completed).length;
-                const pendingHomework = homework.filter(hw => !hw.completed && hw.status !== 'did-not-give').length;
-                const didNotGiveHomework = homework.filter(hw => hw.status === 'did-not-give').length;
-                const overdueHomework = homework.filter(hw => !hw.completed && hw.status !== 'did-not-give' && isHomeworkOverdue(hw.dueDate)).length;
-                
-                pdf.setTextColor(28, 28, 30);
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'normal');
-                
-                // Create homework stats in a more visual way
-                const stats = [
-                    { label: 'Total Assigned', value: totalHomework, color: [28, 28, 30] },
-                    { label: 'Completed', value: completedHomework, color: [52, 199, 89] },
-                    { label: 'Pending', value: pendingHomework, color: [255, 149, 0] },
-                    { label: 'Overdue', value: overdueHomework, color: [255, 184, 77] },
-                    { label: 'Did Not Give', value: didNotGiveHomework, color: [255, 59, 48] }
-                ];
-                
-                stats.forEach((stat, index) => {
-                    const x = 25 + (index % 3) * 55;
-                    const y = yPosition + Math.floor(index / 3) * 15;
-                    
-                    pdf.setTextColor(stat.color[0], stat.color[1], stat.color[2]);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text(`${stat.value}`, x, y);
-                    
-                    pdf.setTextColor(142, 142, 147);
-                    pdf.setFont(undefined, 'normal');
-                    pdf.text(stat.label, x + 15, y);
-                });
-                
-                yPosition += 30;
-                
-                const completionRate = totalHomework > 0 ? Math.round((completedHomework / totalHomework) * 100) : 0;
-                pdf.setTextColor(16, 163, 127);
-                pdf.setFont(undefined, 'bold');
-                pdf.text(`📊 Completion Rate: ${completionRate}%`, 25, yPosition);
-                yPosition += 25;
-            } else {
-                pdf.setFillColor(248, 249, 250);
-                pdf.rect(15, yPosition - 5, 180, 15, 'F');
-                
-                pdf.setTextColor(16, 163, 127);
-                pdf.setFontSize(16);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('📚 Homework Summary', 20, yPosition + 5);
-                yPosition += 25;
-                
-                pdf.setTextColor(142, 142, 147);
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'normal');
-                pdf.text('No homework has been assigned yet.', 25, yPosition);
-                yPosition += 25;
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                pdf.roundedRect(x, y, width, height, radius, radius, style);
             }
             
-            // Progress Summary Section
-            pdf.setFillColor(248, 249, 250);
-            pdf.rect(15, yPosition - 5, 180, 15, 'F');
+            // Fallback if roundedRect doesn't exist
+            if (typeof pdf.roundedRect === 'undefined') {
+                roundedRect = function(x, y, width, height, radius, style) {
+                    pdf.rect(x, y, width, height, style);
+                };
+            }
             
-            pdf.setTextColor(16, 163, 127);
-            pdf.setFontSize(16);
-            pdf.setFont(undefined, 'bold');
-            pdf.text('📊 Daily Progress Summary', 20, yPosition + 5);
-            yPosition += 25;
-            
-            const progressStats = { sabak: 0, para: 0, dhor: 0 };
-            let totalDays = 0;
-            
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    totalDays++;
-                    progressTypes.forEach(type => {
-                        if (dayData[type]) {
-                            progressStats[type]++;
-                        }
-                    });
-                }
-            });
-            
-            pdf.setTextColor(28, 28, 30);
-            pdf.setFontSize(12);
-            pdf.setFont(undefined, 'normal');
-            pdf.text(`📅 Total Days Recorded: ${totalDays}`, 25, yPosition);
-            yPosition += 12;
-            
-            // Progress stats with colors
-            const progressItems = [
-                { label: 'Sabak (New Lessons)', value: progressStats.sabak, color: [16, 163, 127] },
-                { label: 'Sabak Para (Previous Lessons)', value: progressStats.para, color: [142, 68, 173] },
-                { label: 'Dhor (Revision)', value: progressStats.dhor, color: [255, 149, 0] }
-            ];
-            
-            progressItems.forEach((item, index) => {
-                pdf.setTextColor(item.color[0], item.color[1], item.color[2]);
-                pdf.setFont(undefined, 'bold');
-                pdf.text(`${item.value}`, 25, yPosition);
-                
-                pdf.setTextColor(28, 28, 30);
-                pdf.setFont(undefined, 'normal');
-                pdf.text(`${item.label}`, 35, yPosition);
-                yPosition += 12;
-            });
-            
-            // Footer
-            yPosition += 20;
-            pdf.setTextColor(142, 142, 147);
-            pdf.setFontSize(10);
-            pdf.setFont(undefined, 'italic');
-            pdf.text('Generated by Hifz Record App - Tracking Quranic Memorization Progress', 20, yPosition);
-            
-            // Save PDF
-            pdf.save(`${student.name}_${reportType}_report.pdf`);
-        }
-
-        async function generateAllStudentsPDF(reportType) {
-            const students = await window.getStudents();
-            
-            // Create PDF with app styling
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            
-            // Header with app styling
+            // Header Section
             pdf.setFillColor(16, 163, 127);
-            pdf.rect(0, 0, 210, 30, 'F');
+            roundedRect(10, 10, 190, 30, 4, 'F');
             
             pdf.setTextColor(255, 255, 255);
             pdf.setFontSize(20);
             pdf.setFont(undefined, 'bold');
-            pdf.text('📖 All Students Progress Report', 20, 20);
+            pdf.text('Monthly Progress Report', 20, 25);
             
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(student.name + ' • ' + new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), 20, 32);
+            
+            let yPos = 50;
+            
+            // Monthly Progress Section
             pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(14);
-            pdf.setFont(undefined, 'normal');
-            pdf.text(`Report Type: ${reportType.replace('-', ' ').toUpperCase()}`, 20, 45);
-            pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Progress', 20, yPos);
+            yPos += 10;
             
-            let yPosition = 75;
+            // Calculate monthly stats
+            const currentMonth = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
+            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0 };
             
-            for (const student of students) {
-                if (yPosition > 250) {
-                    pdf.addPage();
-                    yPosition = 20;
-                }
-                
-                const studentData = await window.getStudentData(student.id);
-                const homework = await getStudentHomework(student.id);
-                
-                // Student header with app styling
-                pdf.setFillColor(248, 249, 250);
-                pdf.rect(15, yPosition - 5, 180, 15, 'F');
-                
-                pdf.setTextColor(16, 163, 127);
-                pdf.setFontSize(16);
-                pdf.setFont(undefined, 'bold');
-                pdf.text(`👤 ${student.name}`, 20, yPosition + 5);
-                yPosition += 20;
-                
-                // Homework summary
-                if (homework && homework.length > 0) {
-                    const totalHomework = homework.length;
-                    const completedHomework = homework.filter(hw => hw.completed).length;
-                    const didNotGiveHomework = homework.filter(hw => hw.status === 'did-not-give').length;
-                    const completionRate = Math.round((completedHomework / totalHomework) * 100);
-                    
-                    pdf.setTextColor(28, 28, 30);
-                    pdf.setFontSize(10);
-                    pdf.setFont(undefined, 'normal');
-                    pdf.text(`📚 Homework: ${completedHomework}/${totalHomework} (${completionRate}%) | Did Not Give: ${didNotGiveHomework}`, 25, yPosition);
-                    yPosition += 10;
-                } else {
-                    pdf.setTextColor(142, 142, 147);
-                    pdf.setFontSize(10);
-                    pdf.setFont(undefined, 'normal');
-                    pdf.text('📚 Homework: No assignments', 25, yPosition);
-                    yPosition += 10;
-                }
-                
-                // Progress summary
-                const progressStats = { sabak: 0, para: 0, dhor: 0 };
-                let totalDays = 0;
-                
-                Object.entries(studentData).forEach(([date, dayData]) => {
-                    if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                        totalDays++;
-                        progressTypes.forEach(type => {
-                            if (dayData[type]) {
-                                progressStats[type]++;
-                            }
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(currentMonth)) {
+                    if (dayData.absent) {
+                        monthlyStats.absent++;
+                    } else {
+                        ['sabak', 'para', 'dhor'].forEach(function(type) {
+                            if (dayData[type]) monthlyStats[type]++;
                         });
+                    }
+                }
+            });
+            
+            // Monthly Progress Boxes - Smaller and more compact
+            const boxWidth = 38;
+            const boxHeight = 22;
+            const spacing = 6;
+            const startX = 20;
+            
+            const progressBoxes = [
+                { label: 'SABAK', value: monthlyStats.sabak, color: [16, 163, 127] },
+                { label: 'SABAK PARA', value: monthlyStats.para, color: [142, 68, 173] },
+                { label: 'DHOR', value: monthlyStats.dhor, color: [255, 149, 0] },
+                { label: 'ABSENT', value: monthlyStats.absent, color: [255, 59, 48] }
+            ];
+            
+            progressBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Homework Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Homework Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate homework stats
+            const homeworkStats = {
+                total: homework ? homework.length : 0,
+                completed: homework ? homework.filter(function(hw) { return hw.completed; }).length : 0,
+                pending: homework ? homework.filter(function(hw) { return !hw.completed && hw.status !== 'did-not-give'; }).length : 0,
+                didNotDo: homework ? homework.filter(function(hw) { return hw.status === 'did-not-give'; }).length : 0
+            };
+            
+            const homeworkBoxes = [
+                { label: 'TOTAL', value: homeworkStats.total, color: [28, 28, 30] },
+                { label: 'COMPLETED', value: homeworkStats.completed, color: [52, 199, 89] },
+                { label: 'PENDING', value: homeworkStats.pending, color: [255, 149, 0] },
+                { label: 'DID NOT DO', value: homeworkStats.didNotDo, color: [255, 59, 48] }
+            ];
+            
+            homeworkBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Sabak Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate sabak totals
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(currentMonth) && dayData.sabak && dayData.sabak.lines) {
+                    totalLines += dayData.sabak.lines;
+                    totalPages += dayData.sabak.pages || 0;
+                    totalJuz += dayData.sabak.juz || 0;
+                }
+            });
+            
+                // Format Juz display
+                let juzDisplay = '';
+                if (totalLines === 0 || totalJuz === 0) {
+                    juzDisplay = '0 Juz';
+                } else if (totalJuz < 0.125) {
+                    juzDisplay = '< 1/4 Juz';
+                } else if (totalJuz < 1) {
+                if (totalJuz >= 0.875) juzDisplay = '1 Juz';
+                else if (totalJuz >= 0.625) juzDisplay = '3/4 Juz';
+                else if (totalJuz >= 0.375) juzDisplay = '1/2 Juz';
+                else juzDisplay = '1/4 Juz';
+            } else {
+                const wholeJuz = Math.floor(totalJuz);
+                const remainingJuz = totalJuz - wholeJuz;
+                
+                if (remainingJuz < 0.125) {
+                    juzDisplay = wholeJuz + ' Juz';
+                } else if (remainingJuz < 0.375) {
+                    juzDisplay = wholeJuz + ' Juz & 1/4';
+                } else if (remainingJuz < 0.625) {
+                    juzDisplay = wholeJuz + ' Juz & 1/2';
+                } else if (remainingJuz < 0.875) {
+                    juzDisplay = wholeJuz + ' Juz & 3/4';
+                } else {
+                    juzDisplay = (wholeJuz + 1) + ' Juz';
+                }
+            }
+            
+            const sabakBoxWidth = 50;
+            const sabakBoxes = [
+                { label: 'LINES', value: totalLines, color: [16, 163, 127] },
+                { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'JUZ', value: juzDisplay, color: [255, 149, 0] }
+            ];
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (sabakBoxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
+                
+                // Number/Value - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (sabakBoxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Daily Breakdown Section - Full width with proper spacing
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Daily Breakdown', 20, yPos);
+            yPos += 10;
+            
+            // Table headers - Using full page width
+            const tableWidth = 170; // Full usable width
+            const colWidths = [25, 30, 35, 25, 25, 30]; // Better distributed widths
+            const colHeaders = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+            
+            // Header background - full width
+            pdf.setFillColor(248, 249, 250);
+            roundedRect(20, yPos - 2, tableWidth, 10, 1, 'F');
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(8);
+            pdf.setFont(undefined, 'bold');
+            
+            let currentX = 22;
+            colHeaders.forEach(function(header, index) {
+                // Center align headers in their columns
+                const headerWidth = pdf.getTextWidth(header);
+                const centerX = currentX + (colWidths[index] - headerWidth) / 2;
+                pdf.text(header, centerX, yPos + 4);
+                currentX += colWidths[index];
+            });
+            
+            yPos += 12;
+            
+            // Get all days in current month
+            const year = new Date().getFullYear();
+            const month = new Date().getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            pdf.setFont(undefined, 'normal');
+            pdf.setFontSize(7);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayOfWeek = date.getDay();
+                
+                // Skip weekends
+                if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+                
+                const dateKey = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                const dayData = studentData[dateKey] || {};
+                
+                // Check if page break needed
+                if (yPos > 270) {
+                    pdf.addPage();
+                    yPos = 20;
+                }
+                
+                // Row background for absent days - full width
+                if (dayData.absent) {
+                    pdf.setFillColor(255, 242, 242);
+                    roundedRect(20, yPos - 1, tableWidth, 8, 1, 'F');
+                }
+                
+                currentX = 22;
+                pdf.setTextColor(28, 28, 30);
+                
+                // Date - centered
+                const dateText = day.toString();
+                const dateWidth = pdf.getTextWidth(dateText);
+                pdf.text(dateText, currentX + (colWidths[0] - dateWidth) / 2, yPos + 3);
+                currentX += colWidths[0];
+                
+                // Sabak - centered
+                const sabakText = dayData.sabak ? (dayData.sabak.lines || '--') + ' lines' : '--';
+                const sabakWidth = pdf.getTextWidth(sabakText);
+                pdf.text(sabakText, currentX + (colWidths[1] - sabakWidth) / 2, yPos + 3);
+                currentX += colWidths[1];
+                
+                // Sabak Para - centered
+                const paraText = dayData.para ? dayData.para.amount || '--' : '--';
+                const paraWidth = pdf.getTextWidth(paraText);
+                pdf.text(paraText, currentX + (colWidths[2] - paraWidth) / 2, yPos + 3);
+                currentX += colWidths[2];
+                
+                // Dhor - centered
+                const dhorText = dayData.dhor ? dayData.dhor.amount || '--' : '--';
+                const dhorWidth = pdf.getTextWidth(dhorText);
+                pdf.text(dhorText, currentX + (colWidths[3] - dhorWidth) / 2, yPos + 3);
+                currentX += colWidths[3];
+                
+                // Status - centered
+                const statusText = dayData.absent ? 'Absent' : 'Present';
+                pdf.setTextColor(dayData.absent ? 255 : 52, dayData.absent ? 59 : 199, dayData.absent ? 48 : 89);
+                const statusWidth = pdf.getTextWidth(statusText);
+                pdf.text(statusText, currentX + (colWidths[4] - statusWidth) / 2, yPos + 3);
+                currentX += colWidths[4];
+                
+                // Parent Review - centered
+                const parentText = dayData.parentChecked ? '✓' : '✗';
+                pdf.setTextColor(dayData.parentChecked ? 52 : 255, dayData.parentChecked ? 199 : 59, dayData.parentChecked ? 89 : 48);
+                const parentWidth = pdf.getTextWidth(parentText);
+                pdf.text(parentText, currentX + (colWidths[5] - parentWidth) / 2, yPos + 3);
+                
+                yPos += 8;
+            }
+            
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                pdf.save(student.name + '_monthly_report.pdf');
+            }
+        }
+
+        async function generateYearlySummaryPDF(studentId, providedPDF = null, skipSave = false) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentData = await window.getStudentData(studentId);
+            
+            // Create PDF or use provided one
+            const { jsPDF } = window.jspdf;
+            const pdf = providedPDF || new jsPDF();
+            
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                pdf.roundedRect(x, y, width, height, radius, radius, style);
+            }
+            
+            // Fallback if roundedRect doesn't exist
+            if (typeof pdf.roundedRect === 'undefined') {
+                roundedRect = function(x, y, width, height, radius, style) {
+                    pdf.rect(x, y, width, height, style);
+                };
+            }
+            
+            // Header Section - More compact
+            pdf.setFillColor(16, 163, 127);
+            roundedRect(10, 10, 190, 25, 4, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Yearly Summary Report', 20, 22);
+            
+            pdf.setFontSize(9);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(student.name + ' • Academic Year 2024-2025', 20, 28);
+            
+            let yPos = 42;
+            
+            // Sabak Summary Section (Academic Year Total) - More compact
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            const titleWidth = pdf.getTextWidth('Academic Year Sabak Summary');
+            pdf.text('Academic Year Sabak Summary', (210 - titleWidth) / 2, yPos);
+            yPos += 8;
+            
+            // Calculate yearly sabak totals (Sep 2024 - Aug 2025)
+            let yearlyTotalLines = 0;
+            let yearlyTotalPages = 0;
+            let yearlyTotalJuz = 0;
+            
+            // Academic year months
+            const academicMonths = [
+                '2024-09', '2024-10', '2024-11', '2024-12',
+                '2025-01', '2025-02', '2025-03', '2025-04',
+                '2025-05', '2025-06', '2025-07', '2025-08'
+            ];
+            
+            academicMonths.forEach(function(monthKey) {
+                Object.entries(studentData).forEach(function([date, dayData]) {
+                    if (date.startsWith(monthKey) && dayData.sabak && dayData.sabak.lines) {
+                        yearlyTotalLines += dayData.sabak.lines;
+                        yearlyTotalPages += dayData.sabak.pages || 0;
+                        yearlyTotalJuz += dayData.sabak.juz || 0;
+                    }
+                });
+            });
+            
+                // Format Juz display for yearly total
+                let yearlyJuzDisplay = '';
+                if (yearlyTotalLines === 0 || yearlyTotalJuz === 0) {
+                    yearlyJuzDisplay = '0 Juz';
+                } else if (yearlyTotalJuz < 0.125) {
+                    yearlyJuzDisplay = '< 1/4 Juz';
+                } else if (yearlyTotalJuz < 1) {
+                if (yearlyTotalJuz >= 0.875) yearlyJuzDisplay = '1 Juz';
+                else if (yearlyTotalJuz >= 0.625) yearlyJuzDisplay = '3/4 Juz';
+                else if (yearlyTotalJuz >= 0.375) yearlyJuzDisplay = '1/2 Juz';
+                else yearlyJuzDisplay = '1/4 Juz';
+            } else {
+                const wholeJuz = Math.floor(yearlyTotalJuz);
+                const remainingJuz = yearlyTotalJuz - wholeJuz;
+                
+                if (remainingJuz < 0.125) {
+                    yearlyJuzDisplay = wholeJuz + ' Juz';
+                } else if (remainingJuz < 0.375) {
+                    yearlyJuzDisplay = wholeJuz + ' Juz & 1/4';
+                } else if (remainingJuz < 0.625) {
+                    yearlyJuzDisplay = wholeJuz + ' Juz & 1/2';
+                } else if (remainingJuz < 0.875) {
+                    yearlyJuzDisplay = wholeJuz + ' Juz & 3/4';
+                } else {
+                    yearlyJuzDisplay = (wholeJuz + 1) + ' Juz';
+                }
+            }
+            
+            // Yearly Sabak Summary Boxes - Smaller
+            const yearlyBoxWidth = 45;
+            const yearlyBoxHeight = 20;
+            const yearlySpacing = 6;
+            const totalYearlyWidth = (3 * yearlyBoxWidth) + (2 * yearlySpacing);
+            const yearlyStartX = (210 - totalYearlyWidth) / 2;
+            
+            const yearlySabakBoxes = [
+                { label: 'TOTAL LINES', value: yearlyTotalLines, color: [16, 163, 127] },
+                { label: 'TOTAL PAGES', value: Math.round(yearlyTotalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'TOTAL JUZ', value: yearlyJuzDisplay, color: [255, 149, 0] }
+            ];
+            
+            yearlySabakBoxes.forEach(function(box, index) {
+                const x = yearlyStartX + (index * (yearlyBoxWidth + yearlySpacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, yearlyBoxWidth, yearlyBoxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, yearlyBoxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, yearlyBoxWidth, yearlyBoxHeight, 2, 'S');
+                
+                // Number/Value - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (yearlyBoxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(5);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (yearlyBoxWidth - labelWidth)/2, yPos + 17);
+            });
+            
+            yPos += 32;
+            
+            // Monthly Progress Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            const monthlyTitleWidth = pdf.getTextWidth('Monthly Progress (Academic Year)');
+            pdf.text('Monthly Progress (Academic Year)', (210 - monthlyTitleWidth) / 2, yPos);
+            yPos += 12;
+            
+            // Month names and their display names
+            const monthNames = [
+                { key: '2024-09', name: 'September 2024' },
+                { key: '2024-10', name: 'October 2024' },
+                { key: '2024-11', name: 'November 2024' },
+                { key: '2024-12', name: 'December 2024' },
+                { key: '2025-01', name: 'January 2025' },
+                { key: '2025-02', name: 'February 2025' },
+                { key: '2025-03', name: 'March 2025' },
+                { key: '2025-04', name: 'April 2025' },
+                { key: '2025-05', name: 'May 2025' },
+                { key: '2025-06', name: 'June 2025' },
+                { key: '2025-07', name: 'July 2025' },
+                { key: '2025-08', name: 'August 2025' }
+            ];
+            
+            // Box dimensions for monthly progress - Smaller
+            const monthlyBoxWidth = 32;
+            const monthlyBoxHeight = 16;
+            const monthlySpacing = 5;
+            const totalMonthlyWidth = (4 * monthlyBoxWidth) + (3 * monthlySpacing);
+            const monthlyStartX = (210 - totalMonthlyWidth) / 2;
+            
+            monthNames.forEach(function(month, monthIndex) {
+                // Calculate monthly stats for this month
+                const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0 };
+                
+                Object.entries(studentData).forEach(function([date, dayData]) {
+                    if (date.startsWith(month.key)) {
+                        if (dayData.absent) {
+                            monthlyStats.absent++;
+                        } else {
+                            ['sabak', 'para', 'dhor'].forEach(function(type) {
+                                if (dayData[type]) monthlyStats[type]++;
+                            });
+                        }
                     }
                 });
                 
+                // Check if we need a new page - More generous space for 2 pages
+                if (yPos > 265) {
+                    pdf.addPage();
+                    yPos = 15;
+                }
+                
+                // Month name - Smaller font
                 pdf.setTextColor(28, 28, 30);
-                pdf.setFontSize(10);
-                pdf.text(`📊 Progress: Sabak(${progressStats.sabak}) Para(${progressStats.para}) Dhor(${progressStats.dhor}) - Total: ${totalDays} days`, 25, yPosition);
-                yPosition += 20;
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'bold');
+                const monthNameWidth = pdf.getTextWidth(month.name);
+                pdf.text(month.name, (210 - monthNameWidth) / 2, yPos);
+                yPos += 7;
+                
+                // Monthly progress boxes (4 boxes per month)
+                const monthlyBoxes = [
+                    { label: 'SABAK', value: monthlyStats.sabak, color: [16, 163, 127] },
+                    { label: 'SABAK PARA', value: monthlyStats.para, color: [142, 68, 173] },
+                    { label: 'DHOR', value: monthlyStats.dhor, color: [255, 149, 0] },
+                    { label: 'ABSENT', value: monthlyStats.absent, color: [255, 59, 48] }
+                ];
+                
+                monthlyBoxes.forEach(function(box, index) {
+                    const x = monthlyStartX + (index * (monthlyBoxWidth + monthlySpacing));
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    roundedRect(x, yPos, monthlyBoxWidth, monthlyBoxHeight, 2, 'F');
+                    
+                    // Top colored bar
+                    pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                    roundedRect(x, yPos, monthlyBoxWidth, 2, 2, 'F');
+                    
+                    // Border
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(x, yPos, monthlyBoxWidth, monthlyBoxHeight, 2, 'S');
+                    
+                    // Number - Centered
+                    pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'bold');
+                    const numWidth = pdf.getTextWidth(box.value.toString());
+                    pdf.text(box.value.toString(), x + (monthlyBoxWidth - numWidth)/2, yPos + 9);
+                    
+                    // Label - Centered
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(4);
+                    pdf.setFont(undefined, 'normal');
+                    const labelWidth = pdf.getTextWidth(box.label);
+                    pdf.text(box.label, x + (monthlyBoxWidth - labelWidth)/2, yPos + 13);
+                });
+                
+                yPos += 24; // Increased spacing between months from 20 to 24
+            });
+            
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                pdf.save(student.name + '_yearly_summary_2024-2025.pdf');
+            }
+        }
+
+        async function generateMonthlyDetailedPDF(studentId, year, month, providedPDF = null, skipSave = false) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentData = await window.getStudentData(studentId);
+            const homework = await getStudentHomework(studentId);
+            
+            // Create PDF or use provided one
+            const { jsPDF } = window.jspdf;
+            const pdf = providedPDF || new jsPDF();
+            
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                pdf.roundedRect(x, y, width, height, radius, radius, style);
             }
             
-            // Footer
-            yPosition += 10;
-            pdf.setTextColor(142, 142, 147);
-            pdf.setFontSize(10);
-            pdf.setFont(undefined, 'italic');
-            pdf.text('Generated by Hifz Record App - Comprehensive Student Progress Overview', 20, yPosition);
+            // Fallback if roundedRect doesn't exist
+            if (typeof pdf.roundedRect === 'undefined') {
+                roundedRect = function(x, y, width, height, radius, style) {
+                    pdf.rect(x, y, width, height, style);
+                };
+            }
             
-            // Save PDF
-            pdf.save(`all_students_${reportType}_report.pdf`);
+            // Header Section
+            pdf.setFillColor(16, 163, 127);
+            roundedRect(10, 10, 190, 30, 4, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(20);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Progress Report', 20, 25);
+            
+            const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(student.name + ' • ' + monthNames[parseInt(month)] + ' ' + year, 20, 32);
+            
+            let yPos = 50;
+            
+            // Monthly Progress Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Progress', 20, yPos);
+            yPos += 10;
+            
+            // Calculate monthly stats for selected month
+            const selectedMonth = year + '-' + month;
+            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0 };
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(selectedMonth)) {
+                    if (dayData.absent) {
+                        monthlyStats.absent++;
+                    } else {
+                        ['sabak', 'para', 'dhor'].forEach(function(type) {
+                            if (dayData[type]) monthlyStats[type]++;
+                        });
+                    }
+                }
+            });
+            
+            // Monthly Progress Boxes - Smaller and more compact
+            const boxWidth = 38;
+            const boxHeight = 22;
+            const spacing = 6;
+            const startX = 20;
+            
+            const progressBoxes = [
+                { label: 'SABAK', value: monthlyStats.sabak, color: [16, 163, 127] },
+                { label: 'SABAK PARA', value: monthlyStats.para, color: [142, 68, 173] },
+                { label: 'DHOR', value: monthlyStats.dhor, color: [255, 149, 0] },
+                { label: 'ABSENT', value: monthlyStats.absent, color: [255, 59, 48] }
+            ];
+            
+            progressBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Homework Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Homework Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate homework stats for selected month
+            const monthHomework = homework ? homework.filter(function(hw) {
+                const hwDate = new Date(hw.assignedDate);
+                const hwMonth = hwDate.getFullYear() + '-' + String(hwDate.getMonth() + 1).padStart(2, '0');
+                return hwMonth === selectedMonth;
+            }) : [];
+            
+            const homeworkStats = {
+                total: monthHomework.length,
+                completed: monthHomework.filter(function(hw) { return hw.completed; }).length,
+                pending: monthHomework.filter(function(hw) { return !hw.completed && hw.status !== 'did-not-give'; }).length,
+                didNotDo: monthHomework.filter(function(hw) { return hw.status === 'did-not-give'; }).length
+            };
+            
+            const homeworkBoxes = [
+                { label: 'TOTAL', value: homeworkStats.total, color: [28, 28, 30] },
+                { label: 'COMPLETED', value: homeworkStats.completed, color: [52, 199, 89] },
+                { label: 'PENDING', value: homeworkStats.pending, color: [255, 149, 0] },
+                { label: 'DID NOT DO', value: homeworkStats.didNotDo, color: [255, 59, 48] }
+            ];
+            
+            homeworkBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Sabak Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate sabak totals for selected month
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(selectedMonth) && dayData.sabak && dayData.sabak.lines) {
+                    totalLines += dayData.sabak.lines;
+                    totalPages += dayData.sabak.pages || 0;
+                    totalJuz += dayData.sabak.juz || 0;
+                }
+            });
+            
+                // Format Juz display
+                let juzDisplay = '';
+                if (totalLines === 0 || totalJuz === 0) {
+                    juzDisplay = '0 Juz';
+                } else if (totalJuz < 0.125) {
+                    juzDisplay = '< 1/4 Juz';
+                } else if (totalJuz < 1) {
+                if (totalJuz >= 0.875) juzDisplay = '1 Juz';
+                else if (totalJuz >= 0.625) juzDisplay = '3/4 Juz';
+                else if (totalJuz >= 0.375) juzDisplay = '1/2 Juz';
+                else juzDisplay = '1/4 Juz';
+            } else {
+                const wholeJuz = Math.floor(totalJuz);
+                const remainingJuz = totalJuz - wholeJuz;
+                
+                if (remainingJuz < 0.125) {
+                    juzDisplay = wholeJuz + ' Juz';
+                } else if (remainingJuz < 0.375) {
+                    juzDisplay = wholeJuz + ' Juz & 1/4';
+                } else if (remainingJuz < 0.625) {
+                    juzDisplay = wholeJuz + ' Juz & 1/2';
+                } else if (remainingJuz < 0.875) {
+                    juzDisplay = wholeJuz + ' Juz & 3/4';
+                } else {
+                    juzDisplay = (wholeJuz + 1) + ' Juz';
+                }
+            }
+            
+            const sabakBoxWidth = 50;
+            const sabakBoxes = [
+                { label: 'LINES', value: totalLines, color: [16, 163, 127] },
+                { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'JUZ', value: juzDisplay, color: [255, 149, 0] }
+            ];
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (sabakBoxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
+                
+                // Number/Value - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (sabakBoxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Daily Breakdown Section - Full width with proper spacing
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Daily Breakdown', 20, yPos);
+            yPos += 10;
+            
+            // Table headers - Using full page width
+            const tableWidth = 170;
+            const colWidths = [25, 30, 35, 25, 25, 30];
+            const colHeaders = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+            
+            // Header background - full width
+            pdf.setFillColor(248, 249, 250);
+            roundedRect(20, yPos - 2, tableWidth, 10, 1, 'F');
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(8);
+            pdf.setFont(undefined, 'bold');
+            
+            let currentX = 22;
+            colHeaders.forEach(function(header, index) {
+                // Center align headers in their columns
+                const headerWidth = pdf.getTextWidth(header);
+                const centerX = currentX + (colWidths[index] - headerWidth) / 2;
+                pdf.text(header, centerX, yPos + 4);
+                currentX += colWidths[index];
+            });
+            
+            yPos += 12;
+            
+            // Get all days in selected month
+            const selectedYear = parseInt(year);
+            const selectedMonthNum = parseInt(month) - 1;
+            const daysInMonth = new Date(selectedYear, selectedMonthNum + 1, 0).getDate();
+            
+            pdf.setFont(undefined, 'normal');
+            pdf.setFontSize(7);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(selectedYear, selectedMonthNum, day);
+                const dayOfWeek = date.getDay();
+                
+                // Skip weekends
+                if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+                
+                const dateKey = selectedYear + '-' + String(selectedMonthNum + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                const dayData = studentData[dateKey] || {};
+                
+                // Check if page break needed
+                if (yPos > 270) {
+                    pdf.addPage();
+                    yPos = 20;
+                }
+                
+                // Row background for absent days - full width
+                if (dayData.absent) {
+                    pdf.setFillColor(255, 242, 242);
+                    roundedRect(20, yPos - 1, tableWidth, 8, 1, 'F');
+                }
+                
+                currentX = 22;
+                pdf.setTextColor(28, 28, 30);
+                
+                // Date - centered
+                const dateText = day.toString();
+                const dateWidth = pdf.getTextWidth(dateText);
+                pdf.text(dateText, currentX + (colWidths[0] - dateWidth) / 2, yPos + 3);
+                currentX += colWidths[0];
+                
+                // Sabak - centered
+                const sabakText = dayData.sabak ? (dayData.sabak.lines || '--') + ' lines' : '--';
+                const sabakWidth = pdf.getTextWidth(sabakText);
+                pdf.text(sabakText, currentX + (colWidths[1] - sabakWidth) / 2, yPos + 3);
+                currentX += colWidths[1];
+                
+                // Sabak Para - centered
+                const paraText = dayData.para ? dayData.para.amount || '--' : '--';
+                const paraWidth = pdf.getTextWidth(paraText);
+                pdf.text(paraText, currentX + (colWidths[2] - paraWidth) / 2, yPos + 3);
+                currentX += colWidths[2];
+                
+                // Dhor - centered
+                const dhorText = dayData.dhor ? dayData.dhor.amount || '--' : '--';
+                const dhorWidth = pdf.getTextWidth(dhorText);
+                pdf.text(dhorText, currentX + (colWidths[3] - dhorWidth) / 2, yPos + 3);
+                currentX += colWidths[3];
+                
+                // Status - centered
+                const statusText = dayData.absent ? 'Absent' : 'Present';
+                pdf.setTextColor(dayData.absent ? 255 : 52, dayData.absent ? 59 : 199, dayData.absent ? 48 : 89);
+                const statusWidth = pdf.getTextWidth(statusText);
+                pdf.text(statusText, currentX + (colWidths[4] - statusWidth) / 2, yPos + 3);
+                currentX += colWidths[4];
+                
+                // Parent Review - centered
+                const parentText = dayData.parentChecked ? '✓' : '✗';
+                pdf.setTextColor(dayData.parentChecked ? 52 : 255, dayData.parentChecked ? 199 : 59, dayData.parentChecked ? 89 : 48);
+                const parentWidth = pdf.getTextWidth(parentText);
+                pdf.text(parentText, currentX + (colWidths[5] - parentWidth) / 2, yPos + 3);
+                
+                yPos += 8;
+            }
+            
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                pdf.save(student.name + '_' + monthNames[parseInt(month)] + '_' + year + '_report.pdf');
+            }
+        }
+
+        async function generateOverallProgressPDF(studentId, providedPDF = null, skipSave = false) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            // Get Juz data using the same function as the modal
+            const juzData = await getStudentJuzProgress(studentId);
+            
+            // Create PDF or use provided one
+            const { jsPDF } = window.jspdf;
+            const pdf = providedPDF || new jsPDF();
+            
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                pdf.roundedRect(x, y, width, height, radius, radius, style);
+            }
+            
+            // Fallback if roundedRect doesn't exist
+            if (typeof pdf.roundedRect === 'undefined') {
+                roundedRect = function(x, y, width, height, radius, style) {
+                    pdf.rect(x, y, width, height, style);
+                };
+            }
+            
+            // Header Section - Smaller
+            pdf.setFillColor(16, 163, 127);
+            roundedRect(10, 10, 190, 25, 4, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Overall Progress Report', 20, 22);
+            
+            pdf.setFontSize(9);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(student.name + ' • Complete Hifz Journey', 20, 28);
+            
+            let yPos = 42; // Reduced from 50
+            
+            // Calculate time in Hifz using the same logic as modal
+            const hifzStartDate = juzData.hifzStartDate ? new Date(juzData.hifzStartDate) : null;
+            const currentDate = new Date();
+            let timeInHifz = 'Not Available';
+            
+            if (hifzStartDate) {
+                const totalDuration = calculateDuration(juzData.hifzStartDate);
+                timeInHifz = formatDuration(totalDuration);
+            }
+            
+            // Time in Hifz Section - Smaller
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Time in Hifz', 20, yPos);
+            yPos += 8; // Reduced from 10
+            
+            // Time box - Smaller
+            const timeBoxWidth = 100; // Reduced from 120
+            const timeBoxHeight = 20; // Reduced from 25
+            const timeBoxX = (210 - timeBoxWidth) / 2;
+            
+            pdf.setFillColor(255, 255, 255);
+            roundedRect(timeBoxX, yPos, timeBoxWidth, timeBoxHeight, 2, 'F');
+            
+            pdf.setFillColor(16, 163, 127);
+            roundedRect(timeBoxX, yPos, timeBoxWidth, 2, 2, 'F');
+            
+            pdf.setDrawColor(229, 229, 234);
+            pdf.setLineWidth(0.3);
+            roundedRect(timeBoxX, yPos, timeBoxWidth, timeBoxHeight, 2, 'S');
+            
+            // Start date
+            pdf.setTextColor(142, 142, 147);
+            pdf.setFontSize(5);
+            pdf.setFont(undefined, 'normal');
+            const startText = 'Started: ' + (hifzStartDate ? hifzStartDate.toLocaleDateString() : 'Unknown');
+            const startWidth = pdf.getTextWidth(startText);
+            pdf.text(startText, timeBoxX + (timeBoxWidth - startWidth)/2, yPos + 6);
+            
+            // Duration
+            pdf.setTextColor(16, 163, 127);
+            pdf.setFontSize(10); // Reduced from 12
+            pdf.setFont(undefined, 'bold');
+            const timeWidth = pdf.getTextWidth(timeInHifz);
+            pdf.text(timeInHifz, timeBoxX + (timeBoxWidth - timeWidth)/2, yPos + 15);
+            
+            yPos += 28; // Reduced from 35
+            
+            // Juz Progress Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            const juzTitleWidth = pdf.getTextWidth('Juz Progress (1-30)');
+            pdf.text('Juz Progress (1-30)', (210 - juzTitleWidth) / 2, yPos);
+            yPos += 10; // Reduced from 15
+            
+            // Get Juz progress using the same structure as modal
+            const juzProgress = juzData.juzProgress || {};
+            
+            // Juz grid (6 columns, 5 rows) - More compact
+            const juzBoxWidth = 26; // Reduced from 28
+            const juzBoxHeight = 25; // Reduced from 28
+            const juzSpacing = 2; // Reduced from 3
+            const juzCols = 6;
+            const juzRows = 5;
+            const totalJuzWidth = (juzCols * juzBoxWidth) + ((juzCols - 1) * juzSpacing);
+            const juzStartX = (210 - totalJuzWidth) / 2;
+            
+            for (let juz = 1; juz <= 30; juz++) {
+                const row = Math.floor((juz - 1) / juzCols);
+                const col = (juz - 1) % juzCols;
+                const x = juzStartX + (col * (juzBoxWidth + juzSpacing));
+                const y = yPos + (row * (juzBoxHeight + juzSpacing));
+                
+                // Use same logic as modal to determine status
+                const juzInfo = juzProgress[juz];
+                const hasStarted = juzInfo && juzInfo.startDate;
+                const isCompleted = juzInfo && juzInfo.startDate && juzInfo.finishDate;
+                const isInProgress = hasStarted && !isCompleted;
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, y, juzBoxWidth, juzBoxHeight, 2, 'F');
+                
+                // Top colored bar based on status
+                if (isCompleted) {
+                    pdf.setFillColor(52, 199, 89); // Green
+                } else if (isInProgress) {
+                    pdf.setFillColor(255, 149, 0); // Orange
+                } else {
+                    pdf.setFillColor(229, 229, 234); // Gray
+                }
+                roundedRect(x, y, juzBoxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, y, juzBoxWidth, juzBoxHeight, 2, 'S');
+                
+                // Juz number
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(13);
+                pdf.setFont(undefined, 'bold');
+                const juzNumWidth = pdf.getTextWidth(juz.toString());
+                pdf.text(juz.toString(), x + (juzBoxWidth - juzNumWidth)/2, y + 9);
+                
+                // Status indicator
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'normal');
+                let statusText = '';
+                if (isCompleted) {
+                    statusText = 'Done';
+                    pdf.setTextColor(52, 199, 89);
+                } else if (isInProgress) {
+                    statusText = 'Current';
+                    pdf.setTextColor(255, 149, 0);
+                } else {
+                    statusText = 'Pending';
+                    pdf.setTextColor(142, 142, 147);
+                }
+                const statusWidth = pdf.getTextWidth(statusText);
+                pdf.text(statusText, x + (juzBoxWidth - statusWidth)/2, y + 14);
+                
+                // Duration text
+                let durationText = '';
+                if (isCompleted && juzInfo.startDate && juzInfo.finishDate) {
+                    const duration = calculateDuration(juzInfo.startDate, juzInfo.finishDate);
+                    durationText = formatDuration(duration);
+                } else if (isInProgress && juzInfo.startDate) {
+                    const duration = calculateDuration(juzInfo.startDate);
+                    durationText = formatDuration(duration);
+                }
+                
+                if (durationText && durationText !== 'Not Available') {
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(8);
+                    pdf.setFont(undefined, 'normal');
+                    
+                    // Split long duration text if needed
+                    let displayDuration = durationText;
+                    if (displayDuration.length > 10) {
+                        // Abbreviate long durations more aggressively
+                        displayDuration = displayDuration
+                            .replace(' Years', 'Y')
+                            .replace(' Year', 'Y')
+                            .replace(' Months', 'M')
+                            .replace(' Month', 'M')
+                            .replace(' Days', 'D')
+                            .replace(' Day', 'D')
+                            .replace(' ', '');
+                    }
+                    
+                    const durationWidth = pdf.getTextWidth(displayDuration);
+                    pdf.text(displayDuration, x + (juzBoxWidth - durationWidth)/2, y + 18);
+                }
+            }
+            
+            yPos += (juzRows * (juzBoxHeight + juzSpacing)) + 10; // Reduced from 15
+            
+            // Summary Statistics - using same logic as modal
+            let completedJuz = 0;
+            let inProgressJuz = 0;
+            
+            for (let juz = 1; juz <= 30; juz++) {
+                const juzInfo = juzProgress[juz];
+                const hasStarted = juzInfo && juzInfo.startDate;
+                const isCompleted = juzInfo && juzInfo.startDate && juzInfo.finishDate;
+                const isInProgress = hasStarted && !isCompleted;
+                
+                if (isCompleted) completedJuz++;
+                else if (isInProgress) inProgressJuz++;
+            }
+            
+            const pendingJuz = 30 - completedJuz - inProgressJuz;
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(11); // Reduced from 12
+            pdf.setFont(undefined, 'bold');
+            const summaryTitleWidth = pdf.getTextWidth('Progress Summary');
+            pdf.text('Progress Summary', (210 - summaryTitleWidth) / 2, yPos);
+            yPos += 8; // Reduced from 10
+            
+            // Summary boxes - Smaller
+            const summaryBoxWidth = 45; // Reduced from 50
+            const summaryBoxHeight = 18; // Reduced from 20
+            const summarySpacing = 6; // Reduced from 8
+            const totalSummaryWidth = (3 * summaryBoxWidth) + (2 * summarySpacing);
+            const summaryStartX = (210 - totalSummaryWidth) / 2;
+            
+            const summaryBoxes = [
+                { label: 'COMPLETED', value: completedJuz, color: [52, 199, 89] },
+                { label: 'IN PROGRESS', value: inProgressJuz, color: [255, 149, 0] },
+                { label: 'PENDING', value: pendingJuz, color: [142, 142, 147] }
+            ];
+            
+            summaryBoxes.forEach(function(box, index) {
+                const x = summaryStartX + (index * (summaryBoxWidth + summarySpacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, summaryBoxWidth, summaryBoxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, summaryBoxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, summaryBoxWidth, summaryBoxHeight, 2, 'S');
+                
+                // Number
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(11); // Reduced from 12
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (summaryBoxWidth - numWidth)/2, yPos + 11);
+                
+                // Label
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(4.5); // Reduced from 5
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (summaryBoxWidth - labelWidth)/2, yPos + 15);
+            });
+            
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                pdf.save(student.name + '_overall_progress.pdf');
+            }
+        }
+
+        async function generateAllStudentsPDF(reportType, selectedYear = null, selectedMonth = null) {
+            const students = await window.getStudents();
+            
+            if (students.length === 0) {
+                alert('No students found');
+                return;
+            }
+            
+            // Create one master PDF
+            const { jsPDF } = window.jspdf;
+            const masterPDF = new jsPDF();
+            let isFirstStudent = true;
+            
+            for (const student of students) {
+                // Add new page for each student (except first)
+                if (!isFirstStudent) {
+                    masterPDF.addPage();
+                }
+                
+                if (reportType === 'yearly-summary') {
+                    await generateYearlySummaryPDF(student.id, masterPDF, true);
+                } else if (reportType === 'monthly-detailed') {
+                    await generateMonthlyDetailedPDF(student.id, selectedYear, selectedMonth, masterPDF, true);
+                } else if (reportType === 'overall-progress') {
+                    await generateOverallProgressPDF(student.id, masterPDF, true);
+                } else {
+                    await generateSingleStudentPDF(student.id, reportType, masterPDF, true);
+                }
+                
+                isFirstStudent = false;
+            }
+            
+            // Save the master PDF
+            const reportName = reportType === 'yearly-summary' ? 'yearly_summary' : 
+                              reportType === 'monthly-detailed' ? 'monthly_detailed' : 'current_month';
+            masterPDF.save('all_students_' + reportName + '_combined.pdf');
         }
 
         function showResetModal() {
