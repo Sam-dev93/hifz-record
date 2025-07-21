@@ -2900,12 +2900,19 @@
                 const { getDoc, doc, setDoc } = window.firebaseModules;
                 const { db } = window.firebase;
                 
-                // Always reset with fresh student data
-                await setDoc(doc(db, 'config', 'students'), {
-                    list: defaultStudents,
-                    lastUpdated: new Date().toISOString()
-                });
-                console.log('Fresh students data initialized');
+                // Check if students data already exists
+                const studentsDoc = await getDoc(doc(db, 'config', 'students'));
+                
+                if (!studentsDoc.exists()) {
+                    // Only create default data if none exists
+                    await setDoc(doc(db, 'config', 'students'), {
+                        list: defaultStudents,
+                        lastUpdated: new Date().toISOString()
+                    });
+                    console.log('Default students data initialized');
+                } else {
+                    console.log('Existing students data found, not overwriting');
+                }
                 
                 // FIXED: Build the access codes mapping
                 await buildStudentAccessCodes();
@@ -3007,7 +3014,6 @@
                     break;
                 case 'parent':
                     // FIXED: Rebuild access codes and check if access code matches any student's access code
-                    await buildStudentAccessCodes();
                     const studentInfo = studentAccessCodes[accessCode.toLowerCase()];
                     if (studentInfo) {
                         loginSuccess = true;
@@ -5486,8 +5492,11 @@
                     lastUpdated: new Date().toISOString()
                 });
                 
-                // FIXED: Rebuild access codes after adding student
-                await buildStudentAccessCodes();
+                // Directly update access codes instead of rebuilding from Firebase
+                studentAccessCodes[parentCode.toLowerCase()] = {
+                    studentId: studentId,
+                    studentName: name
+                };
                 
                 populateStudentTabs(students);
                 closeModal('addStudentModal');
