@@ -2108,7 +2108,7 @@
         <div class="header">
             <h1 class="app-title">📖 Hifz Record</h1>
             <div class="current-date" id="currentDate">Loading...</div>
-            <div class="cloud-status connecting" id="cloudStatus">🔄 Connecting to Firebase...</div>
+            <div class="cloud-status connecting" id="cloudStatus">🔄 Connecting to Cloud...</div>
             <div class="user-info" id="userInfo" style="display: none;"></div>
         </div>
 
@@ -2346,7 +2346,7 @@
         </div>
 
         <div class="footer">
-            <p id="footerText">Secure Firebase connection - Choose your access level above</p>
+            <p id="footerText">Secure Cloud connection - Choose your access level above</p>
         </div>
     </div>
 
@@ -2877,7 +2877,7 @@
                 await initializeDefaultData();
                 
                 // Update status to connected
-                updateCloudStatus('connected', '✅ Firebase Ready');
+                updateCloudStatus('connected', '✅ Cloud Sync Ready');
                 
                 // Show profile selection by default
                 showProfileSelection();
