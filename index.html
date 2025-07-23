@@ -1591,10 +1591,13 @@
 
         /* UPDATED - Homework status badges to match app theme */
         .homework-status {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
         }
 
         .homework-status.completed {
@@ -3967,16 +3970,16 @@
                         let statusHtml = '';
                         let statusColor = '';
                         if (hw.status === 'did-not-give') {
-                            statusHtml = '<span style="color: #991B1B; font-weight: 600; font-size: 11px;">Did Not Give</span>';
+                            statusHtml = '<span style="color: #991B1B; font-weight: 600; font-size: 12px;">Did Not Give</span>';
                             statusColor = '#FEF2F2';
                         } else if (hw.completed) {
-                            statusHtml = '<span style="color: #34C759; font-weight: 600; font-size: 11px;">Completed</span>';
+                            statusHtml = '<span style="color: #34C759; font-weight: 600; font-size: 12px;">Completed</span>';
                             statusColor = '#D1FAE5';
                         } else if (isOverdue) {
-                            statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 11px;">Overdue</span>';
+                            statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 12px;">Overdue</span>';
                             statusColor = '#FFE4CC';
                         } else {
-                            statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 11px;">Pending</span>';
+                            statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 12px;">Pending</span>';
                             statusColor = '#FED7AA';
                         }
                         
@@ -3993,7 +3996,7 @@
                                         <h3 class="homework-student-name">${typeDisplay} Homework</h3>
                                         <p class="homework-details">Due: ${dueDateStr}</p>
                                     </div>
-                                    <div style="padding: 4px 8px; background: ${statusColor}; border-radius: 6px;">
+                                    <div style="padding: 6px 12px; background: ${statusColor}; border-radius: 20px; line-height: 1; display: inline-flex; align-items: center;">
                                         ${statusHtml}
                                     </div>
                                 </div>
@@ -4448,10 +4451,10 @@
                             let statusHtml = '';
                             let statusColor = '';
                             if (isOverdue) {
-                                statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 11px;">Overdue</span>';
+                                statusHtml = '<span style="color: #EA580C; font-weight: 600; font-size: 12px;">Overdue</span>';
                                 statusColor = '#FFE4CC';
                             } else {
-                                statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 11px;">Pending</span>';
+                                statusHtml = '<span style="color: #C2410C; font-weight: 600; font-size: 12px;">Pending</span>';
                                 statusColor = '#FED7AA';
                             }
                             
@@ -4468,7 +4471,7 @@
                                             <h3 class="homework-student-name">${typeDisplay} Homework</h3>
                                             <p class="homework-details">Due: ${dueDateStr}</p>
                                         </div>
-                                        <div style="padding: 4px 8px; background: ${statusColor}; border-radius: 6px;">
+                                        <div style="padding: 6px 12px; background: ${statusColor}; border-radius: 20px; line-height: 1; display: inline-flex; align-items: center;">
                                             ${statusHtml}
                                         </div>
                                     </div>
