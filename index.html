@@ -953,7 +953,7 @@
         @media (min-width: 768px) {
             .homework-button {
                 font-size: 16px;
-                padding: 16px 32px;
+                padding: 16px 24px;
             }
         }
 
@@ -1273,21 +1273,22 @@
         
         .grade-button { 
             flex: 1; 
-            padding: 16px; 
+            padding: 12px; 
             border: 1px solid #E5E5EA; 
-            border-radius: 12px; 
+            border-radius: 10px; 
             background: #F2F2F7; 
             color: #8E8E93; 
-            font-size: 16px; 
+            font-size: 14px; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: all 0.3s ease; 
+            transition: all 0.3s ease;
+            text-align: center; 
         }
 
         @media (min-width: 768px) {
             .grade-button {
-                padding: 20px;
-                font-size: 18px;
+                padding: 16px;
+                font-size: 16px;
             }
         }
         
@@ -1301,18 +1302,19 @@
             background: #10A37F; 
             color: white; 
             border: none; 
-            padding: 18px; 
-            border-radius: 12px; 
-            font-size: 18px; 
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 14px; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: all 0.3s ease; 
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
         @media (min-width: 768px) {
             .save-button {
-                padding: 22px;
-                font-size: 20px;
+                padding: 16px;
+                font-size: 16px;
             }
         }
 
@@ -1344,8 +1346,8 @@
 
         @media (min-width: 768px) {
             .save-button {
-                padding: 22px;
-                font-size: 20px;
+                padding: 16px;
+                font-size: 16px;
             }
         }
         
@@ -1353,9 +1355,9 @@
             background: #FF3B30; 
             color: white; 
             border: none; 
-            padding: 16px; 
-            border-radius: 12px; 
-            font-size: 16px; 
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 14px; 
             font-weight: 600; 
             cursor: pointer; 
             margin-top: 15px; 
@@ -1363,8 +1365,8 @@
 
         @media (min-width: 768px) {
             .clear-button {
-                padding: 20px;
-                font-size: 18px;
+                padding: 16px;
+                font-size: 16px;
                 margin-top: 20px;
             }
         }
@@ -2216,6 +2218,7 @@
             border: 1px solid #E5E5EA;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
+            margin-bottom: 20px;
         }
 
         .juz-card:hover {
@@ -2793,7 +2796,9 @@
                             <!-- Juz cards will be generated here -->
                         </div>
                         
-                        <button class="save-button" onclick="saveStudentOverview()">Save Overview</button>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="save-button" onclick="saveStudentOverview()">Save Overview</button>
+                        </div>
                     </div>
                 </div>
             </div>
