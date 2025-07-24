@@ -2702,6 +2702,7 @@
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
                             <button class="control-button" onclick="showAcademicYearModal()">📅 Set Academic Year</button>
                             <button class="control-button" onclick="refreshAccessCodesManually()">🔄 Refresh Access Codes</button>
+                            <button class="control-button" onclick="diagnoseAccessCodesIssues()">🩺 Diagnose Access Issues</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="pdfSpinner"></div>
                                 <span id="pdfBtnText">📄 Export Student PDF</span>
@@ -3398,6 +3399,117 @@
             }
         }
 
+        // ENHANCED: Comprehensive diagnostic function for teachers
+        async function diagnoseAccessCodesIssues() {
+            if (currentUserType !== 'teacher') return;
+            
+            try {
+                console.log('🩺 STARTING ACCESS CODE DIAGNOSIS...');
+                
+                const diagnostic = {
+                    timestamp: new Date().toISOString(),
+                    issues: [],
+                    fixes: [],
+                    summary: ''
+                };
+                
+                // 1. Check students in Firebase
+                const students = await window.getStudents();
+                console.log(`📊 Found ${students.length} students in Firebase`);
+                
+                if (students.length === 0) {
+                    diagnostic.issues.push('No students found in Firebase');
+                    diagnostic.fixes.push('Add students using "Manage Students" → "Add"');
+                }
+                
+                // 2. Check for missing access codes
+                const studentsWithoutCodes = students.filter(s => !s.accessCode);
+                if (studentsWithoutCodes.length > 0) {
+                    diagnostic.issues.push(`${studentsWithoutCodes.length} students missing access codes`);
+                    diagnostic.fixes.push('Update missing access codes using "Manage Students" → "Update"');
+                    console.warn('Students without access codes:', studentsWithoutCodes.map(s => s.name));
+                }
+                
+                // 3. Check for duplicate access codes
+                const accessCodes = students.filter(s => s.accessCode).map(s => s.accessCode.toLowerCase());
+                const duplicates = accessCodes.filter((code, index) => accessCodes.indexOf(code) !== index);
+                if (duplicates.length > 0) {
+                    diagnostic.issues.push(`Duplicate access codes found: ${duplicates.join(', ')}`);
+                    diagnostic.fixes.push('Change duplicate access codes to unique values');
+                }
+                
+                // 4. Test access code building
+                const buildResult = await buildStudentAccessCodes();
+                const loadedCount = Object.keys(studentAccessCodes).length;
+                const expectedCount = students.filter(s => s.accessCode).length;
+                
+                if (loadedCount !== expectedCount) {
+                    diagnostic.issues.push(`Access code count mismatch: loaded ${loadedCount}, expected ${expectedCount}`);
+                    diagnostic.fixes.push('Try "Refresh Access Codes" button');
+                }
+                
+                // 5. Check for invalid characters in access codes
+                const invalidCodes = students.filter(s => s.accessCode && !/^[a-zA-Z0-9]+$/.test(s.accessCode));
+                if (invalidCodes.length > 0) {
+                    diagnostic.issues.push(`${invalidCodes.length} access codes contain invalid characters`);
+                    diagnostic.fixes.push('Access codes should only contain letters and numbers');
+                    console.warn('Invalid access codes:', invalidCodes.map(s => ({ name: s.name, code: s.accessCode })));
+                }
+                
+                // 6. Check for wrong length codes
+                const wrongLengthCodes = students.filter(s => s.accessCode && s.accessCode.length !== 8);
+                if (wrongLengthCodes.length > 0) {
+                    diagnostic.issues.push(`${wrongLengthCodes.length} access codes are not 8 characters`);
+                    diagnostic.fixes.push('All access codes must be exactly 8 characters long');
+                }
+                
+                // Generate summary
+                if (diagnostic.issues.length === 0) {
+                    diagnostic.summary = '✅ All access codes are working correctly!';
+                } else {
+                    diagnostic.summary = `❌ Found ${diagnostic.issues.length} issue(s) with access codes`;
+                }
+                
+                // Display results
+                let reportText = `🩺 ACCESS CODE DIAGNOSIS REPORT\n`;
+                reportText += `Generated: ${new Date().toLocaleString()}\n\n`;
+                reportText += `📊 SUMMARY:\n${diagnostic.summary}\n\n`;
+                
+                if (diagnostic.issues.length > 0) {
+                    reportText += `❌ ISSUES FOUND:\n`;
+                    diagnostic.issues.forEach((issue, i) => {
+                        reportText += `${i + 1}. ${issue}\n`;
+                    });
+                    reportText += `\n🔧 RECOMMENDED FIXES:\n`;
+                    diagnostic.fixes.forEach((fix, i) => {
+                        reportText += `${i + 1}. ${fix}\n`;
+                    });
+                }
+                
+                reportText += `\n📋 DETAILS:\n`;
+                reportText += `• Total students: ${students.length}\n`;
+                reportText += `• Students with access codes: ${students.filter(s => s.accessCode).length}\n`;
+                reportText += `• Access codes loaded in memory: ${loadedCount}\n`;
+                reportText += `• Firebase connection: ${window.firebase ? 'Connected' : 'Disconnected'}\n`;
+                
+                console.log(reportText);
+                alert(reportText);
+                
+                // Auto-fix if possible
+                if (loadedCount !== expectedCount) {
+                    if (confirm('Would you like to automatically refresh access codes now?')) {
+                        await refreshAccessCodesManually();
+                    }
+                }
+                
+                return diagnostic;
+                
+            } catch (error) {
+                console.error('Error during diagnosis:', error);
+                alert('❌ Diagnosis failed: ' + error.message);
+            }
+        }
+
         const progressTypes = ['sabak', 'para', 'dhor'];
 
         // FIXED: Function to build student access codes mapping from student list
@@ -3831,81 +3943,146 @@
                 return;
             }
 
+            // Show loading state
+            const loginButton = document.querySelector('.login-button');
+            const originalText = loginButton.textContent;
+            loginButton.textContent = 'Logging in...';
+            loginButton.disabled = true;
+
             let loginSuccess = false;
             let foundStudent = null;
 
-            switch(currentUserType) {
-                case 'teacher':
-                    if (accessCode === teacherCode) {
-                        loginSuccess = true;
-                    }
-                    break;
-                case 'office':
-                    if (accessCode === officeCode) {
-                        loginSuccess = true;
-                    }
-                    break;
-                case 'parent':
-                    // FIXED: Always rebuild access codes before checking for parent login
-                    try {
-                        await buildStudentAccessCodes();
-                        console.log('Access codes rebuilt for parent login:', Object.keys(studentAccessCodes));
-                        
-                        const studentInfo = studentAccessCodes[accessCode.toLowerCase()];
-                        if (studentInfo) {
+            try {
+                switch(currentUserType) {
+                    case 'teacher':
+                        if (accessCode === teacherCode) {
                             loginSuccess = true;
-                            currentStudent = studentInfo.studentId;
-                            console.log('Parent login successful for student:', studentInfo.studentName);
-                        } else {
-                            console.log('Access code not found:', accessCode.toLowerCase());
-                            console.log('Available codes:', Object.keys(studentAccessCodes));
                         }
-                    } catch (error) {
-                        console.error('Error rebuilding access codes:', error);
-                        showError('Error loading student data. Please try again.');
-                        return;
-                    }
-                    break;
-            }
-
-            if (loginSuccess) {
-                // Sign in to Firebase anonymously for demo
-                try {
-                    const { signInWithEmailAndPassword } = window.firebaseModules;
-                    const { auth } = window.firebase;
-                    
-                    // Use dummy account for demo (you can create these in Firebase Console)
-                    const email = `${currentUserType}@hifz.com`;
-                    const password = `${currentUserType}123`;
-                    
-                    try {
-                        await signInWithEmailAndPassword(auth, email, password);
-                    } catch (authError) {
-                        // If account doesn't exist, continue without Firebase auth for demo
-                        console.log('Auth account not found, continuing with local auth');
-                    }
-                    
-                    showMainInterface();
-                } catch (error) {
-                    console.error('Login error:', error);
-                    showMainInterface(); // Continue anyway for demo
+                        break;
+                    case 'office':
+                        if (accessCode === officeCode) {
+                            loginSuccess = true;
+                        }
+                        break;
+                    case 'parent':
+                        // ENHANCED: Multiple attempts to build access codes for parent login
+                        console.log('Parent login attempt with code:', accessCode.toLowerCase());
+                        
+                        let attempts = 0;
+                        const maxAttempts = 3;
+                        
+                        while (attempts < maxAttempts && !loginSuccess) {
+                            attempts++;
+                            console.log(`Access code build attempt ${attempts}/${maxAttempts}`);
+                            
+                            try {
+                                // Force rebuild access codes
+                                await buildStudentAccessCodes();
+                                console.log('Access codes after rebuild:', Object.keys(studentAccessCodes));
+                                
+                                // Check if any codes were loaded
+                                if (Object.keys(studentAccessCodes).length === 0) {
+                                    console.warn('No access codes loaded, retrying...');
+                                    if (attempts < maxAttempts) {
+                                        // Wait before retry
+                                        await new Promise(resolve => setTimeout(resolve, 1000));
+                                        continue;
+                                    }
+                                }
+                                
+                                const studentInfo = studentAccessCodes[accessCode.toLowerCase()];
+                                if (studentInfo) {
+                                    loginSuccess = true;
+                                    currentStudent = studentInfo.studentId;
+                                    console.log('Parent login successful for student:', studentInfo.studentName);
+                                    break;
+                                } else {
+                                    console.log('Access code not found in loaded codes');
+                                    console.log('Available codes:', Object.keys(studentAccessCodes));
+                                    console.log('Looking for:', accessCode.toLowerCase());
+                                    
+                                    // Try direct Firebase query as fallback
+                                    console.log('Attempting direct Firebase fallback...');
+                                    const students = await window.getStudents();
+                                    const directMatch = students.find(s => 
+                                        s.accessCode && s.accessCode.toLowerCase().trim() === accessCode.toLowerCase().trim()
+                                    );
+                                    
+                                    if (directMatch) {
+                                        console.log('Found student via direct Firebase query:', directMatch.name);
+                                        loginSuccess = true;
+                                        currentStudent = directMatch.id;
+                                        
+                                        // Update access codes with found student
+                                        studentAccessCodes[accessCode.toLowerCase()] = {
+                                            studentId: directMatch.id,
+                                            studentName: directMatch.name
+                                        };
+                                        break;
+                                    }
+                                }
+                                
+                            } catch (error) {
+                                console.error(`Access code build attempt ${attempts} failed:`, error);
+                                if (attempts >= maxAttempts) {
+                                    throw error;
+                                }
+                                // Wait before retry
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                            }
+                        }
+                        break;
                 }
-            } else {
-                let errorMsg;
-                if (currentUserType === 'parent') {
-                    errorMsg = `Invalid student access code: "${accessCode}"`;
-                    // Add helpful diagnostic info for debugging
-                    console.log('Parent login failed. Access code:', accessCode);
-                    console.log('Available access codes:', Object.keys(studentAccessCodes));
-                    
-                    // Suggest refreshing if no codes are loaded
-                    if (Object.keys(studentAccessCodes).length === 0) {
-                        errorMsg += '\n\nNo access codes loaded. Please contact the teacher.';
+
+                if (loginSuccess) {
+                    // Sign in to Firebase anonymously for demo
+                    try {
+                        const { signInWithEmailAndPassword } = window.firebaseModules;
+                        const { auth } = window.firebase;
+                        
+                        // Use dummy account for demo (you can create these in Firebase Console)
+                        const email = `${currentUserType}@hifz.com`;
+                        const password = `${currentUserType}123`;
+                        
+                        try {
+                            await signInWithEmailAndPassword(auth, email, password);
+                        } catch (authError) {
+                            // If account doesn't exist, continue without Firebase auth for demo
+                            console.log('Auth account not found, continuing with local auth');
+                        }
+                        
+                        showMainInterface();
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        showMainInterface(); // Continue anyway for demo
                     }
                 } else {
-                    errorMsg = `Invalid ${currentUserType} access code`;
+                    let errorMsg;
+                    if (currentUserType === 'parent') {
+                        errorMsg = `Invalid student access code: "${accessCode}"`;
+                        
+                        // Enhanced diagnostic info
+                        const totalCodes = Object.keys(studentAccessCodes).length;
+                        if (totalCodes === 0) {
+                            errorMsg += '\n\nNo access codes loaded. Please contact the teacher.';
+                            console.error('DIAGNOSTIC: No access codes in memory');
+                        } else {
+                            errorMsg += `\n\nAccess code not found. ${totalCodes} codes are loaded.`;
+                            console.error('DIAGNOSTIC: Access codes loaded but code not found');
+                            console.error('Available codes:', Object.keys(studentAccessCodes));
+                        }
+                    } else {
+                        errorMsg = `Invalid ${currentUserType} access code`;
+                    }
+                    showError(errorMsg);
                 }
-                showError(errorMsg);
+            } catch (error) {
+                console.error('Login process failed:', error);
+                showError('Login failed: ' + error.message);
+            } finally {
+                // Reset button state
+                loginButton.textContent = originalText;
+                loginButton.disabled = false;
             }
         }
 
@@ -5809,7 +5986,9 @@
             if (currentUserType !== 'parent' || !currentStudent) return;
             
             try {
-                const targets = await getStudentTargets(currentStudent);
+                // FIXED: Use current academic year for parents
+                const academicYear = currentAcademicYear || await getCurrentAcademicYear();
+                const targets = await getStudentTargetsForYear(currentStudent, academicYear);
                 const content = document.getElementById('viewTargetsContent');
                 
                 if (!targets || (!targets.yearly?.text && Object.keys(targets.monthly || {}).length === 0)) {
@@ -5817,7 +5996,7 @@
                         <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">🎯</div>
                             <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Targets Set</h3>
-                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set any targets yet.</p>
+                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set any targets for academic year ${academicYear} yet.</p>
                         </div>
                     `;
                 } else {
@@ -5834,7 +6013,7 @@
                         contentHtml += `
                             <div class="target-view-section">
                                 <div class="target-view-title">
-                                    📅 Yearly Target (August 2025 - July 2026)
+                                    📅 Yearly Target (${academicYear})
                                 </div>
                                 <div class="target-view-item ${targets.yearly.status ? targets.yearly.status + '-target' : ''}">
                                     <div class="target-view-text">${targets.yearly.text}</div>
@@ -5844,7 +6023,7 @@
                         `;
                     }
                     
-                    // Monthly Targets
+                    // Monthly Targets - FIXED: Use correct academic year months
                     const monthlyTargets = targets.monthly || {};
                     const hasMonthlyTargets = Object.keys(monthlyTargets).some(key => monthlyTargets[key].text);
                     
@@ -5852,25 +6031,28 @@
                         contentHtml += `
                             <div class="target-view-section">
                                 <div class="target-view-title">
-                                    📆 Monthly Targets
+                                    📆 Monthly Targets (${academicYear})
                                 </div>
                         `;
                         
+                        // FIXED: Generate month names for the correct academic year
+                        const [startYear, endYear] = academicYear.split('-');
                         const monthNames = {
-                            '2025-08': 'August 2025',
-                            '2025-09': 'September 2025',
-                            '2025-10': 'October 2025',
-                            '2025-11': 'November 2025',
-                            '2025-12': 'December 2025',
-                            '2026-01': 'January 2026',
-                            '2026-02': 'February 2026',
-                            '2026-03': 'March 2026',
-                            '2026-04': 'April 2026',
-                            '2026-05': 'May 2026',
-                            '2026-06': 'June 2026',
-                            '2026-07': 'July 2026'
+                            [`${startYear}-09`]: `September ${startYear}`,
+                            [`${startYear}-10`]: `October ${startYear}`,
+                            [`${startYear}-11`]: `November ${startYear}`,
+                            [`${startYear}-12`]: `December ${startYear}`,
+                            [`${endYear}-01`]: `January ${endYear}`,
+                            [`${endYear}-02`]: `February ${endYear}`,
+                            [`${endYear}-03`]: `March ${endYear}`,
+                            [`${endYear}-04`]: `April ${endYear}`,
+                            [`${endYear}-05`]: `May ${endYear}`,
+                            [`${endYear}-06`]: `June ${endYear}`,
+                            [`${endYear}-07`]: `July ${endYear}`,
+                            [`${endYear}-08`]: `August ${endYear}`
                         };
                         
+                        // Only show months that exist in the current academic year
                         Object.keys(monthNames).forEach(monthKey => {
                             const monthData = monthlyTargets[monthKey];
                             if (monthData && monthData.text) {
@@ -8825,6 +9007,7 @@ window.selectProfile = selectProfile;
         window.diagnoseAccessCodes = diagnoseAccessCodes;
         window.refreshAccessCodes = refreshAccessCodes;
         window.refreshAccessCodesManually = refreshAccessCodesManually;
+        window.diagnoseAccessCodesIssues = diagnoseAccessCodesIssues;
     </script>
 </body>
 </html>
