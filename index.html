@@ -2326,6 +2326,164 @@
         .large-modal .modal-body {
             max-height: calc(90vh - 120px);
         }
+
+        /* Target Status Styles */
+        .target-status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .target-status-badge.above {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .target-status-badge.on {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        
+        .target-status-badge.below {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .monthly-target-item {
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .monthly-target-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .target-textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 12px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: #F2F2F7;
+            color: #1C1C1E;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+        
+        .target-textarea:focus {
+            outline: none;
+            border-color: #10A37F;
+            background: white;
+        }
+        
+        .target-status-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .target-status-button {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: #F2F2F7;
+            color: #8E8E93;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .target-status-button.selected {
+            border-color: transparent;
+        }
+        
+        .target-status-button.selected.above {
+            background: #34C759;
+            color: white;
+        }
+        
+        .target-status-button.selected.on {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .target-status-button.selected.below {
+            background: #FF3B30;
+            color: white;
+        }
+        
+        .target-view-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E5E5EA;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .target-view-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1C1C1E;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .target-view-item {
+            padding: 16px;
+            background: #F8F9FA;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* 🔥 ADD THESE NEW COLORED BACKGROUND STYLES 🔥 */
+        .target-view-item.above-target {
+            background: #F0FDF4;  /* Light green background like completed homework */
+            border-left: 4px solid #34C759;
+        }
+
+        .target-view-item.on-target {
+            background: #EFF6FF;  /* Light blue background */
+            border-left: 4px solid #007AFF;
+        }
+
+        .target-view-item.below-target {
+            background: #FEF2F2;  /* Light red background like did-not-give homework */
+            border-left: 4px solid #FF3B30;
+        }
+        
+        .target-view-month {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 8px;
+        }
+        
+        .target-view-text {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -2538,9 +2696,12 @@
                         <div id="teacherControls" style="display: none;">
                             <button class="control-button" onclick="showManageStudentsModal()">🧑‍🧑‍🧒‍🧒 Manage Students</button>
                             <button class="control-button" onclick="showUpdateStudentOverviewModal()">📊 Update Student Overview</button>
+                            <button class="control-button" onclick="showStudentTargetsModal()">🎯 Student Targets</button>
                             <button class="control-button" onclick="showAssignHomeworkModal()">📚 Assign Homework</button>
                             <button class="control-button" onclick="showViewAllHomeworkModal()">📋 View All Homework</button>
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
+                            <button class="control-button" onclick="showAcademicYearModal()">📅 Set Academic Year</button>
+                            <button class="control-button" onclick="refreshAccessCodesManually()">🔄 Refresh Access Codes</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="pdfSpinner"></div>
                                 <span id="pdfBtnText">📄 Export Student PDF</span>
@@ -2551,6 +2712,7 @@
                         <!-- Office Controls -->
                         <div id="officeControls" style="display: none;">
                             <button class="control-button" onclick="showOverallProgressModal()">📈 Overall Progress</button>
+                            <button class="control-button" onclick="showOfficeTargetsModal()">🎯 Student Targets</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="officePdfSpinner"></div>
                                 <span id="officePdfBtnText">📄 Export Student PDF</span>
@@ -2561,6 +2723,7 @@
                         <div id="parentControls" style="display: none;">
                             <button class="control-button" onclick="showHomeworkSummaryModal()">📊 Homework Summary</button>
                             <button class="control-button" onclick="showOverallProgressModal()">📈 Overall Progress</button>
+                            <button class="control-button" onclick="showViewTargetsModal()">🎯 View Targets</button>
                         </div>
 
                         <button class="logout-button" onclick="logout()">Logout</button>
@@ -2939,6 +3102,122 @@
         </div>
     </div>
 
+    <!-- Student Targets Modal -->
+    <div id="studentTargetsModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🎯 Student Targets</h2>
+                <span class="close" onclick="closeModal('studentTargetsModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Select Academic Year</label>
+                        <select class="form-select" id="targetYearSelect" onchange="loadTargetYearOptions()">
+                            <option value="">Choose academic year</option>
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                            <option value="2026-2027">2026-2027</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="targetStudentGroup" style="display: none;">
+                        <label class="form-label">Select Student</label>
+                        <select class="form-select" id="targetStudentSelect" onchange="loadStudentTargets()">
+                            <option value="">Choose student</option>
+                        </select>
+                    </div>
+                    
+                    <div id="targetFormSection" style="display: none;">
+                        <!-- Yearly Target Section -->
+                        <div class="homework-section" style="margin-bottom: 30px;">
+                            <div class="homework-section-title">
+                                📅 <span id="yearlyTargetTitle">Yearly Target</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Yearly Target Description</label>
+                                <textarea class="homework-description" id="yearlyTargetText" 
+                                        placeholder="Enter yearly target for this student..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Yearly Target Status</label>
+                                <div class="grade-buttons">
+                                    <div class="grade-button" data-status="above" onclick="selectTargetStatus('yearly', 'above')" 
+                                        style="background: #34C759; color: white;">Above Target</div>
+                                    <div class="grade-button" data-status="on" onclick="selectTargetStatus('yearly', 'on')" 
+                                        style="background: #007AFF; color: white;">On Target</div>
+                                    <div class="grade-button" data-status="below" onclick="selectTargetStatus('yearly', 'below')" 
+                                        style="background: #FF3B30; color: white;">Below Target</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Monthly Targets Section -->
+                        <div class="homework-section">
+                            <div class="homework-section-title">
+                                📆 Monthly Targets
+                            </div>
+                            <div id="monthlyTargetsContainer">
+                                <!-- Monthly target fields will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <button class="save-button" onclick="saveStudentTargets()" style="margin-top: 30px;">
+                            💾 Save All Targets
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Targets Modal (Parent) -->
+    <div id="viewTargetsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🎯 Student Targets</h2>
+                <span class="close" onclick="closeModal('viewTargetsModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="viewTargetsContent">
+                    <!-- Targets will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Year Modal -->
+        <div id="academicYearModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">📅 Set Academic Year</h2>
+                    <span class="close" onclick="closeModal('academicYearModal')">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="homework-section">
+                        <div class="homework-section-title">
+                            🎓 Choose Active Academic Year
+                        </div>
+                        <div class="entry-form">
+                            <div class="form-group">
+                                <label class="form-label">Academic Year (September - August)</label>
+                                <select class="form-select" id="academicYearSelect">
+                                    <option value="2024-2025">September 2024 - August 2025</option>
+                                    <option value="2025-2026">September 2025 - August 2026</option>
+                                    <option value="2026-2027">September 2026 - August 2027</option>
+                                    <option value="2027-2028">September 2027 - August 2028</option>
+                                </select>
+                            </div>
+                            <div style="background: #E8F4FD; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                                <strong>📢 Important:</strong> This sets what academic year Parents and Office users can see. They will only have access to data from the selected academic year.
+                            </div>
+                            <button class="save-button" onclick="saveAcademicYear()">Save Academic Year</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- Day Modal -->
     <div id="dayModal" class="modal">
         <div class="modal-content">
@@ -3053,40 +3332,104 @@
         let studentAccessCodes = {};
 
         // Updated default students data - cleared old students and added new ones alphabetically
-        const defaultStudents = [
-            { id: 'abdul_qadir', name: 'Abdul Qadir', parentEmail: 'parent1@hifz.com', quranType: 13, accessCode: 'aq123456' },
-            { id: 'abdullah_sheriwala', name: 'Abdullah Sheriwala', parentEmail: 'parent2@hifz.com', quranType: 13, accessCode: 'as123456' },
-            { id: 'ahsan_haque', name: 'Ahsan Haque', parentEmail: 'parent3@hifz.com', quranType: 13, accessCode: 'ah123456' },
-            { id: 'arafat_rayyan', name: 'Arafat Rayyan', parentEmail: 'parent4@hifz.com', quranType: 13, accessCode: 'ar123456' },
-            { id: 'ayyan_miah', name: 'Ayyan Miah', parentEmail: 'parent5@hifz.com', quranType: 13, accessCode: 'am123456' },
-            { id: 'ishaq_noor', name: 'Ishaq Noor', parentEmail: 'parent6@hifz.com', quranType: 13, accessCode: 'in123456' },
-            { id: 'ismail_hussain', name: 'Ismail Hussain', parentEmail: 'parent7@hifz.com', quranType: 13, accessCode: 'ih123456' },
-            { id: 'naveed_khan', name: 'Naveed Khan', parentEmail: 'parent8@hifz.com', quranType: 13, accessCode: 'nk123456' },
-            { id: 'raqib_awal', name: 'Raqib Awal', parentEmail: 'parent9@hifz.com', quranType: 13, accessCode: 'ra123456' },
-            { id: 'rayhan_rahman', name: 'Rayhan Rahman', parentEmail: 'parent10@hifz.com', quranType: 13, accessCode: 'rr123456' },
-            { id: 'sulaiman_noor', name: 'Sulaiman Noor', parentEmail: 'parent11@hifz.com', quranType: 13, accessCode: 'sn123456' }
-        ];
+        const defaultStudents = [];
+
+        // FIXED: Diagnostic function to check access codes status
+        async function diagnoseAccessCodes() {
+            console.log('=== ACCESS CODES DIAGNOSTIC ===');
+            console.log('Current access codes mapping:', studentAccessCodes);
+            console.log('Total access codes loaded:', Object.keys(studentAccessCodes).length);
+            
+            try {
+                const students = await window.getStudents();
+                console.log('Students from Firebase:', students.map(s => ({ id: s.id, name: s.name, accessCode: s.accessCode })));
+                console.log('Expected access codes:', students.map(s => s.accessCode?.toLowerCase()).filter(Boolean));
+                
+                // Check for mismatches
+                const expectedCodes = students.map(s => s.accessCode?.toLowerCase()).filter(Boolean);
+                const loadedCodes = Object.keys(studentAccessCodes);
+                
+                const missing = expectedCodes.filter(code => !loadedCodes.includes(code));
+                const extra = loadedCodes.filter(code => !expectedCodes.includes(code));
+                
+                if (missing.length > 0) {
+                    console.warn('Missing access codes:', missing);
+                }
+                if (extra.length > 0) {
+                    console.warn('Extra access codes:', extra);
+                }
+                
+                console.log('=== END DIAGNOSTIC ===');
+                return { expectedCodes, loadedCodes, missing, extra };
+            } catch (error) {
+                console.error('Error during diagnostic:', error);
+                return null;
+            }
+        }
+
+        // FIXED: Manual function to refresh access codes
+        async function refreshAccessCodes() {
+            console.log('Manually refreshing access codes...');
+            try {
+                await buildStudentAccessCodes();
+                await diagnoseAccessCodes();
+                console.log('Access codes refreshed successfully');
+                return true;
+            } catch (error) {
+                console.error('Error refreshing access codes:', error);
+                return false;
+            }
+        }
+
+        // FIXED: Manual function for teachers to refresh access codes
+        async function refreshAccessCodesManually() {
+            if (currentUserType !== 'teacher') return;
+            
+            try {
+                const result = await refreshAccessCodes();
+                if (result) {
+                    alert('✅ Access codes refreshed successfully!\n\nAll parent access codes have been reloaded from Firebase.');
+                } else {
+                    alert('❌ Failed to refresh access codes. Please check the console for errors.');
+                }
+            } catch (error) {
+                console.error('Error in manual refresh:', error);
+                alert('❌ Error refreshing access codes: ' + error.message);
+            }
+        }
 
         const progressTypes = ['sabak', 'para', 'dhor'];
 
         // FIXED: Function to build student access codes mapping from student list
         async function buildStudentAccessCodes() {
             try {
+                console.log('Building student access codes...');
                 const students = await window.getStudents();
                 studentAccessCodes = {};
                 
+                if (!students || students.length === 0) {
+                    console.warn('No students found when building access codes');
+                    return;
+                }
+                
                 students.forEach(student => {
                     if (student.accessCode) {
-                        studentAccessCodes[student.accessCode.toLowerCase()] = {
-                            studentId: student.id,
-                            studentName: student.name
-                        };
+                        const normalizedCode = student.accessCode.toLowerCase().trim();
+                        if (normalizedCode) {
+                            studentAccessCodes[normalizedCode] = {
+                                studentId: student.id,
+                                studentName: student.name
+                            };
+                        }
                     }
                 });
                 
-                console.log('Student access codes updated:', Object.keys(studentAccessCodes));
+                console.log('Student access codes built successfully. Total codes:', Object.keys(studentAccessCodes).length);
+                console.log('Access codes mapping:', studentAccessCodes);
+                return true;
             } catch (error) {
                 console.error('Error building student access codes:', error);
+                throw error;
             }
         }
 
@@ -3388,8 +3731,24 @@
                     console.log('Existing students data found, not overwriting');
                 }
                 
-                // FIXED: Build the access codes mapping
-                await buildStudentAccessCodes();
+                // FIXED: Build the access codes mapping with retry mechanism
+                let retries = 3;
+                while (retries > 0) {
+                    try {
+                        await buildStudentAccessCodes();
+                        console.log('Access codes built successfully');
+                        break;
+                    } catch (error) {
+                        retries--;
+                        console.warn(`Failed to build access codes, ${retries} retries left:`, error);
+                        if (retries === 0) {
+                            console.error('Failed to build access codes after all retries');
+                            throw error;
+                        }
+                        // Wait 1 second before retry
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
                 
             } catch (error) {
                 console.error('Error initializing default data:', error);
@@ -3487,11 +3846,24 @@
                     }
                     break;
                 case 'parent':
-                    // FIXED: Rebuild access codes and check if access code matches any student's access code
-                    const studentInfo = studentAccessCodes[accessCode.toLowerCase()];
-                    if (studentInfo) {
-                        loginSuccess = true;
-                        currentStudent = studentInfo.studentId;
+                    // FIXED: Always rebuild access codes before checking for parent login
+                    try {
+                        await buildStudentAccessCodes();
+                        console.log('Access codes rebuilt for parent login:', Object.keys(studentAccessCodes));
+                        
+                        const studentInfo = studentAccessCodes[accessCode.toLowerCase()];
+                        if (studentInfo) {
+                            loginSuccess = true;
+                            currentStudent = studentInfo.studentId;
+                            console.log('Parent login successful for student:', studentInfo.studentName);
+                        } else {
+                            console.log('Access code not found:', accessCode.toLowerCase());
+                            console.log('Available codes:', Object.keys(studentAccessCodes));
+                        }
+                    } catch (error) {
+                        console.error('Error rebuilding access codes:', error);
+                        showError('Error loading student data. Please try again.');
+                        return;
                     }
                     break;
             }
@@ -3519,9 +3891,20 @@
                     showMainInterface(); // Continue anyway for demo
                 }
             } else {
-                const errorMsg = currentUserType === 'parent' 
-                    ? 'Invalid student access code' 
-                    : `Invalid ${currentUserType} access code`;
+                let errorMsg;
+                if (currentUserType === 'parent') {
+                    errorMsg = `Invalid student access code: "${accessCode}"`;
+                    // Add helpful diagnostic info for debugging
+                    console.log('Parent login failed. Access code:', accessCode);
+                    console.log('Available access codes:', Object.keys(studentAccessCodes));
+                    
+                    // Suggest refreshing if no codes are loaded
+                    if (Object.keys(studentAccessCodes).length === 0) {
+                        errorMsg += '\n\nNo access codes loaded. Please contact the teacher.';
+                    }
+                } else {
+                    errorMsg = `Invalid ${currentUserType} access code`;
+                }
                 showError(errorMsg);
             }
         }
@@ -3632,6 +4015,9 @@
 
         async function loadStudentsAndInitialize() {
             try {
+                // Load academic year first
+                currentAcademicYear = await getCurrentAcademicYear();
+                
                 const students = await window.getStudents();
                 
                 // Load holiday cache
@@ -4861,7 +5247,18 @@
                 const homework = [];
                 
                 querySnapshot.forEach((doc) => {
-                    homework.push({ id: doc.id, ...doc.data() });
+                    const homeworkData = { id: doc.id, ...doc.data() };
+                    
+                    // Filter by academic year for Parents and Office
+                    if ((currentUserType === 'parent' || currentUserType === 'office') && 
+                        currentAcademicYear) {
+                        const assignedDate = homeworkData.assignedDate.split('T')[0]; // Get date part
+                        if (!isDateInAcademicYear(assignedDate, currentAcademicYear)) {
+                            return; // Skip homework outside academic year
+                        }
+                    }
+                    
+                    homework.push(homeworkData);
                 });
                 
                 // Sort by assigned date (newest first)
@@ -4963,6 +5360,790 @@
                 console.error('Error fetching homework:', error);
                 alert('Error loading homework: ' + error.message);
             }
+        }
+
+        // Student Targets Functions
+        function showStudentTargetsModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Populate student dropdown
+            window.getStudents().then(students => {
+                const select = document.getElementById('targetStudentSelect');
+                select.innerHTML = '<option value="">Choose student</option>';
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            });
+            
+            // Reset form
+            document.getElementById('targetFormSection').style.display = 'none';
+            
+            document.getElementById('studentTargetsModal').style.display = 'block';
+        }
+
+        function showStudentTargetsModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Reset form
+            document.getElementById('targetYearSelect').value = '';
+            document.getElementById('targetStudentGroup').style.display = 'none';
+            document.getElementById('targetFormSection').style.display = 'none';
+            
+            document.getElementById('studentTargetsModal').style.display = 'block';
+        }
+
+        function loadTargetYearOptions() {
+            const selectedYear = document.getElementById('targetYearSelect').value;
+            const studentGroup = document.getElementById('targetStudentGroup');
+            const yearlyTargetTitle = document.getElementById('yearlyTargetTitle');
+            
+            if (!selectedYear) {
+                studentGroup.style.display = 'none';
+                document.getElementById('targetFormSection').style.display = 'none';
+                return;
+            }
+            
+            // Update yearly target title
+            yearlyTargetTitle.textContent = `Yearly Target (${selectedYear})`;
+            
+            // Show student selector and populate it
+            studentGroup.style.display = 'block';
+            
+            window.getStudents().then(students => {
+                const select = document.getElementById('targetStudentSelect');
+                select.innerHTML = '<option value="">Choose student</option>';
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        async function loadStudentTargets() {
+            const studentId = document.getElementById('targetStudentSelect').value;
+            const selectedYear = document.getElementById('targetYearSelect').value;
+            const formSection = document.getElementById('targetFormSection');
+            
+            if (!studentId || !selectedYear) {
+                formSection.style.display = 'none';
+                return;
+            }
+            
+            // Show form
+            formSection.style.display = 'block';
+            
+            // Generate monthly target fields for selected year
+            generateMonthlyTargetFieldsForYear(selectedYear);
+            
+            // Load existing targets
+            try {
+                const targets = await getStudentTargetsForYear(studentId, selectedYear);
+                
+                // Load yearly target
+                if (targets.yearly) {
+                    document.getElementById('yearlyTargetText').value = targets.yearly.text || '';
+                    if (targets.yearly.status) {
+                        selectTargetStatus('yearly', targets.yearly.status);
+                    }
+                }
+                
+                // Load monthly targets
+                if (targets.monthly) {
+                    Object.keys(targets.monthly).forEach(monthKey => {
+                        const monthData = targets.monthly[monthKey];
+                        const textArea = document.querySelector(`[data-month="${monthKey}"] .target-textarea`);
+                        if (textArea) {
+                            textArea.value = monthData.text || '';
+                        }
+                        if (monthData.status) {
+                            selectTargetStatus(monthKey, monthData.status);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading targets:', error);
+            }
+        }
+
+        function generateMonthlyTargetFieldsForYear(academicYear) {
+            const container = document.getElementById('monthlyTargetsContainer');
+            container.innerHTML = '';
+            
+            // Generate months based on academic year
+            let months = [];
+            const [startYear, endYear] = academicYear.split('-');
+            
+            // Academic year months (September to August)
+            months = [
+                { key: `${startYear}-09`, display: `September ${startYear}` },
+                { key: `${startYear}-10`, display: `October ${startYear}` },
+                { key: `${startYear}-11`, display: `November ${startYear}` },
+                { key: `${startYear}-12`, display: `December ${startYear}` },
+                { key: `${endYear}-01`, display: `January ${endYear}` },
+                { key: `${endYear}-02`, display: `February ${endYear}` },
+                { key: `${endYear}-03`, display: `March ${endYear}` },
+                { key: `${endYear}-04`, display: `April ${endYear}` },
+                { key: `${endYear}-05`, display: `May ${endYear}` },
+                { key: `${endYear}-06`, display: `June ${endYear}` },
+                { key: `${endYear}-07`, display: `July ${endYear}` },
+                { key: `${endYear}-08`, display: `August ${endYear}` }
+            ];
+            
+            months.forEach(month => {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'monthly-target-item';
+                monthDiv.setAttribute('data-month', month.key);
+                
+                monthDiv.innerHTML = `
+                    <div class="monthly-target-header">
+                        📅 ${month.display}
+                    </div>
+                    <textarea class="target-textarea" 
+                              placeholder="Enter target for ${month.display}..."></textarea>
+                    <div class="target-status-buttons">
+                        <div class="target-status-button" data-status="above" 
+                             onclick="selectTargetStatus('${month.key}', 'above')">
+                            Above Target
+                        </div>
+                        <div class="target-status-button" data-status="on" 
+                             onclick="selectTargetStatus('${month.key}', 'on')">
+                            On Target
+                        </div>
+                        <div class="target-status-button" data-status="below" 
+                             onclick="selectTargetStatus('${month.key}', 'below')">
+                            Below Target
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(monthDiv);
+            });
+        }
+
+        function selectTargetStatus(targetType, status) {
+            if (targetType === 'yearly') {
+                // Handle yearly target status
+                document.querySelectorAll('#targetFormSection .grade-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                    // Reset to original colors
+                    if (btn.dataset.status === 'above') {
+                        btn.style.background = '#34C759';
+                        btn.style.color = 'white';
+                    } else if (btn.dataset.status === 'on') {
+                        btn.style.background = '#007AFF';
+                        btn.style.color = 'white';
+                    } else if (btn.dataset.status === 'below') {
+                        btn.style.background = '#FF3B30';
+                        btn.style.color = 'white';
+                    }
+                });
+                
+                const selectedBtn = document.querySelector(`#targetFormSection .grade-button[data-status="${status}"]`);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('selected');
+                    // Make selected button darker
+                    if (status === 'above') {
+                        selectedBtn.style.background = '#2FB344';
+                    } else if (status === 'on') {
+                        selectedBtn.style.background = '#0051D5';
+                    } else if (status === 'below') {
+                        selectedBtn.style.background = '#D70015';
+                    }
+                }
+            } else {
+                // Handle monthly target status
+                const monthDiv = document.querySelector(`[data-month="${targetType}"]`);
+                if (monthDiv) {
+                    monthDiv.querySelectorAll('.target-status-button').forEach(btn => {
+                        btn.classList.remove('selected', 'above', 'on', 'below');
+                    });
+                    
+                    const selectedBtn = monthDiv.querySelector(`.target-status-button[data-status="${status}"]`);
+                    if (selectedBtn) {
+                        selectedBtn.classList.add('selected', status);
+                    }
+                }
+            }
+        }
+
+        async function saveStudentTargets() {
+            const studentId = document.getElementById('targetStudentSelect').value;
+            const selectedYear = document.getElementById('targetYearSelect').value;
+            
+            if (!studentId || !selectedYear) {
+                alert('Please select both academic year and student');
+                return;
+            }
+            
+            try {
+                const targets = {
+                    academicYear: selectedYear,
+                    yearly: {
+                        text: document.getElementById('yearlyTargetText').value.trim(),
+                        status: getSelectedYearlyStatus()
+                    },
+                    monthly: {},
+                    lastUpdated: new Date().toISOString(),
+                    updatedBy: 'Ustaadh'
+                };
+                
+                // Collect monthly targets
+                document.querySelectorAll('.monthly-target-item').forEach(monthDiv => {
+                    const monthKey = monthDiv.getAttribute('data-month');
+                    const text = monthDiv.querySelector('.target-textarea').value.trim();
+                    const status = getSelectedMonthlyStatus(monthDiv);
+                    
+                    if (text || status) {
+                        targets.monthly[monthKey] = {
+                            text: text,
+                            status: status
+                        };
+                    }
+                });
+                
+                // Save to Firebase with year-specific key
+                await saveTargetsToFirebaseWithYear(studentId, selectedYear, targets);
+                
+                alert('Targets saved successfully!');
+                
+            } catch (error) {
+                console.error('Error saving targets:', error);
+                alert('Error saving targets: ' + error.message);
+            }
+        }
+
+        function getSelectedYearlyStatus() {
+            const selectedBtn = document.querySelector('#targetFormSection .grade-button.selected');
+            return selectedBtn ? selectedBtn.dataset.status : null;
+        }
+
+        function getSelectedMonthlyStatus(monthDiv) {
+            const selectedBtn = monthDiv.querySelector('.target-status-button.selected');
+            return selectedBtn ? selectedBtn.dataset.status : null;
+        }
+
+        async function saveTargetsToFirebase(studentId, targets) {
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await setDoc(doc(db, 'studentTargets', studentId), targets);
+                console.log(`Targets saved for student ${studentId}`);
+            } catch (error) {
+                console.error('Error saving targets to Firebase:', error);
+                throw error;
+            }
+        }
+
+        async function saveTargetsToFirebaseWithYear(studentId, academicYear, targets) {
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const targetId = `${studentId}_${academicYear}`;
+                await setDoc(doc(db, 'studentTargets', targetId), targets);
+                console.log(`Targets saved for student ${studentId} for year ${academicYear}`);
+            } catch (error) {
+                console.error('Error saving targets to Firebase:', error);
+                throw error;
+            }
+        }
+
+        async function getStudentTargetsForYear(studentId, academicYear) {
+            try {
+                const { getDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const targetId = `${studentId}_${academicYear}`;
+                const targetDoc = await getDoc(doc(db, 'studentTargets', targetId));
+                if (targetDoc.exists()) {
+                    return targetDoc.data();
+                }
+                return { yearly: {}, monthly: {} };
+            } catch (error) {
+                console.error('Error fetching student targets:', error);
+                return { yearly: {}, monthly: {} };
+            }
+        }
+
+        // Office function to view all student targets
+        async function showOfficeStudentTargetsModal() {
+            if (currentUserType !== 'office') return;
+            
+            try {
+                const students = await window.getStudents();
+                
+                if (students.length === 0) {
+                    alert('No students found');
+                    return;
+                }
+                
+                // Create a modal to show all targets
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 1000px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">🎯 All Student Targets Overview</h2>
+                            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="entry-form">
+                                <div class="form-group">
+                                    <label class="form-label">Select Academic Year</label>
+                                    <select class="form-select" id="officeTargetYearSelect" onchange="loadAllStudentTargetsForYear()">
+                                        <option value="">Choose academic year</option>
+                                        <option value="2024-2025">2024-2025</option>
+                                        <option value="2025-2026">2025-2026</option>
+                                        <option value="2026-2027">2026-2027</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="allTargetsDisplay" style="display: none;">
+                                    <!-- All targets will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Add click outside to close
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error showing office targets modal:', error);
+                alert('Error loading targets: ' + error.message);
+            }
+        }
+
+        async function loadAllStudentTargetsForYear() {
+            const selectedYear = document.getElementById('officeTargetYearSelect').value;
+            const display = document.getElementById('allTargetsDisplay');
+            
+            if (!selectedYear) {
+                display.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const students = await window.getStudents();
+                let allTargetsHtml = '';
+                
+                for (const student of students) {
+                    const targets = await getStudentTargetsForYear(student.id, selectedYear);
+                    
+                    allTargetsHtml += `
+                        <div class="target-view-section">
+                            <div class="target-view-title">
+                                👤 ${student.name}
+                            </div>
+                    `;
+                    
+                    if (targets.yearly && targets.yearly.text) {
+                        const statusBadge = targets.yearly.status ? 
+                            `<span class="target-status-badge ${targets.yearly.status}">
+                                ${targets.yearly.status === 'above' ? 'Above Target' : 
+                                  targets.yearly.status === 'on' ? 'On Target' : 'Below Target'}
+                            </span>` : '';
+                        
+                        allTargetsHtml += `
+                            <div class="target-view-item">
+                                <div class="target-view-month">Yearly Target (${selectedYear})</div>
+                                <div class="target-view-text">${targets.yearly.text}</div>
+                                ${statusBadge}
+                            </div>
+                        `;
+                    } else {
+                        allTargetsHtml += `
+                            <div class="target-view-item">
+                                <div class="target-view-text" style="color: #8E8E93; font-style: italic;">No yearly target set</div>
+                            </div>
+                        `;
+                    }
+                    
+                    allTargetsHtml += '</div>';
+                }
+                
+                display.innerHTML = allTargetsHtml;
+                display.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading all student targets:', error);
+                display.innerHTML = '<p style="color: #FF3B30; text-align: center;">Error loading targets</p>';
+                display.style.display = 'block';
+            }
+        }
+
+        async function getStudentTargets(studentId) {
+            try {
+                const { getDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const targetDoc = await getDoc(doc(db, 'studentTargets', studentId));
+                if (targetDoc.exists()) {
+                    return targetDoc.data();
+                }
+                return { yearly: {}, monthly: {} };
+            } catch (error) {
+                console.error('Error fetching student targets:', error);
+                return { yearly: {}, monthly: {} };
+            }
+        }
+
+        // View Targets Modal (Parent)
+        async function showViewTargetsModal() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const targets = await getStudentTargets(currentStudent);
+                const content = document.getElementById('viewTargetsContent');
+                
+                if (!targets || (!targets.yearly?.text && Object.keys(targets.monthly || {}).length === 0)) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">🎯</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Targets Set</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set any targets yet.</p>
+                        </div>
+                    `;
+                } else {
+                    let contentHtml = '';
+                    
+                    // Yearly Target
+                    if (targets.yearly && targets.yearly.text) {
+                        const statusBadge = targets.yearly.status ? 
+                            `<span class="target-status-badge ${targets.yearly.status}">
+                                ${targets.yearly.status === 'above' ? 'Above Target' : 
+                                targets.yearly.status === 'on' ? 'On Target' : 'Below Target'}
+                            </span>` : '';
+                        
+                        contentHtml += `
+                            <div class="target-view-section">
+                                <div class="target-view-title">
+                                    📅 Yearly Target (August 2025 - July 2026)
+                                </div>
+                                <div class="target-view-item ${targets.yearly.status ? targets.yearly.status + '-target' : ''}">
+                                    <div class="target-view-text">${targets.yearly.text}</div>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Monthly Targets
+                    const monthlyTargets = targets.monthly || {};
+                    const hasMonthlyTargets = Object.keys(monthlyTargets).some(key => monthlyTargets[key].text);
+                    
+                    if (hasMonthlyTargets) {
+                        contentHtml += `
+                            <div class="target-view-section">
+                                <div class="target-view-title">
+                                    📆 Monthly Targets
+                                </div>
+                        `;
+                        
+                        const monthNames = {
+                            '2025-08': 'August 2025',
+                            '2025-09': 'September 2025',
+                            '2025-10': 'October 2025',
+                            '2025-11': 'November 2025',
+                            '2025-12': 'December 2025',
+                            '2026-01': 'January 2026',
+                            '2026-02': 'February 2026',
+                            '2026-03': 'March 2026',
+                            '2026-04': 'April 2026',
+                            '2026-05': 'May 2026',
+                            '2026-06': 'June 2026',
+                            '2026-07': 'July 2026'
+                        };
+                        
+                        Object.keys(monthNames).forEach(monthKey => {
+                            const monthData = monthlyTargets[monthKey];
+                            if (monthData && monthData.text) {
+                                const statusBadge = monthData.status ? 
+                                    `<span class="target-status-badge ${monthData.status}">
+                                        ${monthData.status === 'above' ? 'Above Target' : 
+                                        monthData.status === 'on' ? 'On Target' : 'Below Target'}
+                                    </span>` : '';
+                                
+                                contentHtml += `
+                                    <div class="target-view-item ${monthData.status ? monthData.status + '-target' : ''}">
+                                        <div class="target-view-month">${monthNames[monthKey]}</div>
+                                        <div class="target-view-text">${monthData.text}</div>
+                                        ${statusBadge}
+                                    </div>
+                                `;
+                            }
+                        });
+                        
+                        contentHtml += '</div>';
+                    }
+                    
+                    content.innerHTML = contentHtml;
+                }
+                
+                document.getElementById('viewTargetsModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading targets:', error);
+                alert('Error loading targets: ' + error.message);
+            }
+        }
+
+        // NEW: Office Targets Modal (like parents view)
+        async function showOfficeTargetsModal() {
+            if (currentUserType !== 'office') return;
+            
+            try {
+                const students = await window.getStudents();
+                
+                if (students.length === 0) {
+                    alert('No students found');
+                    return;
+                }
+                
+                // Create modal similar to parent targets view
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">🎯 Student Targets</h2>
+                            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="entry-form">
+                                <div class="form-group">
+                                    <label class="form-label">Select Student</label>
+                                    <select class="form-select" id="officeTargetsStudentSelect" onchange="loadOfficeStudentTargets()">
+                                        <option value="">Choose student</option>
+                                        ${students.map(student => `<option value="${student.id}">${student.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                                
+                                <div id="officeTargetsContent">
+                                    <!-- Targets will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Add click outside to close
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error showing office targets modal:', error);
+                alert('Error loading targets: ' + error.message);
+            }
+        }
+
+        async function loadOfficeStudentTargets() {
+            const studentId = document.getElementById('officeTargetsStudentSelect').value;
+            const content = document.getElementById('officeTargetsContent');
+            
+            if (!studentId) {
+                content.innerHTML = '';
+                return;
+            }
+            
+            try {
+                // Use current academic year
+                const academicYear = currentAcademicYear || await getCurrentAcademicYear();
+                const targets = await getStudentTargetsForYear(studentId, academicYear);
+                const students = await window.getStudents();
+                const student = students.find(s => s.id === studentId);
+                
+                if (!targets || (!targets.yearly?.text && Object.keys(targets.monthly || {}).length === 0)) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">🎯</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Targets Set</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">No targets have been set for ${student.name} in academic year ${academicYear}.</p>
+                        </div>
+                    `;
+                } else {
+                    // Display targets similar to parent view
+                    let contentHtml = '';
+                    
+                    // Yearly Target
+                    if (targets.yearly && targets.yearly.text) {
+                        const statusBadge = targets.yearly.status ? 
+                            `<span class="target-status-badge ${targets.yearly.status}">
+                                ${targets.yearly.status === 'above' ? 'Above Target' : 
+                                targets.yearly.status === 'on' ? 'On Target' : 'Below Target'}
+                            </span>` : '';
+                        
+                        contentHtml += `
+                            <div class="target-view-section">
+                                <div class="target-view-title">
+                                    📅 Yearly Target (${academicYear})
+                                </div>
+                                <div class="target-view-item ${targets.yearly.status ? targets.yearly.status + '-target' : ''}">
+                                    <div class="target-view-text">${targets.yearly.text}</div>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Monthly Targets - same logic as parent view but using academic year months
+                    const monthlyTargets = targets.monthly || {};
+                    const hasMonthlyTargets = Object.keys(monthlyTargets).some(key => monthlyTargets[key].text);
+                    
+                    if (hasMonthlyTargets) {
+                        contentHtml += `
+                            <div class="target-view-section">
+                                <div class="target-view-title">
+                                    📆 Monthly Targets
+                                </div>
+                        `;
+                        
+                        // Generate month names for academic year
+                        const [startYear, endYear] = academicYear.split('-');
+                        const monthNames = {
+                            [`${startYear}-09`]: `September ${startYear}`,
+                            [`${startYear}-10`]: `October ${startYear}`,
+                            [`${startYear}-11`]: `November ${startYear}`,
+                            [`${startYear}-12`]: `December ${startYear}`,
+                            [`${endYear}-01`]: `January ${endYear}`,
+                            [`${endYear}-02`]: `February ${endYear}`,
+                            [`${endYear}-03`]: `March ${endYear}`,
+                            [`${endYear}-04`]: `April ${endYear}`,
+                            [`${endYear}-05`]: `May ${endYear}`,
+                            [`${endYear}-06`]: `June ${endYear}`,
+                            [`${endYear}-07`]: `July ${endYear}`,
+                            [`${endYear}-08`]: `August ${endYear}`
+                        };
+                        
+                        Object.keys(monthNames).forEach(monthKey => {
+                            const monthData = monthlyTargets[monthKey];
+                            if (monthData && monthData.text) {
+                                const statusBadge = monthData.status ? 
+                                    `<span class="target-status-badge ${monthData.status}">
+                                        ${monthData.status === 'above' ? 'Above Target' : 
+                                        monthData.status === 'on' ? 'On Target' : 'Below Target'}
+                                    </span>` : '';
+                                
+                                contentHtml += `
+                                    <div class="target-view-item ${monthData.status ? monthData.status + '-target' : ''}">
+                                        <div class="target-view-month">${monthNames[monthKey]}</div>
+                                        <div class="target-view-text">${monthData.text}</div>
+                                        ${statusBadge}
+                                    </div>
+                                `;
+                            }
+                        });
+                        
+                        contentHtml += '</div>';
+                    }
+                    
+                    content.innerHTML = contentHtml;
+                }
+                
+            } catch (error) {
+                console.error('Error loading student targets:', error);
+                content.innerHTML = '<p style="color: #FF3B30; text-align: center;">Error loading targets</p>';
+            }
+        }
+
+        // Academic Year Management Functions
+        let currentAcademicYear = null;
+
+        async function showAcademicYearModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Load current academic year setting
+            const academicYear = await getCurrentAcademicYear();
+            document.getElementById('academicYearSelect').value = academicYear || '2024-2025';
+            
+            document.getElementById('academicYearModal').style.display = 'block';
+        }
+
+        async function saveAcademicYear() {
+            const selectedYear = document.getElementById('academicYearSelect').value;
+            
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await setDoc(doc(db, 'config', 'academicYear'), {
+                    currentYear: selectedYear,
+                    setBy: 'Ustaadh',
+                    setDate: new Date().toISOString(),
+                    lastUpdated: new Date().toISOString()
+                });
+                
+                currentAcademicYear = selectedYear;
+                closeModal('academicYearModal');
+                
+                alert(`Academic Year set to: ${selectedYear}\n\nParents and Office users will now only see data from this academic year.`);
+                
+                // Refresh data for current user if needed
+                if (currentUserType === 'office' || currentUserType === 'parent') {
+                    updateTodaysProgress();
+                    updateStats();
+                    generateCalendar();
+                }
+                
+            } catch (error) {
+                console.error('Error saving academic year:', error);
+                alert('Error saving academic year: ' + error.message);
+            }
+        }
+
+        async function getCurrentAcademicYear() {
+            try {
+                const { getDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const academicYearDoc = await getDoc(doc(db, 'config', 'academicYear'));
+                if (academicYearDoc.exists()) {
+                    return academicYearDoc.data().currentYear;
+                }
+                return '2024-2025'; // Default
+            } catch (error) {
+                console.error('Error fetching academic year:', error);
+                return '2024-2025';
+            }
+        }
+
+        // Helper function to get academic year date range
+        function getAcademicYearDateRange(academicYear) {
+            const [startYear, endYear] = academicYear.split('-');
+            return {
+                start: `${startYear}-09-01`, // September 1st
+                end: `${endYear}-08-31`,     // August 31st
+                startYear: parseInt(startYear),
+                endYear: parseInt(endYear)
+            };
+        }
+
+        // Helper function to check if date is in academic year
+        function isDateInAcademicYear(dateString, academicYear) {
+            const dateRange = getAcademicYearDateRange(academicYear);
+            return dateString >= dateRange.start && dateString <= dateRange.end;
         }
 
         // Add event listener for overview student select
@@ -5284,6 +6465,13 @@
             const currentMonth = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}`;
             
             Object.entries(studentData).forEach(([date, dayData]) => {
+                // Filter by academic year for Parents and Office
+                if (currentUserType === 'parent' || currentUserType === 'office') {
+                    if (!currentAcademicYear || !isDateInAcademicYear(date, currentAcademicYear)) {
+                        return; // Skip dates outside academic year
+                    }
+                }
+                
                 if (date.startsWith(currentMonth)) {
                     progressTypes.forEach(type => {
                         if (dayData[type]) {
@@ -5489,7 +6677,7 @@
             const monthTitle = document.getElementById('monthTitle');
             
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
+                            'July', 'August', 'September', 'October', 'November', 'December'];
             
             monthTitle.textContent = `${monthNames[currentDisplayMonth - 1]} ${currentDisplayYear}`;
             
@@ -5516,7 +6704,7 @@
             
             const today = new Date();
             const isCurrentMonth = today.getFullYear() === currentDisplayYear && 
-                                  today.getMonth() + 1 === currentDisplayMonth;
+                                today.getMonth() + 1 === currentDisplayMonth;
             const todayDate = today.getDate();
             
             // Generate calendar grid (6 weeks = 42 days)
@@ -5560,6 +6748,13 @@
                 if (currentStudent && isCurrentMonthDay) {
                     window.getStudentData(currentStudent).then(studentData => {
                         const dayData = studentData[dateKey];
+                        
+                        // Filter by academic year for Parents and Office
+                        if ((currentUserType === 'parent' || currentUserType === 'office') && 
+                            currentAcademicYear && 
+                            !isDateInAcademicYear(dateKey, currentAcademicYear)) {
+                            return; // Don't show data outside academic year
+                        }
                         
                         if (dayData) {
                             dayEl.classList.add('has-data');
@@ -5962,7 +7157,10 @@
                     studentId: studentId,
                     studentName: name
                 };
-                
+
+                // FIXED: Also rebuild access codes to ensure consistency
+                await buildStudentAccessCodes();
+
                 populateStudentTabs(students);
                 
                 // Clear form and reload access codes in modal
@@ -6505,7 +7703,7 @@
                 const { db } = window.firebase;
                 
                 // Show progress indicator
-                const button = event.target;
+                const button = document.querySelector('.save-button.permanent-delete');
                 const originalText = button.textContent;
                 button.textContent = '🗑️ DELETING...';
                 button.disabled = true;
@@ -6594,7 +7792,7 @@
                 alert('❌ Error during permanent deletion: ' + error.message);
                 
                 // Reset button on error
-                const button = event.target;
+                const button = document.querySelector('.save-button.permanent-delete');
                 button.textContent = '🗑️ PERMANENTLY DELETE';
                 button.disabled = false;
             }
@@ -7021,7 +8219,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'manageStudentsModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal'];
+            const modals = ['progressModal', 'manageStudentsModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal', 'studentTargetsModal', 'viewTargetsModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -7117,6 +8315,22 @@ window.selectProfile = selectProfile;
         window.updateHomeworkStatus = updateHomeworkStatus;
         window.toggleHomeworkCompletion = toggleHomeworkCompletion;
         window.deleteHomework = deleteHomework;
+        window.showAcademicYearModal = showAcademicYearModal;
+        window.saveAcademicYear = saveAcademicYear;
+        window.getCurrentAcademicYear = getCurrentAcademicYear;
+        window.getAcademicYearDateRange = getAcademicYearDateRange;
+        window.isDateInAcademicYear = isDateInAcademicYear;
+        window.showOfficeTargetsModal = showOfficeTargetsModal;
+        window.loadOfficeStudentTargets = loadOfficeStudentTargets;
+        window.showStudentTargetsModal = showStudentTargetsModal;
+        window.loadTargetYearOptions = loadTargetYearOptions;
+        window.loadStudentTargets = loadStudentTargets;
+        window.generateMonthlyTargetFieldsForYear = generateMonthlyTargetFieldsForYear;
+        window.selectTargetStatus = selectTargetStatus;
+        window.saveStudentTargets = saveStudentTargets;
+        window.showOfficeStudentTargetsModal = showOfficeStudentTargetsModal;
+        window.loadAllStudentTargetsForYear = loadAllStudentTargetsForYear;
+        window.showViewTargetsModal = showViewTargetsModal;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
         window.showResetModal = showResetModal;
@@ -7608,6 +8822,9 @@ window.selectProfile = selectProfile;
         window.generateMonthlyDetailedPDF = generateMonthlyDetailedPDF;
         window.generateOverallProgressPDF = generateOverallProgressPDF;
         window.generateAllStudentsPDF = generateAllStudentsPDF;
+        window.diagnoseAccessCodes = diagnoseAccessCodes;
+        window.refreshAccessCodes = refreshAccessCodes;
+        window.refreshAccessCodesManually = refreshAccessCodesManually;
     </script>
 </body>
 </html>
