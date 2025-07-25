@@ -7,7 +7,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="📖 Hifz Record">
     <meta name="theme-color" content="#F2F2F7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
     <title>📖 Hifz Record - Progress Tracking</title>
+
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png">
     
     <!-- Firebase SDK v12 -->
     <script type="module">
@@ -2812,7 +2818,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Parent Access Code</label>
-                                <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code (8 characters)">
+                                <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code (min. 6 characters)">
                             </div>
                             <button class="save-button" onclick="addStudent()">Add Student</button>
                         </div>
@@ -2844,7 +2850,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Parent Access Code</label>
-                                    <input type="text" class="form-input" id="updateAccessCode" placeholder="Enter access code (8 characters)">
+                                    <input type="text" class="form-input" id="updateAccessCode" placeholder="Enter access code (min. 6 characters)">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Quran Type</label>
@@ -7381,8 +7387,8 @@
                 return;
             }
             
-            if (parentCode.length !== 8) {
-                alert('Parent access code must be 8 characters long');
+            if (parentCode.length < 6) {
+                alert('Parent access code must be at least 6 characters long');
                 return;
             }
             
@@ -7509,8 +7515,8 @@
                 return;
             }
             
-            if (newAccessCode.length !== 8) {
-                alert('Access code must be 8 characters long');
+            if (newAccessCode.length < 6) {
+                alert('Access code must be at least 6 characters long');
                 return;
             }
             
@@ -8523,6 +8529,15 @@
             } catch (error) {
                 console.error('Error initializing app:', error);
             }
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('ServiceWorker registered'))
+                    .catch(err => console.log('ServiceWorker registration failed: ', err));
+            });
         }
 
         if (document.readyState === 'loading') {
