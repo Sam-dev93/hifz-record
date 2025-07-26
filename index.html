@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="📖 Hifz Record">
+    <meta name="apple-mobile-web-app-title" content="Hifz Record">
     <meta name="theme-color" content="#F2F2F7">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
-    <title>📖 Hifz Record - Progress Tracking</title>
+    <title>Hifz Record - Progress Tracking</title>
 
     <!-- iOS Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
@@ -2711,8 +2711,6 @@
                             <button class="control-button" onclick="showViewAllHomeworkModal()">📋 View All Homework</button>
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
                             <button class="control-button" onclick="showAcademicYearModal()">📅 Set Academic Year</button>
-                            <button class="control-button" onclick="refreshAccessCodesManually()">🔄 Refresh Access Codes</button>
-                            <button class="control-button" onclick="diagnoseAccessCodesIssues()">🩺 Diagnose Access Issues</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
                                 <div class="loading-spinner" id="pdfSpinner"></div>
                                 <span id="pdfBtnText">📄 Export Student PDF</span>
@@ -2792,86 +2790,12 @@
             <div class="modal-body">
                 <!-- Tab Navigation -->
                 <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #E5E5EA; padding-bottom: 16px; flex-wrap: wrap;">
-                    <button class="manage-tab-button active" onclick="switchManageTab('add')" id="addTab">➕ Add</button>
-                    <button class="manage-tab-button" onclick="switchManageTab('update')" id="updateTab">✏️ Update</button>
-                    <button class="manage-tab-button" onclick="switchManageTab('remove')" id="removeTab">➖ Remove</button>
+                    <button class="manage-tab-button active" onclick="switchManageTab('remove')" id="removeTab">➖ Remove</button>
                     <button class="manage-tab-button" onclick="switchManageTab('recovery')" id="recoveryTab">🔄 Recover</button>
                     <button class="manage-tab-button" onclick="switchManageTab('codes')" id="codesTab">🔑 View AC</button>
                 </div>
-                <!-- Add Student Section -->
-                <div id="addStudentSection" class="manage-section">
-                    <div class="homework-section">
-                        <div class="homework-section-title">
-                            ➕ Add New Student
-                        </div>
-                        <div class="entry-form">
-                            <div class="form-group">
-                                <label class="form-label">Student Name</label>
-                                <input type="text" class="form-input" id="newStudentName" placeholder="Enter student name">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Quran Type</label>
-                                <select class="form-select" id="newQuranType">
-                                    <option value="13">13 Line Quran (26 pages = 1 Juz)</option>
-                                    <option value="15">15 Line Quran (20 pages = 1 Juz)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Parent Access Code</label>
-                                <input type="text" class="form-input" id="newParentCode" placeholder="Create parent access code (min. 6 characters)">
-                            </div>
-                            <button class="save-button" onclick="addStudent()">Add Student</button>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Update Student Info Section -->
-                <div id="updateStudentSection" class="manage-section" style="display: none;">
-                    <div class="homework-section">
-                        <div class="homework-section-title">
-                            ✏️ Update Student Info
-                        </div>
-                        <div style="background: #E8F4FD; border: none; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; font-size: 14px; color: #1E40AF;">
-                            <strong>📝 Edit student names and access codes</strong><br>
-                            Perfect for fixing recovered students or updating information
-                        </div>
-                        <div class="entry-form">
-                            <div class="form-group">
-                                <label class="form-label">Select Student to Update</label>
-                                <select class="form-select" id="updateStudentSelect" onchange="loadStudentForUpdate()">
-                                    <option value="">Choose student to update</option>
-                                </select>
-                            </div>
-                            
-                            <div id="updateStudentForm" style="display: none;">
-                                <div class="form-group">
-                                    <label class="form-label">Student Name</label>
-                                    <input type="text" class="form-input" id="updateStudentName" placeholder="Enter corrected student name">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Parent Access Code</label>
-                                    <input type="text" class="form-input" id="updateAccessCode" placeholder="Enter access code (min. 6 characters)">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Quran Type</label>
-                                    <select class="form-select" id="updateQuranType">
-                                        <option value="13">13 Line Quran (26 pages = 1 Juz)</option>
-                                        <option value="15">15 Line Quran (20 pages = 1 Juz)</option>
-                                    </select>
-                                </div>
-                                
-                                <div style="background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 12px; color: #856404;">
-                                    ⚠️ <strong>Note:</strong> Changing the access code will require parents to use the new code for access.
-                                </div>
-                                
-                                <button class="save-button" onclick="updateStudentInfo()">Update Student Info</button>
-                                <button class="clear-button" onclick="resetUpdateForm()">Reset Form</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-<!-- Remove Student Section -->
+                <!-- Remove Student Section -->
                 <div id="removeStudentSection" class="manage-section" style="display: none;">
                     <div class="homework-section">
                         <div class="homework-section-title">
@@ -3424,236 +3348,14 @@
         // FIXED: Dynamic student access codes mapping - will be loaded from Firebase
         let studentAccessCodes = {};
 
-        // Updated default students data - cleared old students and added new ones alphabetically
-        const defaultStudents = [];
-
-        // FIXED: Diagnostic function to check access codes status
-        async function diagnoseAccessCodes() {
-            console.log('=== ACCESS CODES DIAGNOSTIC ===');
-            console.log('Current access codes mapping:', studentAccessCodes);
-            console.log('Total access codes loaded:', Object.keys(studentAccessCodes).length);
-            
-            try {
-                const students = await window.getStudents();
-                console.log('Students from Firebase:', students.map(s => ({ id: s.id, name: s.name, accessCode: s.accessCode })));
-                console.log('Expected access codes:', students.map(s => s.accessCode?.toLowerCase()).filter(Boolean));
-                
-                // Check for mismatches
-                const expectedCodes = students.map(s => s.accessCode?.toLowerCase()).filter(Boolean);
-                const loadedCodes = Object.keys(studentAccessCodes);
-                
-                const missing = expectedCodes.filter(code => !loadedCodes.includes(code));
-                const extra = loadedCodes.filter(code => !expectedCodes.includes(code));
-                
-                if (missing.length > 0) {
-                    console.warn('Missing access codes:', missing);
-                }
-                if (extra.length > 0) {
-                    console.warn('Extra access codes:', extra);
-                }
-                
-                console.log('=== END DIAGNOSTIC ===');
-                return { expectedCodes, loadedCodes, missing, extra };
-            } catch (error) {
-                console.error('Error during diagnostic:', error);
-                return null;
-            }
-        }
-
-        // FIXED: Manual function to refresh access codes
-        async function refreshAccessCodes() {
-            console.log('Manually refreshing access codes...');
-            try {
-                await buildStudentAccessCodes();
-                await diagnoseAccessCodes();
-                console.log('Access codes refreshed successfully');
-                return true;
-            } catch (error) {
-                console.error('Error refreshing access codes:', error);
-                return false;
-            }
-        }
-
-        // FIXED: Manual function for teachers to refresh access codes
-        async function refreshAccessCodesManually() {
-            if (currentUserType !== 'teacher') return;
-            
-            try {
-                const result = await refreshAccessCodes();
-                if (result) {
-                    alert('✅ Access codes refreshed successfully!\n\nAll parent access codes have been reloaded from Firebase.');
-                } else {
-                    alert('❌ Failed to refresh access codes. Please check the console for errors.');
-                }
-            } catch (error) {
-                console.error('Error in manual refresh:', error);
-                alert('❌ Error refreshing access codes: ' + error.message);
-            }
-        }
-
-        // ENHANCED: Comprehensive diagnostic function for teachers
-        async function diagnoseAccessCodesIssues() {
-            if (currentUserType !== 'teacher') return;
-            
-            try {
-                console.log('🩺 STARTING ACCESS CODE DIAGNOSIS...');
-                
-                const diagnostic = {
-                    timestamp: new Date().toISOString(),
-                    issues: [],
-                    fixes: [],
-                    summary: ''
-                };
-                
-                // 1. Check students in Firebase
-                const students = await window.getStudents();
-                console.log(`📊 Found ${students.length} students in Firebase`);
-                
-                if (students.length === 0) {
-                    diagnostic.issues.push('No students found in Firebase');
-                    diagnostic.fixes.push('Add students using "Manage Students" → "Add"');
-                }
-                
-                // 2. Check for missing access codes
-                const studentsWithoutCodes = students.filter(s => !s.accessCode);
-                if (studentsWithoutCodes.length > 0) {
-                    diagnostic.issues.push(`${studentsWithoutCodes.length} students missing access codes`);
-                    diagnostic.fixes.push('Update missing access codes using "Manage Students" → "Update"');
-                    console.warn('Students without access codes:', studentsWithoutCodes.map(s => s.name));
-                }
-                
-                // 3. Check for duplicate access codes
-                const accessCodes = students.filter(s => s.accessCode).map(s => s.accessCode.toLowerCase());
-                const duplicates = accessCodes.filter((code, index) => accessCodes.indexOf(code) !== index);
-                if (duplicates.length > 0) {
-                    diagnostic.issues.push(`Duplicate access codes found: ${duplicates.join(', ')}`);
-                    diagnostic.fixes.push('Change duplicate access codes to unique values');
-                }
-                
-                // 4. Test access code building
-                const buildResult = await buildStudentAccessCodes();
-                const loadedCount = Object.keys(studentAccessCodes).length;
-                const expectedCount = students.filter(s => s.accessCode).length;
-                
-                if (loadedCount !== expectedCount) {
-                    diagnostic.issues.push(`Access code count mismatch: loaded ${loadedCount}, expected ${expectedCount}`);
-                    diagnostic.fixes.push('Try "Refresh Access Codes" button');
-                }
-                
-                // 5. Check for invalid characters in access codes
-                const invalidCodes = students.filter(s => s.accessCode && !/^[a-zA-Z0-9]+$/.test(s.accessCode));
-                if (invalidCodes.length > 0) {
-                    diagnostic.issues.push(`${invalidCodes.length} access codes contain invalid characters`);
-                    diagnostic.fixes.push('Access codes should only contain letters and numbers');
-                    console.warn('Invalid access codes:', invalidCodes.map(s => ({ name: s.name, code: s.accessCode })));
-                }
-                
-                // 6. Check for wrong length codes
-                const wrongLengthCodes = students.filter(s => s.accessCode && s.accessCode.length !== 8);
-                if (wrongLengthCodes.length > 0) {
-                    diagnostic.issues.push(`${wrongLengthCodes.length} access codes are not 8 characters`);
-                    diagnostic.fixes.push('All access codes must be exactly 8 characters long');
-                }
-                
-                // Generate summary
-                if (diagnostic.issues.length === 0) {
-                    diagnostic.summary = '✅ All access codes are working correctly!';
-                } else {
-                    diagnostic.summary = `❌ Found ${diagnostic.issues.length} issue(s) with access codes`;
-                }
-                
-                // Display results
-                let reportText = `🩺 ACCESS CODE DIAGNOSIS REPORT\n`;
-                reportText += `Generated: ${new Date().toLocaleString()}\n\n`;
-                reportText += `📊 SUMMARY:\n${diagnostic.summary}\n\n`;
-                
-                if (diagnostic.issues.length > 0) {
-                    reportText += `❌ ISSUES FOUND:\n`;
-                    diagnostic.issues.forEach((issue, i) => {
-                        reportText += `${i + 1}. ${issue}\n`;
-                    });
-                    reportText += `\n🔧 RECOMMENDED FIXES:\n`;
-                    diagnostic.fixes.forEach((fix, i) => {
-                        reportText += `${i + 1}. ${fix}\n`;
-                    });
-                }
-                
-                reportText += `\n📋 DETAILS:\n`;
-                reportText += `• Total students: ${students.length}\n`;
-                reportText += `• Students with access codes: ${students.filter(s => s.accessCode).length}\n`;
-                reportText += `• Access codes loaded in memory: ${loadedCount}\n`;
-                reportText += `• Firebase connection: ${window.firebase ? 'Connected' : 'Disconnected'}\n`;
-                
-                console.log(reportText);
-                alert(reportText);
-                
-                // Auto-fix if possible
-                if (loadedCount !== expectedCount) {
-                    if (confirm('Would you like to automatically refresh access codes now?')) {
-                        await refreshAccessCodesManually();
-                    }
-                }
-                
-                return diagnostic;
-                
-            } catch (error) {
-                console.error('Error during diagnosis:', error);
-                alert('❌ Diagnosis failed: ' + error.message);
-            }
-        }
-
         const progressTypes = ['sabak', 'para', 'dhor'];
-
-        // FIXED: Function to build student access codes mapping from student list
-        async function buildStudentAccessCodes() {
-            try {
-                console.log('Building student access codes...');
-                const students = await window.getStudents();
-                studentAccessCodes = {};
-                
-                if (!students || students.length === 0) {
-                    console.warn('No students found when building access codes');
-                    return;
-                }
-                
-                students.forEach(student => {
-                    if (student.accessCode) {
-                        const normalizedCode = student.accessCode.toLowerCase().trim();
-                        if (normalizedCode) {
-                            studentAccessCodes[normalizedCode] = {
-                                studentId: student.id,
-                                studentName: student.name
-                            };
-                        }
-                    }
-                });
-                
-                console.log('Student access codes built successfully. Total codes:', Object.keys(studentAccessCodes).length);
-                console.log('Access codes mapping:', studentAccessCodes);
-                return true;
-            } catch (error) {
-                console.error('Error building student access codes:', error);
-                throw error;
-            }
-        }
 
         // Manage Students Modal Functions
         function showManageStudentsModal() {
             if (currentUserType !== 'teacher') return;
             
-            // Reset to first tab
-            switchManageTab('add');
-            
-            // Clear forms
-            document.getElementById('newStudentName').value = '';
-            document.getElementById('newQuranType').value = '13';
-            document.getElementById('newParentCode').value = '';
-            
-            // Load remove student dropdown
-            loadRemoveStudentDropdown();
-            
-            // Load access codes
-            loadAccessCodes();
+            // Reset to remove tab (first available tab)
+            switchManageTab('remove');
             
             document.getElementById('manageStudentsModal').style.display = 'block';
         }
@@ -3663,19 +3365,15 @@
             document.querySelectorAll('.manage-tab-button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.getElementById(tabName === 'add' ? 'addTab' : tabName === 'update' ? 'updateTab' : tabName === 'remove' ? 'removeTab' : tabName === 'recovery' ? 'recoveryTab' : 'codesTab').classList.add('active');
+            document.getElementById(tabName === 'remove' ? 'removeTab' : tabName === 'recovery' ? 'recoveryTab' : 'codesTab').classList.add('active');
             
             // Show/hide sections
-            document.getElementById('addStudentSection').style.display = tabName === 'add' ? 'block' : 'none';
-            document.getElementById('updateStudentSection').style.display = tabName === 'update' ? 'block' : 'none';
             document.getElementById('removeStudentSection').style.display = tabName === 'remove' ? 'block' : 'none';
             document.getElementById('recoverySection').style.display = tabName === 'recovery' ? 'block' : 'none';
             document.getElementById('accessCodesSection').style.display = tabName === 'codes' ? 'block' : 'none';
             
             // Load data for specific tabs
-            if (tabName === 'update') {
-                loadUpdateStudentDropdown();
-            } else if (tabName === 'remove') {
+            if (tabName === 'remove') {
                 loadRemoveStudentDropdown();
             } else if (tabName === 'recovery') {
                 loadSoftRemovedStudents();
@@ -3918,44 +3616,46 @@
 
         async function initializeDefaultData() {
             try {
-                const { getDoc, doc, setDoc } = window.firebaseModules;
-                const { db } = window.firebase;
+                // Load students from CSV and build access codes
+                const students = await window.getStudents();
+                studentAccessCodes = {};
                 
-                // Check if students data already exists
-                const studentsDoc = await getDoc(doc(db, 'config', 'students'));
-                
-                if (!studentsDoc.exists()) {
-                    // Only create default data if none exists
-                    await setDoc(doc(db, 'config', 'students'), {
-                        list: defaultStudents,
-                        lastUpdated: new Date().toISOString()
-                    });
-                    console.log('Default students data initialized');
-                } else {
-                    console.log('Existing students data found, not overwriting');
-                }
-                
-                // FIXED: Build the access codes mapping with retry mechanism
-                let retries = 3;
-                while (retries > 0) {
-                    try {
-                        await buildStudentAccessCodes();
-                        console.log('Access codes built successfully');
-                        break;
-                    } catch (error) {
-                        retries--;
-                        console.warn(`Failed to build access codes, ${retries} retries left:`, error);
-                        if (retries === 0) {
-                            console.error('Failed to build access codes after all retries');
-                            throw error;
-                        }
-                        // Wait 1 second before retry
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                students.forEach(student => {
+                    if (student.accessCode) {
+                        studentAccessCodes[student.accessCode] = {
+                            studentId: student.id,
+                            studentName: student.name
+                        };
                     }
-                }
+                });
+                
+                console.log(`Loaded ${students.length} students from CSV`);
+                console.log(`Built ${Object.keys(studentAccessCodes).length} access codes`);
                 
             } catch (error) {
-                console.error('Error initializing default data:', error);
+                console.error('Error loading CSV data:', error);
+            }
+        }
+
+        async function buildStudentAccessCodes() {
+            try {
+                const students = await window.getStudents();
+                studentAccessCodes = {};
+                
+                students.forEach(student => {
+                    if (student.accessCode) {
+                        studentAccessCodes[student.accessCode.toLowerCase()] = {
+                            studentId: student.id,
+                            studentName: student.name
+                        };
+                    }
+                });
+                
+                console.log(`Built ${Object.keys(studentAccessCodes).length} access codes`);
+                
+            } catch (error) {
+                console.error('Error building student access codes:', error);
+                throw error;
             }
         }
 
@@ -6435,23 +6135,18 @@
         window.saveStudentOverview = saveStudentOverview;
         window.showOverallProgressModal = showOverallProgressModal;
 
-        // Firebase Helper Functions
         window.getStudents = async function() {
-            try {
-                const { getDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                const studentsDoc = await getDoc(doc(db, 'config', 'students'));
-                if (studentsDoc.exists()) {
-                    const students = studentsDoc.data().list || [];
-                    // Sort alphabetically by name
-                    return students.sort((a, b) => a.name.localeCompare(b.name));
-                }
-                return defaultStudents.sort((a, b) => a.name.localeCompare(b.name));
-            } catch (error) {
-                console.error('Error fetching students:', error);
-                return defaultStudents.sort((a, b) => a.name.localeCompare(b.name));
-            }
+            // Hardcoded student data instead of fetching from CSV
+            const students = [
+                { id: 'arafat_rayyan', name: 'Arafat Rayyan', quranType: 13, accessCode: '151110' },
+                { id: 'ayyan_miah', name: 'Ayyan Miah', quranType: 13, accessCode: '120416' },
+                { id: 'ishaq_noor', name: 'Ishaq Noor', quranType: 15, accessCode: '070213' },
+                { id: 'ismail_hussain', name: 'Ismail Hussain', quranType: 15, accessCode: '220218' },
+                { id: 'naveed_khan', name: 'Naveed Khan', quranType: 13, accessCode: '030213' },
+                { id: 'rayhan_rahman', name: 'Rayhan Rahman', quranType: 13, accessCode: '290914' }
+            ];
+            
+            return students.sort((a, b) => a.name.localeCompare(b.name));
         };
 
         window.getStudentData = async function(studentId) {
@@ -7372,228 +7067,6 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Admin functions (Teacher only)
-        async function addStudent() {
-            if (currentUserType !== 'teacher') return;
-            
-            const name = document.getElementById('newStudentName').value.trim();
-            const quranType = parseInt(document.getElementById('newQuranType').value);
-            const parentCode = document.getElementById('newParentCode').value.trim();
-            
-            if (!name || !parentCode) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            if (parentCode.length < 6) {
-                alert('Parent access code must be at least 6 characters long');
-                return;
-            }
-            
-            const students = await window.getStudents();
-            const studentId = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-            
-            if (students.find(s => s.id === studentId)) {
-                alert('Student with this name already exists');
-                return;
-            }
-            
-            // Check if access code already exists
-            if (students.find(s => s.accessCode === parentCode.toLowerCase())) {
-                alert('This access code is already in use');
-                return;
-            }
-            
-            const newStudent = { 
-                id: studentId, 
-                name: name, 
-                parentEmail: `parent_${studentId}@hifz.com`,
-                quranType: quranType,
-                accessCode: parentCode.toLowerCase()
-            };
-            
-            students.push(newStudent);
-            
-            try {
-                const { setDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                // Save updated students list
-                await setDoc(doc(db, 'config', 'students'), {
-                    list: students,
-                    lastUpdated: new Date().toISOString()
-                });
-                
-                // Directly update access codes instead of rebuilding from Firebase
-                studentAccessCodes[parentCode.toLowerCase()] = {
-                    studentId: studentId,
-                    studentName: name
-                };
-
-                // FIXED: Also rebuild access codes to ensure consistency
-                await buildStudentAccessCodes();
-
-                populateStudentTabs(students);
-                
-                // Clear form and reload access codes in modal
-                document.getElementById('newStudentName').value = '';
-                document.getElementById('newQuranType').value = '13';
-                document.getElementById('newParentCode').value = '';
-                loadAccessCodes();
-                
-                alert(`Student ${name} added successfully!\nQuran Type: ${quranType} Line\nParent access code: ${parentCode.toLowerCase()}`);
-            } catch (error) {
-                console.error('Error adding student:', error);
-                alert('Error adding student: ' + error.message);
-            }
-        }
-
-        async function loadUpdateStudentDropdown() {
-            try {
-                const students = await window.getStudents();
-                const select = document.getElementById('updateStudentSelect');
-                select.innerHTML = '<option value="">Choose student to update</option>';
-                
-                students.forEach(student => {
-                    const option = document.createElement('option');
-                    option.value = student.id;
-                    option.textContent = student.name;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Error loading students for update:', error);
-            }
-        }
-
-        async function loadStudentForUpdate() {
-            const studentId = document.getElementById('updateStudentSelect').value;
-            const updateForm = document.getElementById('updateStudentForm');
-            
-            if (!studentId) {
-                updateForm.style.display = 'none';
-                return;
-            }
-            
-            try {
-                const students = await window.getStudents();
-                const student = students.find(s => s.id === studentId);
-                
-                if (student) {
-                    // Populate form with current student data
-                    document.getElementById('updateStudentName').value = student.name || '';
-                    document.getElementById('updateAccessCode').value = student.accessCode || '';
-                    document.getElementById('updateQuranType').value = student.quranType || 13;
-                    
-                    updateForm.style.display = 'block';
-                } else {
-                    alert('Student not found');
-                    updateForm.style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Error loading student for update:', error);
-                alert('Error loading student information');
-            }
-        }
-
-        async function updateStudentInfo() {
-            if (currentUserType !== 'teacher') return;
-            
-            const studentId = document.getElementById('updateStudentSelect').value;
-            const newName = document.getElementById('updateStudentName').value.trim();
-            const newAccessCode = document.getElementById('updateAccessCode').value.trim();
-            const newQuranType = parseInt(document.getElementById('updateQuranType').value);
-            
-            if (!studentId) {
-                alert('Please select a student to update');
-                return;
-            }
-            
-            if (!newName || !newAccessCode) {
-                alert('Please fill in both name and access code');
-                return;
-            }
-            
-            if (newAccessCode.length < 6) {
-                alert('Access code must be at least 6 characters long');
-                return;
-            }
-            
-            try {
-                const { setDoc, doc } = window.firebaseModules;
-                const { db } = window.firebase;
-                
-                // Get current students list
-                const students = await window.getStudents();
-                const studentIndex = students.findIndex(s => s.id === studentId);
-                
-                if (studentIndex === -1) {
-                    alert('Student not found in active list');
-                    return;
-                }
-                
-                // Check if new access code is already in use by another student
-                const existingStudent = students.find(s => s.id !== studentId && s.accessCode === newAccessCode.toLowerCase());
-                if (existingStudent) {
-                    alert(`Access code "${newAccessCode}" is already used by ${existingStudent.name}`);
-                    return;
-                }
-                
-                // Update student in the list
-                const oldName = students[studentIndex].name;
-                const oldAccessCode = students[studentIndex].accessCode;
-                
-                students[studentIndex] = {
-                    ...students[studentIndex],
-                    name: newName,
-                    accessCode: newAccessCode.toLowerCase(),
-                    quranType: newQuranType,
-                    lastUpdated: new Date().toISOString()
-                };
-                
-                // Save updated students list
-                await setDoc(doc(db, 'config', 'students'), {
-                    list: students,
-                    lastUpdated: new Date().toISOString()
-                });
-                
-                // Update student info in Firebase
-                await setDoc(doc(db, 'students', studentId), {
-                    name: newName,
-                    accessCode: newAccessCode.toLowerCase(),
-                    quranType: newQuranType,
-                    parentEmail: students[studentIndex].parentEmail || `${studentId}@hifz.com`,
-                    lastUpdated: new Date().toISOString(),
-                    updated: true,
-                    updatedDate: new Date().toISOString(),
-                    previousName: oldName,
-                    previousAccessCode: oldAccessCode
-                });
-                
-                // Rebuild access codes and update UI
-                await buildStudentAccessCodes();
-                populateStudentTabs(students);
-                loadUpdateStudentDropdown();
-                loadAccessCodes();
-                
-                // Reset form
-                resetUpdateForm();
-                
-                alert(`✅ Student information updated successfully!\n\nName: ${oldName} → ${newName}\nAccess Code: ${oldAccessCode} → ${newAccessCode.toLowerCase()}\nQuran Type: ${newQuranType} Line\n\nParents should use the new access code: ${newAccessCode.toLowerCase()}`);
-                
-            } catch (error) {
-                console.error('Error updating student:', error);
-                alert('❌ Error updating student: ' + error.message);
-            }
-        }
-
-        function resetUpdateForm() {
-            document.getElementById('updateStudentSelect').value = '';
-            document.getElementById('updateStudentName').value = '';
-            document.getElementById('updateAccessCode').value = '';
-            document.getElementById('updateQuranType').value = '13';
-            document.getElementById('updateStudentForm').style.display = 'none';
         }
 
         async function loadSoftRemovedStudents() {
@@ -8556,6 +8029,7 @@ window.selectProfile = selectProfile;
         window.continueToLogin = continueToLogin;
         window.goBackToProfiles = goBackToProfiles;
         window.login = login;
+        window.buildStudentAccessCodes = buildStudentAccessCodes;
         window.openProgressModal = openProgressModal;
         window.selectGrade = selectGrade;
         window.saveProgress = saveProgress;
@@ -8570,11 +8044,6 @@ window.selectProfile = selectProfile;
         window.showManageStudentsModal = showManageStudentsModal;
         window.switchManageTab = switchManageTab;
         window.copyAccessCode = copyAccessCode;
-        window.addStudent = addStudent;
-        window.loadUpdateStudentDropdown = loadUpdateStudentDropdown;
-        window.loadStudentForUpdate = loadStudentForUpdate;
-        window.updateStudentInfo = updateStudentInfo;
-        window.resetUpdateForm = resetUpdateForm;
         window.removeStudent = removeStudent;
         window.permanentlyDeleteStudent = permanentlyDeleteStudent;
         window.loadSoftRemovedStudents = loadSoftRemovedStudents;
@@ -9105,10 +8574,6 @@ window.selectProfile = selectProfile;
         window.generateMonthlyDetailedPDF = generateMonthlyDetailedPDF;
         window.generateOverallProgressPDF = generateOverallProgressPDF;
         window.generateAllStudentsPDF = generateAllStudentsPDF;
-        window.diagnoseAccessCodes = diagnoseAccessCodes;
-        window.refreshAccessCodes = refreshAccessCodes;
-        window.refreshAccessCodesManually = refreshAccessCodesManually;
-        window.diagnoseAccessCodesIssues = diagnoseAccessCodesIssues;
 
         // ===== IMPORT DATA FUNCTIONS =====
         let importedData = null;
