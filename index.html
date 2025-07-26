@@ -3574,6 +3574,35 @@
             };
         }
 
+        // Add this new function right after the convertLinesToPagesAndJuz function
+        function convertJuzToFraction(juzDecimal) {
+            if (!juzDecimal || juzDecimal <= 0) return '0 Juz';
+            
+            const wholeJuz = Math.floor(juzDecimal);
+            const fractionalPart = juzDecimal - wholeJuz;
+            
+            // Round UP to nearest quarter
+            let fraction = '';
+            if (fractionalPart < 0.125) {
+                fraction = '0';
+            } else if (fractionalPart < 0.375) {
+                fraction = '1/4';
+            } else if (fractionalPart < 0.625) {
+                fraction = '1/2';
+            } else if (fractionalPart < 0.875) {
+                fraction = '3/4';
+            } else {
+                // Round up to next whole Juz
+                return `${wholeJuz + 1} Juz`;
+            }
+            
+            if (wholeJuz === 0) {
+                return fraction === '0' ? '0 Juz' : `${fraction} Juz`;
+            } else {
+                return fraction === '0' ? `${wholeJuz} Juz` : `${wholeJuz} & ${fraction} Juz`;
+            }
+        }
+
         function updateConversionDisplay() {
             const linesInput = document.getElementById('linesInput');
             const conversionDisplay = document.getElementById('conversionDisplay');
@@ -4192,7 +4221,24 @@
 
         function formatDuration(duration) {
             const { years, months, days } = duration;
-            return `${years} Years ${months} Months ${days} Days`;
+            const parts = [];
+            
+            if (years > 0) {
+                parts.push(`${years} ${years === 1 ? 'Year' : 'Years'}`);
+            }
+            if (months > 0) {
+                parts.push(`${months} ${months === 1 ? 'Month' : 'Months'}`);
+            }
+            if (days > 0) {
+                parts.push(`${days} ${days === 1 ? 'Day' : 'Days'}`);
+            }
+            
+            // If all components are 0, return "0 Days"
+            if (parts.length === 0) {
+                return '0 Days';
+            }
+            
+            return parts.join(' ');
         }
 
         function showUpdateStudentOverviewModal() {
@@ -8218,27 +8264,6 @@
                 return;
             }
             
-            // Check for monthly detailed specific requirements
-            if (reportType === 'monthly-detailed') {
-                const selectedMonth = document.getElementById('monthSelect').value;
-                const selectedYear = document.getElementById('yearSelect').value;
-                
-                if (!selectedMonth || !selectedYear) {
-                    alert('Please select month and year for monthly detailed report');
-                    return;
-                }
-            }
-            
-            // Check for yearly summary specific requirements
-            if (reportType === 'yearly-summary') {
-                const selectedAcademicYear = document.getElementById('academicYearSelect').value;
-                
-                if (!selectedAcademicYear) {
-                    alert('Please select academic year for yearly summary report');
-                    return;
-                }
-            }
-            
             // Show loading
             const btn = document.getElementById('generatePDFBtn');
             const spinner = document.getElementById('modalPdfSpinner');
@@ -8250,8 +8275,10 @@
             
             try {
                 if (studentId === 'all') {
+                    // FIXED: Use the corrected function
                     await generateAllStudentsPDF(reportType);
                 } else {
+                    // Individual reports remain the same
                     if (reportType === 'yearly-summary') {
                         const selectedAcademicYear = document.getElementById('academicYearSelect').value;
                         await generateYearlySummaryPDF(studentId, selectedAcademicYear);
@@ -8270,8 +8297,8 @@
                 alert('PDF report generated successfully!');
                 
             } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('Error generating PDF: ' + error.message);
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF: ' + error.message);
             } finally {
                 // Hide loading
                 spinner.style.display = 'none';
@@ -8676,7 +8703,7 @@
             const sabakBoxes = [
                 { label: 'LINES', value: totalLines, color: [16, 163, 127] },
                 { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
-                { label: 'JUZ', value: Math.round(totalJuz * 100) / 100, color: [255, 149, 0] }
+                { label: 'JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
             ];
             
             // Use wider boxes for Sabak Summary (3 boxes instead of 4)
@@ -8830,6 +8857,40 @@
             // Save PDF only if not part of combined report
             if (!skipSave) {
                 pdf.save(student.name + '_monthly_report.pdf');
+            }
+        }
+
+        function logPDFDebugInfo(functionName, studentId, reportType) {
+            console.log(`=== PDF Debug Info ===`);
+            console.log(`Function: ${functionName}`);
+            console.log(`Student ID: ${studentId}`);
+            console.log(`Report Type: ${reportType}`);
+            console.log(`Timestamp: ${new Date().toISOString()}`);
+            console.log(`======================`);
+        }
+
+        // STEP 7: Error handling wrapper for combined reports
+        async function safeGenerateCombinedReport(generatorFunction, ...args) {
+            try {
+                await generatorFunction(...args);
+            } catch (error) {
+                console.error('Error in combined report generation:', error);
+                
+                // Add error page to PDF
+                const pdf = args[args.length - 2]; // PDF should be second to last argument
+                if (pdf) {
+                    pdf.setTextColor(255, 59, 48);
+                    pdf.setFontSize(16);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Report Generation Error', 20, 50);
+                    
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('An error occurred while generating this report.', 20, 70);
+                    pdf.text('Please try generating individually.', 20, 85);
+                }
+                
+                throw error; // Re-throw to be caught by parent function
             }
         }
 
@@ -8995,6 +9056,11 @@ window.selectProfile = selectProfile;
         window.showViewTargetsModal = showViewTargetsModal;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
+        window.generateAllStudentsPDF = generateAllStudentsPDF;
+        window.generateSingleStudentPDFForCombined = generateSingleStudentPDFForCombined;
+        window.generateYearlySummaryPDFForCombined = generateYearlySummaryPDFForCombined;
+        window.generateMonthlyDetailedPDFForCombined = generateMonthlyDetailedPDFForCombined;
+        window.generateOverallProgressPDFForCombined = generateOverallProgressPDFForCombined;
         window.showResetModal = showResetModal;
         window.logout = logout;
 
@@ -9005,6 +9071,10 @@ window.selectProfile = selectProfile;
             
             const studentData = await window.getStudentData(studentId);
             const juzData = await getStudentJuzProgress(studentId);
+            
+            // ADDED: Fetch target data for the student and academic year
+            const targetYear = academicYear || await getCurrentAcademicYear();
+            const targetData = await getStudentTargetsForYear(studentId, targetYear);
             
             const { jsPDF } = window.jspdf;
             const pdf = providedPDF || new jsPDF();
@@ -9167,13 +9237,13 @@ window.selectProfile = selectProfile;
             }
             
             // Calculate yearly stats for selected academic year
-            let targetYear;
+            let targetYear_calc;
             if (academicYear) {
                 const [startYear, endYear] = academicYear.split('-');
-                targetYear = { start: startYear, end: endYear, academicYear: academicYear };
+                targetYear_calc = { start: startYear, end: endYear, academicYear: academicYear };
             } else {
                 const currentYear = new Date().getFullYear();
-                targetYear = { start: currentYear.toString(), end: currentYear.toString(), academicYear: currentYear.toString() };
+                targetYear_calc = { start: currentYear.toString(), end: currentYear.toString(), academicYear: currentYear.toString() };
             }
             
             const yearlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0, totalDays: 0 };
@@ -9185,7 +9255,7 @@ window.selectProfile = selectProfile;
                 // Filter by academic year if specified
                 if (academicYear && !isDateInAcademicYear(date, academicYear)) {
                     return;
-                } else if (!academicYear && !date.startsWith(targetYear.start)) {
+                } else if (!academicYear && !date.startsWith(targetYear_calc.start)) {
                     return;
                 }
                 
@@ -9224,7 +9294,7 @@ window.selectProfile = selectProfile;
             const sabakBoxes = [
                 { label: 'SABAK DAYS', value: yearlyStats.sabak, color: [16, 163, 127] },
                 { label: 'TOTAL LINES', value: totalLines, color: [142, 68, 173] },
-                { label: 'TOTAL JUZ', value: Math.round(totalJuz * 100) / 100, color: [255, 149, 0] }
+                { label: 'TOTAL JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
             ];
             
             sabakBoxes.forEach(function(box, index) {
@@ -9267,11 +9337,11 @@ window.selectProfile = selectProfile;
             pdf.text('Monthly Breakdown', 20, yPos);
             yPos += 10; // REDUCED spacing
             
-            // FIXED: Generate monthly breakdown table - removed extra column
-            const colStarts = [20, 45, 65, 85, 105, 125];  // FIXED: Removed extra column start
-            const colWidths = [25, 20, 20, 20, 20, 25];    // FIXED: Removed extra column width
-            const tableWidth = 130;                          // FIXED: Adjusted table width
-            const rowHeight = 8;                             // INCREASED row height as requested
+            // UPDATED: Generate monthly breakdown table with Target column (7 columns now)
+            const colStarts = [20, 45, 65, 85, 105, 125, 145];    // ADDED 7th column
+            const colWidths = [25, 20, 20, 20, 20, 20, 20];       // ADDED 7th width
+            const tableWidth = 145;                                // INCREASED table width
+            const rowHeight = 8;                                   // INCREASED row height as requested
             
             // Table headers
             pdf.setFillColor(240, 240, 240);
@@ -9281,7 +9351,7 @@ window.selectProfile = selectProfile;
             pdf.setLineWidth(0.3);
             pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
             
-            // FIXED: Vertical lines for columns - correct number of lines
+            // UPDATED: Vertical lines for 7 columns
             for (let i = 0; i <= colStarts.length; i++) {
                 const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
                 pdf.line(x, yPos, x, yPos + rowHeight);
@@ -9291,7 +9361,8 @@ window.selectProfile = selectProfile;
             pdf.setFontSize(7); // REDUCED font size
             pdf.setFont(undefined, 'bold');
             
-            const headers = ['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Did Not Give'];
+            // UPDATED: Added 'Target' to headers
+            const headers = ['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Did Not Give', 'Target'];
             headers.forEach(function(header, index) {
                 centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 5);
             });
@@ -9334,6 +9405,28 @@ window.selectProfile = selectProfile;
                         }
                     });
                     
+                    // ADDED: Get target status for this month
+                    let targetStatus = '--';
+                    let targetColor = [142, 142, 147]; // Default gray
+                    
+                    if (targetData.monthly && targetData.monthly[month.key] && targetData.monthly[month.key].status) {
+                        const status = targetData.monthly[month.key].status;
+                        switch(status) {
+                            case 'above':
+                                targetStatus = 'Above';
+                                targetColor = [52, 199, 89]; // Green
+                                break;
+                            case 'on':
+                                targetStatus = 'On';
+                                targetColor = [59, 130, 246]; // Blue
+                                break;
+                            case 'below':
+                                targetStatus = 'Below';
+                                targetColor = [255, 59, 48]; // Red
+                                break;
+                        }
+                    }
+                    
                     // Row background
                     const rowColor = index % 2 === 0 ? [255, 255, 255] : [248, 249, 250];
                     pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
@@ -9344,7 +9437,7 @@ window.selectProfile = selectProfile;
                     pdf.setLineWidth(0.2);
                     pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
                     
-                    // FIXED: Vertical lines - correct number
+                    // UPDATED: Vertical lines for 7 columns
                     for (let i = 0; i <= colStarts.length; i++) {
                         const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
                         pdf.line(x, yPos, x, yPos + rowHeight);
@@ -9361,6 +9454,11 @@ window.selectProfile = selectProfile;
                     centerTextInColumn(monthStats.dhor.toString(), colStarts[3], colWidths[3], yPos + 5);
                     centerTextInColumn(monthStats.absent.toString(), colStarts[4], colWidths[4], yPos + 5);
                     centerTextInColumn(monthStats.didNotGive.toString(), colStarts[5], colWidths[5], yPos + 5);
+                    
+                    // ADDED: Target status with appropriate color
+                    pdf.setTextColor(targetColor[0], targetColor[1], targetColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(targetStatus, colStarts[6], colWidths[6], yPos + 5);
                     
                     yPos += rowHeight;
                 });
@@ -9634,7 +9732,7 @@ window.selectProfile = selectProfile;
             const sabakBoxes = [
                 { label: 'LINES', value: totalLines, color: [16, 163, 127] },
                 { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
-                { label: 'JUZ', value: Math.round(totalJuz * 100) / 100, color: [255, 149, 0] }
+                { label: 'JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
             ];
             
             // Use wider boxes for Sabak Summary (3 boxes instead of 4)
@@ -9979,7 +10077,7 @@ window.selectProfile = selectProfile;
                 yPos += 8;
                 
                 // Combine and sort all Juz with data
-                const allJuzWithData = [...completedJuz, ...currentJuz].sort((a, b) => a.number - b.number);
+                const allJuzWithData = [...completedJuz, ...currentJuz].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
                 
                 if (allJuzWithData.length === 0) {
                     pdf.setTextColor(142, 142, 147);
@@ -10020,7 +10118,7 @@ window.selectProfile = selectProfile;
                     yPos += rowHeight;
                     
                     // Add rows for each Juz - REMOVE LAST ROW
-                    const maxRows = Math.min(allJuzWithData.length - 1, 21); // Remove last row (-1)
+                    const maxRows = Math.min(allJuzWithData.length, 21); // Remove last row (-1)
                     
                     for (let i = 0; i < maxRows; i++) {
                         const juz = allJuzWithData[i];
@@ -10143,51 +10241,1483 @@ window.selectProfile = selectProfile;
                 }
             }
             
+            // FIXED: Get report type display name with proper mapping
+            const reportTypeNames = {
+                'current-month': 'Current Month Progress',
+                'yearly-summary': 'Yearly Summary',
+                'monthly-detailed': 'Monthly Detailed',
+                'overall-progress': 'Overall Progress'
+            };
+            const reportTypeName = reportTypeNames[reportType] || 'Progress Report';
+            
+            // FIXED: Get form values safely with fallbacks
+            const selectedAcademicYear = document.getElementById('academicYearSelect')?.value || '2024-2025';
+            const selectedMonth = document.getElementById('monthSelect')?.value || String(new Date().getMonth() + 1).padStart(2, '0');
+            const selectedYear = document.getElementById('yearSelect')?.value || new Date().getFullYear().toString();
+            
             // Cover Page
             pdf.setFillColor(16, 163, 127);
-            roundedRect(10, 10, 190, 40, 6, 'F');
+            roundedRect(10, 10, 190, 50, 6, 'F');
             
             pdf.setTextColor(255, 255, 255);
             pdf.setFontSize(24);
             pdf.setFont(undefined, 'bold');
-            pdf.text('📖 All Students Report', 20, 28);
+            pdf.text('All Students Report', 20, 30);
             
-            pdf.setFontSize(14);
+            pdf.setFontSize(16);
             pdf.setFont(undefined, 'normal');
+            pdf.text(reportTypeName, 20, 45);
+            
+            pdf.setFontSize(12);
             pdf.text(`Generated on ${new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 month: 'long', 
                 day: 'numeric', 
                 year: 'numeric' 
-            })}`, 20, 40);
+            })}`, 20, 55);
             
-            // Student List
-            let yPos = 70;
+            // Student List Section
+            let yPos = 80;
             pdf.setTextColor(28, 28, 30);
-            pdf.setFontSize(16);
+            pdf.setFontSize(18);
             pdf.setFont(undefined, 'bold');
             pdf.text(`Total Students: ${students.length}`, 20, yPos);
             yPos += 20;
             
-            students.forEach((student, index) => {
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'normal');
-                pdf.text(`${index + 1}. ${student.name}`, 30, yPos);
-                yPos += 8;
-            });
+            // Create a nice student list with boxes
+            const studentsPerColumn = 15;
+            const columnsNeeded = Math.ceil(students.length / studentsPerColumn);
             
-            // Generate individual reports for each student
-            let isFirstStudent = true;
-            for (const student of students) {
-                if (!isFirstStudent) {
-                    pdf.addPage();
-                }
-                isFirstStudent = false;
+            for (let col = 0; col < columnsNeeded; col++) {
+                const startIndex = col * studentsPerColumn;
+                const endIndex = Math.min(startIndex + studentsPerColumn, students.length);
+                const columnStudents = students.slice(startIndex, endIndex);
                 
-                await generateSingleStudentPDF(student.id, reportType, pdf, true);
+                const xPos = 20 + (col * 90);
+                let columnYPos = yPos;
+                
+                columnStudents.forEach((student, index) => {
+                    pdf.setFillColor(248, 249, 250);
+                    roundedRect(xPos, columnYPos - 5, 85, 12, 2, 'F');
+                    
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(xPos, columnYPos - 5, 85, 12, 2, 'S');
+                    
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text(`${startIndex + index + 1}. ${student.name}`, xPos + 3, columnYPos + 2);
+                    
+                    columnYPos += 15;
+                });
             }
             
-            pdf.save('All_Students_Report.pdf');
+            // Add note about report contents
+            yPos = 220;
+            pdf.setFillColor(232, 244, 253);
+            roundedRect(20, yPos, 170, 30, 4, 'F');
+            
+            pdf.setTextColor(30, 64, 175);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('📋 Report Contents', 25, yPos + 10);
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(`• Individual ${reportTypeName} for each student`, 25, yPos + 18);
+            pdf.text('• Each student report starts on a new page', 25, yPos + 24);
+            
+            // FIXED: Generate individual reports for each student with proper page management
+            for (let i = 0; i < students.length; i++) {
+                const student = students[i];
+                
+                // FIXED: Add new page for each student BEFORE generating content
+                pdf.addPage();
+                
+                try {
+                    // FIXED: Call specialized combined report functions instead of regular ones
+                    if (reportType === 'yearly-summary') {
+                        await generateYearlySummaryPDFForCombined(student.id, selectedAcademicYear, pdf);
+                    } else if (reportType === 'monthly-detailed') {
+                        await generateMonthlyDetailedPDFForCombined(student.id, selectedYear, selectedMonth, pdf);
+                    } else if (reportType === 'overall-progress') {
+                        await generateOverallProgressPDFForCombined(student.id, pdf);
+                    } else {
+                        // Default to current month progress
+                        await generateSingleStudentPDFForCombined(student.id, pdf);
+                    }
+                } catch (error) {
+                    console.error(`Error generating report for ${student.name}:`, error);
+                    
+                    // FIXED: Clear the page and add error message properly positioned
+                    pdf.setTextColor(255, 59, 48);
+                    pdf.setFontSize(16);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`Error generating report for ${student.name}`, 20, 50);
+                    
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('Please try generating this student\'s report individually.', 20, 70);
+                }
+            }
+            
+            // Save the combined PDF
+            const fileName = `All_Students_${reportTypeName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+            pdf.save(fileName);
+        }
+
+        // STEP 2: Create specialized functions for combined reports that start fresh on each page
+
+        async function generateSingleStudentPDFForCombined(studentId, pdf) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentData = await window.getStudentData(studentId);
+            const homework = await getStudentHomework(studentId);
+            
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                if (typeof pdf.roundedRect !== 'undefined') {
+                    pdf.roundedRect(x, y, width, height, radius, radius, style);
+                } else {
+                    pdf.rect(x, y, width, height, style);
+                }
+            }
+            
+            // Helper function to center text in column
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // Header - starts at top of fresh page
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 25, 'F');
+            
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 20, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('MONTHLY PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            pdf.text(monthYear, 105, 39, { align: 'center' });
+            
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
+            
+            let yPos = 55;
+            
+            // Monthly Progress Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Progress', 20, yPos);
+            yPos += 10;
+            
+            // Calculate monthly stats
+            const currentMonth = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
+            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(currentMonth)) {
+                    if (dayData.absent) {
+                        monthlyStats.absent++;
+                    } else if (dayData.didNotGive) {
+                        monthlyStats.didNotGive++;
+                    } else {
+                        ['sabak', 'para', 'dhor'].forEach(function(type) {
+                            if (dayData[type]) monthlyStats[type]++;
+                        });
+                    }
+                }
+            });
+            
+            // Progress boxes
+            const boxWidth = 38;
+            const boxHeight = 22;
+            const spacing = 6;
+            const startX = 20;
+            
+            const progressBoxes = [
+                { label: 'SABAK', value: monthlyStats.sabak, color: [16, 163, 127] },
+                { label: 'SABAK PARA', value: monthlyStats.para, color: [142, 68, 173] },
+                { label: 'DHOR', value: monthlyStats.dhor, color: [255, 149, 0] },
+                { label: 'ABSENT', value: monthlyStats.absent, color: [255, 59, 48] }
+            ];
+            
+            progressBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Homework Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Homework Summary', 20, yPos);
+            yPos += 10;
+            
+            const homeworkStats = {
+                total: homework.length,
+                completed: homework.filter(hw => hw.completed).length,
+                pending: homework.filter(hw => !hw.completed && hw.status !== 'did-not-give').length,
+                didNotDo: homework.filter(hw => hw.status === 'did-not-give').length
+            };
+            
+            const homeworkBoxes = [
+                { label: 'TOTAL', value: homeworkStats.total, color: [28, 28, 30] },
+                { label: 'COMPLETED', value: homeworkStats.completed, color: [52, 199, 89] },
+                { label: 'PENDING', value: homeworkStats.pending, color: [255, 149, 0] },
+                { label: 'DID NOT DO', value: homeworkStats.didNotDo, color: [255, 59, 48] }
+            ];
+            
+            homeworkBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Sabak Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 10;
+            
+            let totalLines = 0, totalPages = 0, totalJuz = 0;
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(currentMonth) && dayData.sabak && !dayData.absent && !dayData.didNotGive) {
+                    if (dayData.sabak.lines) totalLines += dayData.sabak.lines;
+                    if (dayData.sabak.pages) totalPages += dayData.sabak.pages;
+                    if (dayData.sabak.juz) totalJuz += dayData.sabak.juz;
+                }
+            });
+            
+            const sabakBoxes = [
+                { label: 'LINES', value: totalLines, color: [16, 163, 127] },
+                { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
+            ];
+            
+            const sabakBoxWidth = 50;
+            const sabakSpacing = 8;
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (sabakBoxWidth + sabakSpacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (sabakBoxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 35;
+            
+            // CONDENSED Daily Breakdown Table for combined report
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Daily Breakdown (Top 10 Days)', 20, yPos);
+            yPos += 10;
+            
+            // Get days with data in current month and show top 10
+            const year = new Date().getFullYear();
+            const month = new Date().getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const rowHeight = 6; // Smaller rows for combined report
+            const colStarts = [20, 35, 65, 90, 115, 150];
+            const colWidths = [15, 30, 25, 25, 35, 35];
+            const tableWidth = 165;
+            
+            // Table headers
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+            
+            pdf.setDrawColor(200, 200, 200);
+            pdf.setLineWidth(0.3);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+            
+            for (let i = 0; i <= colStarts.length; i++) {
+                const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                pdf.line(x, yPos, x, yPos + rowHeight);
+            }
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(6);
+            pdf.setFont(undefined, 'bold');
+            
+            const headers = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+            headers.forEach(function(header, index) {
+                centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 4);
+            });
+            
+            yPos += rowHeight;
+            
+            // Show only first 10 days or days with data (whichever is fewer)
+            const maxDaysToShow = Math.min(10, daysInMonth);
+            
+            for (let day = 1; day <= maxDaysToShow; day++) {
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayData = studentData[dateKey] || {};
+                
+                // Determine row background color
+                let rowColor = [255, 255, 255];
+                if (dayData.absent) {
+                    rowColor = [255, 235, 235];
+                } else if (dayData.didNotGive) {
+                    rowColor = [255, 243, 224];
+                }
+                
+                pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                
+                pdf.setDrawColor(220, 220, 220);
+                pdf.setLineWidth(0.2);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPos, x, yPos + rowHeight);
+                }
+                
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                
+                centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 4);
+                
+                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 4);
+                
+                let paraText = dayData.para ? dayData.para.amount : '--';
+                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 4);
+                
+                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 4);
+                
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89];
+                if (dayData.absent) {
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48];
+                } else if (dayData.didNotGive) {
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0];
+                }
+                
+                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 4);
+                
+                const parentReview = dayData.parentChecked ? '✓' : '✗';
+                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 4);
+                
+                yPos += rowHeight;
+            }
+        }
+
+        // STEP 3: Create complete specialized functions for combined reports
+
+        async function generateYearlySummaryPDFForCombined(studentId, academicYear, pdf) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentData = await window.getStudentData(studentId);
+            const juzData = await getStudentJuzProgress(studentId);
+            
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                if (typeof pdf.roundedRect !== 'undefined') {
+                    pdf.roundedRect(x, y, width, height, radius, radius, style);
+                } else {
+                    pdf.rect(x, y, width, height, style);
+                }
+            }
+            
+            // Helper function to center text in column
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // Define constants at the top
+            const startX = 20;
+            const boxWidth = 50;
+            const boxHeight = 18;
+            const spacing = 3;
+            
+            // PROFESSIONAL HEADER - Fresh start on new page
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 25, 'F');
+            
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 18, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('YEARLY SUMMARY REPORT', 105, 15, { align: 'center' });
+            
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            const displayYear = academicYear || new Date().getFullYear();
+            pdf.text('Academic Year: ' + displayYear, 105, 39, { align: 'center' });
+            
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
+            
+            let yPos = 50;
+            
+            // Hifz Duration Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Hifz Journey Overview', 20, yPos);
+            yPos += 8;
+            
+            if (juzData.hifzStartDate) {
+                // Calculate duration
+                const totalDuration = calculateDuration(juzData.hifzStartDate);
+                const durationText = formatDuration(totalDuration);
+                
+                // Duration box
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(20, yPos, 170, 18, 2, 'F');
+                
+                pdf.setFillColor(16, 163, 127);
+                roundedRect(20, yPos, 170, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(20, yPos, 170, 18, 2, 'S');
+                
+                pdf.setTextColor(16, 163, 127);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Total Hifz Duration: ' + durationText, 25, yPos + 8);
+                
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Started: ' + new Date(juzData.hifzStartDate).toLocaleDateString(), 25, yPos + 13);
+                
+                yPos += 25;
+                
+                // Find current Juz
+                const completedJuz = Object.values(juzData.juzProgress || {}).filter(juz => juz.startDate && juz.finishDate).length;
+                const currentJuzEntries = Object.entries(juzData.juzProgress || {}).filter(([juzNum, juz]) => juz.startDate && !juz.finishDate);
+                const remainingJuz = 30 - completedJuz - currentJuzEntries.length;
+                
+                let currentJuzDisplay = '0';
+                if (currentJuzEntries.length > 0) {
+                    currentJuzDisplay = currentJuzEntries[0][0];
+                    
+                    pdf.setTextColor(59, 130, 246);
+                    pdf.setFontSize(11);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`Currently working on: Juz ${currentJuzDisplay}`, 20, yPos);
+                    yPos += 12;
+                }
+                
+                // Juz Progress Summary
+                const juzBoxes = [
+                    { label: 'COMPLETED', value: completedJuz, color: [52, 199, 89] },
+                    { label: 'CURRENT', value: currentJuzDisplay, color: [59, 130, 246] },
+                    { label: 'REMAINING', value: remainingJuz, color: [142, 142, 147] }
+                ];
+                
+                juzBoxes.forEach(function(box, index) {
+                    const x = startX + (index * (boxWidth + spacing));
+                    
+                    pdf.setFillColor(255, 255, 255);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                    
+                    pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                    roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                    
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                    
+                    pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    const numWidth = pdf.getTextWidth(box.value.toString());
+                    pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 10);
+                    
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(6);
+                    pdf.setFont(undefined, 'normal');
+                    const labelWidth = pdf.getTextWidth(box.label);
+                    pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 15);
+                });
+                
+                yPos += 25;
+            } else {
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('No Hifz start date recorded', 30, yPos + 8);
+                yPos += 20;
+            }
+            
+            // Calculate yearly stats for selected academic year
+            let targetYear;
+            if (academicYear) {
+                const [startYear, endYear] = academicYear.split('-');
+                targetYear = { start: startYear, end: endYear, academicYear: academicYear };
+            } else {
+                const currentYear = new Date().getFullYear();
+                targetYear = { start: currentYear.toString(), end: currentYear.toString(), academicYear: currentYear.toString() };
+            }
+            
+            const yearlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0, totalDays: 0 };
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(([date, dayData]) => {
+                // Filter by academic year if specified
+                if (academicYear && !isDateInAcademicYear(date, academicYear)) {
+                    return;
+                } else if (!academicYear && !date.startsWith(targetYear.start)) {
+                    return;
+                }
+                
+                yearlyStats.totalDays++;
+                if (dayData.absent) {
+                    yearlyStats.absent++;
+                } else if (dayData.didNotGive) {
+                    yearlyStats.didNotGive++;
+                } else {
+                    ['sabak', 'para', 'dhor'].forEach(type => {
+                        if (dayData[type]) yearlyStats[type]++;
+                    });
+                    
+                    // Calculate Sabak totals
+                    if (dayData.sabak && !dayData.absent && !dayData.didNotGive) {
+                        if (dayData.sabak.lines) {
+                            totalLines += dayData.sabak.lines;
+                        }
+                        if (dayData.sabak.pages) {
+                            totalPages += dayData.sabak.pages;
+                        }
+                        if (dayData.sabak.juz) {
+                            totalJuz += dayData.sabak.juz;
+                        }
+                    }
+                }
+            });
+            
+            // Sabak Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 8;
+            
+            const sabakBoxes = [
+                { label: 'SABAK DAYS', value: yearlyStats.sabak, color: [16, 163, 127] },
+                { label: 'TOTAL LINES', value: totalLines, color: [142, 68, 173] },
+                { label: 'TOTAL JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
+            ];
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 10);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 15);
+            });
+            
+            yPos += 25;
+            
+            // Monthly Breakdown Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Breakdown', 20, yPos);
+            yPos += 10;
+            
+            // Generate monthly breakdown table
+            const colStarts = [20, 45, 65, 85, 105, 125];
+            const colWidths = [25, 20, 20, 20, 20, 25];
+            const tableWidth = 130;
+            const rowHeight = 8;
+            
+            // Table headers
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+            
+            pdf.setDrawColor(200, 200, 200);
+            pdf.setLineWidth(0.3);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+            
+            // Vertical lines for columns
+            for (let i = 0; i <= colStarts.length; i++) {
+                const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                pdf.line(x, yPos, x, yPos + rowHeight);
+            }
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(7);
+            pdf.setFont(undefined, 'bold');
+            
+            const headers = ['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Did Not Give'];
+            headers.forEach(function(header, index) {
+                centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 5);
+            });
+            
+            yPos += rowHeight;
+            
+            // Generate monthly data
+            if (academicYear) {
+                const [startYear, endYear] = academicYear.split('-');
+                const months = [
+                    { key: `${startYear}-09`, name: 'Sep' },
+                    { key: `${startYear}-10`, name: 'Oct' },
+                    { key: `${startYear}-11`, name: 'Nov' },
+                    { key: `${startYear}-12`, name: 'Dec' },
+                    { key: `${endYear}-01`, name: 'Jan' },
+                    { key: `${endYear}-02`, name: 'Feb' },
+                    { key: `${endYear}-03`, name: 'Mar' },
+                    { key: `${endYear}-04`, name: 'Apr' },
+                    { key: `${endYear}-05`, name: 'May' },
+                    { key: `${endYear}-06`, name: 'Jun' },
+                    { key: `${endYear}-07`, name: 'Jul' },
+                    { key: `${endYear}-08`, name: 'Aug' }
+                ];
+                
+                months.forEach((month, index) => {
+                    // Calculate monthly stats
+                    const monthStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
+                    
+                    Object.entries(studentData).forEach(([date, dayData]) => {
+                        if (date.startsWith(month.key)) {
+                            if (dayData.absent) {
+                                monthStats.absent++;
+                            } else if (dayData.didNotGive) {
+                                monthStats.didNotGive++;
+                            } else {
+                                ['sabak', 'para', 'dhor'].forEach(type => {
+                                    if (dayData[type]) monthStats[type]++;
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Row background
+                    const rowColor = index % 2 === 0 ? [255, 255, 255] : [248, 249, 250];
+                    pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                    
+                    // Row border
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.2);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                    
+                    // Vertical lines
+                    for (let i = 0; i <= colStarts.length; i++) {
+                        const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                        pdf.line(x, yPos, x, yPos + rowHeight);
+                    }
+                    
+                    // Cell content
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(7);
+                    pdf.setFont(undefined, 'normal');
+                    
+                    centerTextInColumn(month.name, colStarts[0], colWidths[0], yPos + 5);
+                    centerTextInColumn(monthStats.sabak.toString(), colStarts[1], colWidths[1], yPos + 5);
+                    centerTextInColumn(monthStats.para.toString(), colStarts[2], colWidths[2], yPos + 5);
+                    centerTextInColumn(monthStats.dhor.toString(), colStarts[3], colWidths[3], yPos + 5);
+                    centerTextInColumn(monthStats.absent.toString(), colStarts[4], colWidths[4], yPos + 5);
+                    centerTextInColumn(monthStats.didNotGive.toString(), colStarts[5], colWidths[5], yPos + 5);
+                    
+                    yPos += rowHeight;
+                });
+            }
+        }
+
+        async function generateMonthlyDetailedPDFForCombined(studentId, year, month, pdf) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentData = await window.getStudentData(studentId);
+            const homework = await getStudentHomework(studentId);
+            
+            // Helper functions
+            function roundedRect(x, y, width, height, radius, style) {
+                if (typeof pdf.roundedRect !== 'undefined') {
+                    pdf.roundedRect(x, y, width, height, radius, radius, style);
+                } else {
+                    pdf.rect(x, y, width, height, style);
+                }
+            }
+            
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // Fresh header
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 25, 'F');
+            
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 20, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('MONTHLY PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                            'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthYear = `${monthNames[parseInt(month) - 1]} ${year}`;
+            pdf.text(monthYear, 105, 39, { align: 'center' });
+            
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
+            
+            let yPos = 55;
+            
+            // Monthly Progress Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Progress', 20, yPos);
+            yPos += 10;
+            
+            // Calculate monthly stats for SELECTED month
+            const selectedMonth = `${year}-${String(month).padStart(2, '0')}`;
+            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(selectedMonth)) {
+                    if (dayData.absent) {
+                        monthlyStats.absent++;
+                    } else if (dayData.didNotGive) {
+                        monthlyStats.didNotGive++;
+                    } else {
+                        ['sabak', 'para', 'dhor'].forEach(function(type) {
+                            if (dayData[type]) monthlyStats[type]++;
+                        });
+                    }
+                }
+            });
+            
+            // Monthly Progress Boxes
+            const boxWidth = 38;
+            const boxHeight = 22;
+            const spacing = 6;
+            const startX = 20;
+            
+            const progressBoxes = [
+                { label: 'SABAK', value: monthlyStats.sabak, color: [16, 163, 127] },
+                { label: 'SABAK PARA', value: monthlyStats.para, color: [142, 68, 173] },
+                { label: 'DHOR', value: monthlyStats.dhor, color: [255, 149, 0] },
+                { label: 'ABSENT', value: monthlyStats.absent, color: [255, 59, 48] }
+            ];
+            
+            progressBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Homework Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Homework Summary', 20, yPos);
+            yPos += 10;
+            
+            // Filter homework for selected month
+            const selectedMonthHomework = homework.filter(hw => {
+                const assignedDate = new Date(hw.assignedDate);
+                const hwMonth = `${assignedDate.getFullYear()}-${String(assignedDate.getMonth() + 1).padStart(2, '0')}`;
+                return hwMonth === selectedMonth;
+            });
+            
+            // Calculate homework stats for selected month
+            const homeworkStats = {
+                total: selectedMonthHomework.length,
+                completed: selectedMonthHomework.filter(hw => hw.completed).length,
+                pending: selectedMonthHomework.filter(hw => !hw.completed && hw.status !== 'did-not-give').length,
+                didNotDo: selectedMonthHomework.filter(hw => hw.status === 'did-not-give').length
+            };
+            
+            const homeworkBoxes = [
+                { label: 'TOTAL', value: homeworkStats.total, color: [28, 28, 30] },
+                { label: 'COMPLETED', value: homeworkStats.completed, color: [52, 199, 89] },
+                { label: 'PENDING', value: homeworkStats.pending, color: [255, 149, 0] },
+                { label: 'DID NOT DO', value: homeworkStats.didNotDo, color: [255, 59, 48] }
+            ];
+            
+            homeworkBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Sabak Summary Section  
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate total sabak for the SELECTED month
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(selectedMonth) && dayData.sabak && !dayData.absent && !dayData.didNotGive) {
+                    if (dayData.sabak.lines) {
+                        totalLines += dayData.sabak.lines;
+                    }
+                    if (dayData.sabak.pages) {
+                        totalPages += dayData.sabak.pages;
+                    }
+                    if (dayData.sabak.juz) {
+                        totalJuz += dayData.sabak.juz;
+                    }
+                }
+            });
+            
+            const sabakBoxes = [
+                { label: 'LINES', value: totalLines, color: [16, 163, 127] },
+                { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
+            ];
+            
+            // Use wider boxes for Sabak Summary (3 boxes instead of 4)
+            const sabakBoxWidth = 50;
+            const sabakSpacing = 8;
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (sabakBoxWidth + sabakSpacing));
+                
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
+                
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
+                
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
+                
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
+                
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (sabakBoxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 35;
+            
+            // CONDENSED Daily Breakdown Table for combined report
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Daily Breakdown (First 15 Days)', 20, yPos);
+            yPos += 10;
+            
+            // Get days in SELECTED month
+            const selectedYear = parseInt(year);
+            const selectedMonthNum = parseInt(month) - 1; // JavaScript months are 0-based
+            const daysInMonth = new Date(selectedYear, selectedMonthNum + 1, 0).getDate();
+            
+            const rowHeight = 6; // Smaller rows for combined report
+            const colStarts = [20, 35, 65, 90, 115, 150];
+            const colWidths = [15, 30, 25, 25, 35, 35];
+            const tableWidth = 165;
+            
+            // Table headers
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+            
+            pdf.setDrawColor(200, 200, 200);
+            pdf.setLineWidth(0.3);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+            
+            for (let i = 0; i <= colStarts.length; i++) {
+                const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                pdf.line(x, yPos, x, yPos + rowHeight);
+            }
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(6);
+            pdf.setFont(undefined, 'bold');
+            
+            const headers = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+            headers.forEach(function(header, index) {
+                centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 4);
+            });
+            
+            yPos += rowHeight;
+            
+            // Show only first 15 days or total days (whichever is fewer) for combined report
+            const maxDaysToShow = Math.min(15, daysInMonth);
+            
+            for (let day = 1; day <= maxDaysToShow; day++) {
+                const dateKey = `${selectedYear}-${String(selectedMonthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayData = studentData[dateKey] || {};
+                
+                // Determine row background color
+                let rowColor = [255, 255, 255];
+                if (dayData.absent) {
+                    rowColor = [255, 235, 235];
+                } else if (dayData.didNotGive) {
+                    rowColor = [255, 243, 224];
+                }
+                
+                pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                
+                pdf.setDrawColor(220, 220, 220);
+                pdf.setLineWidth(0.2);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPos, x, yPos + rowHeight);
+                }
+                
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                
+                centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 4);
+                
+                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 4);
+                
+                let paraText = dayData.para ? dayData.para.amount : '--';
+                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 4);
+                
+                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 4);
+                
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89];
+                if (dayData.absent) {
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48];
+                } else if (dayData.didNotGive) {
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0];
+                }
+                
+                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 4);
+                
+                const parentReview = dayData.parentChecked ? '✓' : '✗';
+                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 4);
+                
+                yPos += rowHeight;
+            }
+        }
+
+        async function generateOverallProgressPDFForCombined(studentId, pdf) {
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const juzData = await getStudentJuzProgress(studentId);
+            
+            // Helper functions
+            function roundedRect(x, y, width, height, radius, style) {
+                if (typeof pdf.roundedRect !== 'undefined') {
+                    pdf.roundedRect(x, y, width, height, radius, radius, style);
+                } else {
+                    pdf.rect(x, y, width, height, style);
+                }
+            }
+            
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // Fresh header
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 25, 'F');
+            
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 18, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('OVERALL PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            pdf.text('Complete Hifz Journey Overview', 105, 39, { align: 'center' });
+            
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
+            
+            let yPos = 48;
+            
+            if (!juzData.hifzStartDate) {
+                // No data message
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('No Hifz progress data available', 105, yPos + 50, { align: 'center' });
+                
+                pdf.setFontSize(12);
+                pdf.text('Please contact the teacher to set up Hifz tracking', 105, yPos + 70, { align: 'center' });
+            } else {
+                // Hifz Duration Section - COMPACT
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Hifz Journey Overview', 20, yPos);
+                yPos += 6;
+                
+                // Calculate total duration
+                const totalDuration = calculateDuration(juzData.hifzStartDate);
+                const durationText = formatDuration(totalDuration);
+                
+                // Duration card - SMALLER
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(20, yPos, 170, 16, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(16, 163, 127);
+                roundedRect(20, yPos, 170, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(20, yPos, 170, 16, 2, 'S');
+                
+                // Duration text
+                pdf.setTextColor(16, 163, 127);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Total Hifz Duration: ' + durationText, 25, yPos + 8);
+                
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'normal');
+                const startDateStr = new Date(juzData.hifzStartDate).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                pdf.text('Started: ' + startDateStr, 25, yPos + 13);
+                
+                yPos += 22;
+                
+                // Calculate Juz statistics
+                const completedJuz = [];
+                const currentJuz = [];
+                const notStartedJuz = [];
+                
+                for (let juzNumber = 1; juzNumber <= 30; juzNumber++) {
+                    const juzInfo = juzData.juzProgress[juzNumber];
+                    if (juzInfo && juzInfo.startDate && juzInfo.finishDate) {
+                        completedJuz.push({ number: juzNumber, ...juzInfo });
+                    } else if (juzInfo && juzInfo.startDate && !juzInfo.finishDate) {
+                        currentJuz.push({ number: juzNumber, ...juzInfo });
+                    } else {
+                        notStartedJuz.push(juzNumber);
+                    }
+                }
+                
+                // Progress Summary Boxes - COMPACT
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Progress Summary', 20, yPos);
+                yPos += 6;
+                
+                const boxWidth = 50;
+                const boxHeight = 18;
+                const spacing = 8;
+                const startX = 20;
+                
+                // Show actual Juz number instead of count for CURRENT
+                const currentJuzNumber = currentJuz.length > 0 ? currentJuz[0].number : 0;
+                
+                const progressBoxes = [
+                    { label: 'COMPLETED', value: completedJuz.length, color: [52, 199, 89] },
+                    { label: 'CURRENT', value: currentJuzNumber, color: [59, 130, 246] },
+                    { label: 'REMAINING', value: notStartedJuz.length, color: [142, 142, 147] }
+                ];
+                
+                progressBoxes.forEach(function(box, index) {
+                    const x = startX + (index * (boxWidth + spacing));
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                    
+                    // Top colored bar
+                    pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                    roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                    
+                    // Border
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                    
+                    // Number - Centered
+                    pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    const numWidth = pdf.getTextWidth(box.value.toString());
+                    pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 10);
+                    
+                    // Label - Centered
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(6);
+                    pdf.setFont(undefined, 'normal');
+                    const labelWidth = pdf.getTextWidth(box.label);
+                    pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 15);
+                });
+                
+                yPos += 24;
+                
+                // Detailed Progress Table - CONDENSED for combined report
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Detailed Juz Progress', 20, yPos);
+                yPos += 8;
+                
+                // Combine and sort all Juz with data
+                const allJuzWithData = [...completedJuz, ...currentJuz].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                
+                if (allJuzWithData.length === 0) {
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('No Juz progress recorded yet', 20, yPos + 8);
+                    yPos += 16;
+                } else {
+                    // Table setup - EXACTLY SAME AS INDIVIDUAL REPORT
+                    const rowHeight = 8;
+                    const colStarts = [20, 35, 75, 115, 155]; // Same as individual report
+                    const colWidths = [15, 40, 40, 40, 30];   // Same as individual report
+                    const tableWidth = 165;
+                    
+                    // Table headers
+                    pdf.setFillColor(240, 240, 240);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                    
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.3);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                    
+                    // Vertical lines for 5 columns (same as individual)
+                    for (let i = 0; i <= colStarts.length; i++) {
+                        const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                        pdf.line(x, yPos, x, yPos + rowHeight);
+                    }
+                    
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(7); // Same as individual report
+                    pdf.setFont(undefined, 'bold');
+                    
+                    const headers = ['Juz', 'Start Date', 'End Date', 'Duration', 'Status'];
+                    headers.forEach(function(header, index) {
+                        centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 5);
+                    });
+                    
+                    yPos += rowHeight;
+                    
+                    // Add rows for ALL Juz entries (same as individual report - no limit)
+                    for (let i = 0; i < allJuzWithData.length; i++) {
+                        const juz = allJuzWithData[i];
+                        const isCompleted = juz.startDate && juz.finishDate;
+                        
+                        // Row background
+                        let rowColor = isCompleted ? [240, 253, 244] : [239, 246, 255];
+                        pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                        pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                        
+                        // Row border
+                        pdf.setDrawColor(220, 220, 220);
+                        pdf.setLineWidth(0.2);
+                        pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                        
+                        // Vertical lines for 5 columns
+                        for (let j = 0; j <= colStarts.length; j++) {
+                            const x = j === colStarts.length ? (20 + tableWidth) : colStarts[j];
+                            pdf.line(x, yPos, x, yPos + rowHeight);
+                        }
+                        
+                        // Cell content
+                        pdf.setTextColor(28, 28, 30);
+                        pdf.setFontSize(6); // Same as individual report
+                        pdf.setFont(undefined, 'normal');
+                        
+                        // Juz number
+                        centerTextInColumn(juz.number.toString(), colStarts[0], colWidths[0], yPos + 5);
+                        
+                        // UPDATED: Start date with full year (SAME AS INDIVIDUAL)
+                        const startDate = new Date(juz.startDate).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric'  // Full year like individual report
+                        });
+                        centerTextInColumn(startDate, colStarts[1], colWidths[1], yPos + 5);
+                        
+                        // UPDATED: End date with full year (SAME AS INDIVIDUAL)
+                        const endDate = isCompleted ? 
+                            new Date(juz.finishDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'  // Full year like individual report
+                            }) : '--';
+                        centerTextInColumn(endDate, colStarts[2], colWidths[2], yPos + 5);
+                        
+                        // Duration - FULL TEXT FORMAT (SAME AS INDIVIDUAL)
+                        let durationText;
+                        if (isCompleted) {
+                            const duration = calculateDuration(juz.startDate, juz.finishDate);
+                            durationText = formatDuration(duration); // Same as individual report
+                        } else {
+                            const duration = calculateDuration(juz.startDate);
+                            durationText = formatDuration(duration); // Same as individual report
+                        }
+                        centerTextInColumn(durationText, colStarts[3], colWidths[3], yPos + 5);
+                        
+                        // Status
+                        const statusText = isCompleted ? 'Completed' : 'Current';
+                        const statusColor = isCompleted ? [52, 199, 89] : [59, 130, 246];
+                        pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                        pdf.setFont(undefined, 'bold');
+                        centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                        
+                        yPos += rowHeight;
+                    }
+                    
+                    yPos += 6;
+                }
+                
+                // Remaining Juz Section - VERY COMPACT
+                if (notStartedJuz.length > 0) {
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Remaining Juz to Complete', 20, yPos);
+                    yPos += 6;
+                    
+                    // Show remaining Juz in a very compact format
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(8);
+                    pdf.setFont(undefined, 'normal');
+                    
+                    // Break into multiple lines if too many
+                    const chunkSize = 15; // Show 15 juz per line
+                    for (let i = 0; i < notStartedJuz.length; i += chunkSize) {
+                        const chunk = notStartedJuz.slice(i, i + chunkSize);
+                        let remainingText = 'Juz ' + chunk.join(', ');
+                        pdf.text(remainingText, 20, yPos);
+                        yPos += 8;
+                    }
+                    
+                    yPos += 4;
+                    
+                    // Progress percentage
+                    const progressPercentage = Math.round((completedJuz.length / 30) * 100);
+                    pdf.setTextColor(16, 163, 127);
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`Overall Progress: ${progressPercentage}% Complete`, 20, yPos);
+                }
+            }
         }
 
         // Make new PDF functions available globally
