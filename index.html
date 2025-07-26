@@ -907,6 +907,48 @@
             }
         }
 
+        .did-not-give-button {
+            background: #FF9500;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .did-not-give-button {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+
+        .did-not-give-button.active {
+            background: #8E8E93;
+        }
+
+        .did-not-give-button:disabled {
+            background: #D1D5DB;
+            cursor: not-allowed;
+        }
+
+        .today-progress.did-not-give {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Orange indicator for calendar */
+        .day-indicators .indicator.did-not-give {
+            background: #FF9500;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 2px;
+        }
+
         .absent-button { 
             background: #FF3B30; 
             color: white; 
@@ -2622,6 +2664,9 @@
                             <button class="absent-button" onclick="toggleAbsent()" id="absentButton" style="display: none;">
                                 🔴 Absent
                             </button>
+                            <button class="did-not-give-button" onclick="toggleDidNotGive()" id="didNotGiveButton" style="display: none;">
+                                🟠 Did Not Give
+                            </button>
                         </div>
                     </div>
                     
@@ -3319,6 +3364,14 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group" id="academicYearPicker" style="display: none;">
+                        <label class="form-label">Select Academic Year</label>
+                        <select class="form-select" id="academicYearSelect">
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                            <option value="2026-2027">2026-2027</option>
+                        </select>
+                    </div>
                     <button class="save-button pdf-export-button" onclick="generateSelectedPDF()" id="generatePDFBtn">
                         <div class="loading-spinner" id="modalPdfSpinner"></div>
                         <span id="modalPdfBtnText">📄 Generate PDF Report</span>
@@ -3898,9 +3951,13 @@
             loadStudentsAndInitialize();
         }
 
+        // ===== UPDATE: updateUIForUserType Function =====
+        // FIND this function and UPDATE the teacher case:
+
         function updateUIForUserType() {
             const container = document.querySelector('.container');
             const absentButton = document.getElementById('absentButton');
+            const didNotGiveButton = document.getElementById('didNotGiveButton'); // ADD THIS LINE
             const teacherControls = document.getElementById('teacherControls');
             const officeControls = document.getElementById('officeControls');
             const parentControls = document.getElementById('parentControls');
@@ -3911,7 +3968,6 @@
             
             // Update progress rows
             const progressRows = document.querySelectorAll('.progress-row');
-            
             progressRows.forEach(row => {
                 row.classList.remove('read-only');
             });
@@ -3919,6 +3975,7 @@
             switch(currentUserType) {
                 case 'teacher':
                     absentButton.style.display = 'inline-block';
+                    didNotGiveButton.style.display = 'inline-block'; // ADD THIS LINE
                     teacherControls.style.display = 'block';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'none';
@@ -3927,6 +3984,7 @@
                     
                 case 'office':
                     absentButton.style.display = 'none';
+                    didNotGiveButton.style.display = 'none'; // ADD THIS LINE
                     teacherControls.style.display = 'none';
                     officeControls.style.display = 'block';
                     parentControls.style.display = 'none';
@@ -3942,6 +4000,7 @@
                 case 'parent':
                     container.classList.add('parent-mode');
                     absentButton.style.display = 'none';
+                    didNotGiveButton.style.display = 'none'; // ADD THIS LINE
                     teacherControls.style.display = 'none';
                     officeControls.style.display = 'none';
                     parentControls.style.display = 'block';
@@ -6586,6 +6645,36 @@
             }
         }
 
+        // ===== NEW FUNCTION: Toggle Did Not Give =====
+        async function toggleDidNotGive() {
+            if (!currentStudent || currentUserType !== 'teacher') return;
+            
+            const today = getDateKey();
+            const studentData = await window.getStudentData(currentStudent);
+            
+            if (!studentData[today]) {
+                studentData[today] = {};
+            }
+            
+            const isCurrentlyDidNotGive = studentData[today].didNotGive || false;
+            
+            if (isCurrentlyDidNotGive) {
+                delete studentData[today].didNotGive;
+                if (Object.keys(studentData[today]).length === 0) {
+                    delete studentData[today];
+                }
+            } else {
+                // Clear any existing absent status and progress when marking as "did not give"
+                studentData[today] = { didNotGive: true };
+            }
+            
+            await window.saveStudentData(currentStudent, studentData);
+            updateTodaysProgress();
+            updateStats();
+            generateCalendar();
+        }
+
+        // ===== UPDATED FUNCTION: Toggle Absent =====
         async function toggleAbsent() {
             if (!currentStudent || currentUserType !== 'teacher') return;
             
@@ -6604,6 +6693,7 @@
                     delete studentData[today];
                 }
             } else {
+                // Clear any existing "did not give" status and progress when marking as absent
                 studentData[today] = { absent: true };
             }
             
@@ -6611,6 +6701,47 @@
             updateTodaysProgress();
             updateStats();
             generateCalendar();
+        }
+
+        // ===== NEW FUNCTION: Mark Day as Did Not Give =====
+        async function markDayDidNotGive(dateKey) {
+            if (!currentStudent || currentUserType !== 'teacher') return;
+            
+            const studentData = await window.getStudentData(currentStudent);
+            studentData[dateKey] = { didNotGive: true };
+            
+            await window.saveStudentData(currentStudent, studentData);
+            generateCalendar();
+            closeModal('dayModal');
+            
+            setTimeout(() => {
+                const dayNumber = parseInt(dateKey.split('-')[2]);
+                openDayModal(dayNumber);
+            }, 200);
+        }
+
+        // ===== NEW FUNCTION: Remove Did Not Give Status =====
+        async function removeDidNotGive(dateKey) {
+            if (!currentStudent || currentUserType !== 'teacher') return;
+            
+            const studentData = await window.getStudentData(currentStudent);
+            if (studentData[dateKey] && studentData[dateKey].didNotGive) {
+                delete studentData[dateKey].didNotGive;
+                if (Object.keys(studentData[dateKey]).length === 0) {
+                    delete studentData[dateKey];
+                }
+                
+                await window.saveStudentData(currentStudent, studentData);
+                updateTodaysProgress();
+                updateStats();
+                generateCalendar();
+                closeModal('dayModal');
+                
+                setTimeout(() => {
+                    const dayNumber = parseInt(dateKey.split('-')[2]);
+                    openDayModal(dayNumber);
+                }, 200);
+            }
         }
 
         async function toggleParentCheck(dateKey = null) {
@@ -6641,6 +6772,7 @@
             }
         }
 
+        // ===== COMPLETE: generateCalendar Function =====
         function generateCalendar() {
             const grid = document.getElementById('calendarGrid');
             const monthTitle = document.getElementById('monthTitle');
@@ -6732,6 +6864,11 @@
                                 const absentIndicator = document.createElement('div');
                                 absentIndicator.style.cssText = 'width: 8px; height: 8px; background: #FF3B30; border-radius: 50%; margin-top: 2px;';
                                 dayEl.appendChild(absentIndicator);
+                            } else if (dayData.didNotGive) {
+                                // UPDATED: Add orange dot for "did not give" days
+                                const didNotGiveIndicator = document.createElement('div');
+                                didNotGiveIndicator.style.cssText = 'width: 8px; height: 8px; background: #FF9500; border-radius: 50%; margin-top: 2px;';
+                                dayEl.appendChild(didNotGiveIndicator);
                             } else {
                                 const indicators = document.createElement('div');
                                 indicators.className = 'day-indicators';
@@ -6770,6 +6907,287 @@
             }
         }
 
+        // ===== COMPLETE: updateTodaysProgress Function =====
+        async function updateTodaysProgress() {
+            if (!currentStudent) return;
+            
+            const today = new Date();
+            const todayKey = getDateKey(today);
+            const studentData = await window.getStudentData(currentStudent);
+            const todayData = studentData[todayKey] || {};
+            
+            // Check if today is weekend or holiday
+            const isWeekendToday = isWeekend(today);
+            const isHolidayToday = isHolidayDate(today);
+            const holidayInfo = getHolidayInfo(today);
+            
+            // Get UI elements
+            const progressSectionTitle = document.getElementById('progressSectionTitle');
+            const progressContainer = document.getElementById('todayProgressContainer');
+            const absentButton = document.getElementById('absentButton');
+            const didNotGiveButton = document.getElementById('didNotGiveButton');
+            
+            if (isWeekendToday) {
+                // Weekend mode - show mosque closed message
+                progressSectionTitle.textContent = 'Weekend - Mosque Closed';
+                
+                // Hide buttons
+                if (absentButton) {
+                    absentButton.style.display = 'none';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'none';
+                }
+                
+                // Show weekend closed message instead of progress
+                progressContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🕌</div>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">Mosque Closed Today</h3>
+                        <p style="color: #8E8E93; font-size: 16px;">Weekend - No regular classes</p>
+                        <div style="margin-top: 20px; padding: 12px; background: #E8F4FD; border-radius: 8px; font-size: 14px; color: #1E40AF;">
+                            Classes resume on Monday
+                        </div>
+                    </div>
+                `;
+                
+                // Hide parent check section on weekends
+                const parentCheckSection = document.getElementById('parentCheckSection');
+                if (parentCheckSection) {
+                    parentCheckSection.style.display = 'none';
+                }
+                
+                return;
+            } else if (isHolidayToday && holidayInfo) {
+                // Holiday mode - show holiday message
+                progressSectionTitle.textContent = `Holiday - ${holidayInfo.name}`;
+                
+                // Hide buttons
+                if (absentButton) {
+                    absentButton.style.display = 'none';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'none';
+                }
+                
+                // Show holiday message instead of progress
+                progressContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">Maktab Closed Today</h3>
+                        <p style="color: #8E8E93; font-size: 16px;">Holiday - ${holidayInfo.name}</p>
+                        <div style="margin-top: 20px; padding: 12px; background: #FFF3CD; border-radius: 8px; font-size: 14px; color: #856404;">
+                            🗓️ Holiday Period
+                        </div>
+                    </div>
+                `;
+                
+                // Hide parent check section on holidays
+                const parentCheckSection = document.getElementById('parentCheckSection');
+                if (parentCheckSection) {
+                    parentCheckSection.style.display = 'none';
+                }
+                
+                return;
+            } else if (todayData.didNotGive) {
+                // UPDATED: Did Not Give mode - show special message
+                progressSectionTitle.textContent = 'Did Not Give Today';
+                
+                // Hide buttons
+                if (absentButton) {
+                    absentButton.style.display = 'none';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'none';
+                }
+                
+                // Get student name for personalized message
+                const students = await window.getStudents();
+                const student = students.find(s => s.id === currentStudent);
+                const studentName = student ? student.name : 'Student';
+                
+                // Show did not give message instead of progress
+                progressContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px 30px; color: #FF9500;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">😔</div>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">${studentName} did not give anything today</h3>
+                        <p style="color: #8E8E93; font-size: 16px;">Please make sure he learns at home</p>
+                        <div style="margin-top: 20px; padding: 12px; background: #FFF3E0; border-radius: 8px; font-size: 14px; color: #F57C00;">
+                            📚 Home practice is important for progress
+                        </div>
+                    </div>
+                `;
+                
+                // Hide parent check section when did not give
+                const parentCheckSection = document.getElementById('parentCheckSection');
+                if (parentCheckSection) {
+                    parentCheckSection.style.display = 'none';
+                }
+                
+                return;
+            }
+            
+            // Weekday mode - restore normal progress display
+            progressSectionTitle.textContent = 'Today\'s Progress';
+            
+            // UPDATED: Show buttons for teachers
+            if (currentUserType === 'teacher') {
+                if (absentButton) {
+                    absentButton.style.display = 'inline-block';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'inline-block';
+                }
+            }
+            
+            // Restore progress rows structure if it was changed
+            progressContainer.innerHTML = `
+                <div class="progress-row" onclick="openProgressModal('sabak', 'Sabak')" id="sabakRow">
+                    <div class="progress-info">
+                        <div class="progress-icon sabak">📖</div>
+                        <div class="progress-details">
+                            <h4>Sabak</h4>
+                            <p>New Lesson</p>
+                        </div>
+                    </div>
+                    <div class="progress-status" id="sabakStatus">
+                        <span class="amount-badge">--</span>
+                    </div>
+                </div>
+                <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
+                    <div class="progress-info">
+                        <div class="progress-icon para">🔄</div>
+                        <div class="progress-details">
+                            <h4>Sabak Para</h4>
+                            <p>Previous Lessons</p>
+                        </div>
+                    </div>
+                    <div class="progress-status" id="paraStatus">
+                        <span class="amount-badge">--</span>
+                    </div>
+                </div>
+                <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
+                    <div class="progress-info">
+                        <div class="progress-icon dhor">💭</div>
+                        <div class="progress-details">
+                            <h4>Dhor</h4>
+                            <p>Revision</p>
+                        </div>
+                    </div>
+                    <div class="progress-status" id="dhorStatus">
+                        <span class="amount-badge">--</span>
+                    </div>
+                </div>
+            `;
+            
+            // Update UI based on user type for weekdays
+            updateUIForUserType();
+            
+            // Update progress display
+            progressTypes.forEach(type => {
+                const statusEl = document.getElementById(`${type}Status`);
+                const entry = todayData[type];
+                
+                if (entry) {
+                    if (type === 'sabak' && entry.lines) {
+                        const conversionInfo = entry.fraction ? `<div class="conversion-badge">${entry.fraction}</div>` : '';
+                        let parentCheckHtml = '';
+                        
+                        // Show parent check status for teachers and office
+                        if (currentUserType === 'teacher' || currentUserType === 'office') {
+                            if (todayData.parentChecked) {
+                                parentCheckHtml = '<span class="parent-check-indicator">✓</span>';
+                            } else {
+                                parentCheckHtml = '<span class="parent-pending-indicator">✗</span>';
+                            }
+                        }
+                        
+                        statusEl.innerHTML = `
+                            <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                                <div style="display: flex; gap: 4px; align-items: center;">
+                                    <span class="amount-badge">${entry.lines} lines</span>
+                                    <span class="grade-badge ${entry.grade}"></span>
+                                    ${parentCheckHtml}
+                                </div>
+                                ${conversionInfo}
+                            </div>
+                        `;
+                    } else {
+                        let parentCheckHtml = '';
+                        
+                        // Show parent check status for teachers and office
+                        if (currentUserType === 'teacher' || currentUserType === 'office') {
+                            if (todayData.parentChecked) {
+                                parentCheckHtml = '<span class="parent-check-indicator">✓</span>';
+                            } else {
+                                parentCheckHtml = '<span class="parent-pending-indicator">✗</span>';
+                            }
+                        }
+                        
+                        statusEl.innerHTML = `
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <span class="amount-badge">${entry.amount || entry.lines + ' lines'}</span>
+                                <span class="grade-badge ${entry.grade}"></span>
+                                ${parentCheckHtml}
+                            </div>
+                        `;
+                    }
+                } else {
+                    statusEl.innerHTML = '<span class="amount-badge">--</span>';
+                }
+            });
+
+            // UPDATED: Update absent and did not give buttons for teachers
+            if (currentUserType === 'teacher' && absentButton && didNotGiveButton) {
+                const progressContainer = document.getElementById('todayProgressContainer');
+                const isAbsent = todayData.absent || false;
+                const isDidNotGive = todayData.didNotGive || false;
+                
+                if (isAbsent) {
+                    absentButton.textContent = '✓ Present';
+                    absentButton.classList.add('active');
+                    didNotGiveButton.textContent = '🟠 Did Not Give';
+                    didNotGiveButton.classList.remove('active');
+                    progressContainer.classList.add('absent');
+                    progressContainer.classList.remove('did-not-give');
+                } else if (isDidNotGive) {
+                    didNotGiveButton.textContent = '✓ Gave Today';
+                    didNotGiveButton.classList.add('active');
+                    absentButton.textContent = '🔴 Absent';
+                    absentButton.classList.remove('active');
+                    progressContainer.classList.add('did-not-give');
+                    progressContainer.classList.remove('absent');
+                } else {
+                    absentButton.textContent = '🔴 Absent';
+                    absentButton.classList.remove('active');
+                    didNotGiveButton.textContent = '🟠 Did Not Give';
+                    didNotGiveButton.classList.remove('active');
+                    progressContainer.classList.remove('absent', 'did-not-give');
+                }
+            }
+
+            // Update parent check section and button for parents (only on weekdays)
+            if (currentUserType === 'parent') {
+                const parentCheckSection = document.getElementById('parentCheckSection');
+                const parentCheckButton = document.getElementById('parentCheckButton');
+                
+                if (parentCheckSection) {
+                    parentCheckSection.style.display = 'block';
+                }
+                
+                if (parentCheckButton) {
+                    if (todayData.parentChecked) {
+                        parentCheckButton.textContent = '✓ Checked';
+                        parentCheckButton.classList.add('checked');
+                    } else {
+                        parentCheckButton.textContent = '✓ Mark as Checked';
+                        parentCheckButton.classList.remove('checked');
+                    }
+                }
+            }
+        }
+
+        // ===== COMPLETE: openDayModal Function =====
         async function openDayModal(day) {
             if (!currentStudent) return;
             
@@ -6835,20 +7253,55 @@
                     
                     absentHtml += '</div>';
                     progressList.innerHTML = absentHtml;
-                } else {
-                    // Add absent button for teachers only on non-absent days
+                } else if (dayData.didNotGive) {
+                    // UPDATED: Did Not Give view
+                    // Get student name for personalized message
+                    const students = await window.getStudents();
+                    const student = students.find(s => s.id === currentStudent);
+                    const studentName = student ? student.name : 'Student';
+                    
+                    let didNotGiveHtml = `
+                        <div style="text-align: center; padding: 50px 30px; color: #FF9500;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">😔</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">${studentName} did not give anything today</h3>
+                            <p style="color: #8E8E93; font-size: 16px; margin-bottom: 20px;">Please make sure he learns at home</p>
+                    `;
+                    
                     if (currentUserType === 'teacher') {
-                        const absentButtonDiv = document.createElement('div');
-                        absentButtonDiv.style.marginBottom = '20px';
-                        absentButtonDiv.innerHTML = `
-                            <button onclick="markDayAbsent('${dateKey}')" style="
-                                background: #FF3B30; color: white; border: none; 
+                        didNotGiveHtml += `
+                            <button onclick="removeDidNotGive('${dateKey}')" style="
+                                background: #10A37F; color: white; border: none; 
                                 padding: 14px 24px; border-radius: 10px; 
                                 font-size: 16px; font-weight: 600; 
-                                cursor: pointer; width: 100%;
-                            ">🔴 Mark as Absent</button>
+                                cursor: pointer; margin-top: 20px;
+                            ">Mark as Gave Today</button>
                         `;
-                        progressList.appendChild(absentButtonDiv);
+                    }
+                    
+                    didNotGiveHtml += '</div>';
+                    progressList.innerHTML = didNotGiveHtml;
+                } else {
+                    // UPDATED: Add absent and did not give buttons for teachers only on non-absent/non-did-not-give days
+                    if (currentUserType === 'teacher') {
+                        const buttonDiv = document.createElement('div');
+                        buttonDiv.style.marginBottom = '20px';
+                        buttonDiv.innerHTML = `
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="markDayAbsent('${dateKey}')" style="
+                                    background: #FF3B30; color: white; border: none; 
+                                    padding: 14px 24px; border-radius: 10px; 
+                                    font-size: 16px; font-weight: 600; 
+                                    cursor: pointer; flex: 1;
+                                ">🔴 Mark as Absent</button>
+                                <button onclick="markDayDidNotGive('${dateKey}')" style="
+                                    background: #FF9500; color: white; border: none; 
+                                    padding: 14px 24px; border-radius: 10px; 
+                                    font-size: 16px; font-weight: 600; 
+                                    cursor: pointer; flex: 1;
+                                ">🟠 Did Not Give</button>
+                            </div>
+                        `;
+                        progressList.appendChild(buttonDiv);
                     }
                     
                     const progressContainer = document.createElement('div');
@@ -7709,7 +8162,6 @@
             return holiday || null;
         }
 
-        // UPDATED - PDF Export Functions with better styling
         function exportStudentPDF() {
             document.getElementById('exportPDFModal').style.display = 'block';
             
@@ -7734,16 +8186,25 @@
             // Add event listener for report type change
             const reportTypeSelect = document.getElementById('pdfReportType');
             const monthYearPicker = document.getElementById('monthYearPicker');
+            const academicYearPicker = document.getElementById('academicYearPicker');
             
             reportTypeSelect.addEventListener('change', function() {
+                // Hide all pickers first
+                monthYearPicker.style.display = 'none';
+                academicYearPicker.style.display = 'none';
+                
                 if (this.value === 'monthly-detailed') {
                     monthYearPicker.style.display = 'block';
                     // Set default to current month/year
                     const now = new Date();
                     document.getElementById('monthSelect').value = String(now.getMonth() + 1).padStart(2, '0');
                     document.getElementById('yearSelect').value = now.getFullYear();
-                } else {
-                    monthYearPicker.style.display = 'none';
+                } else if (this.value === 'yearly-summary') {
+                    academicYearPicker.style.display = 'block';
+                    // Set default to current academic year
+                    getCurrentAcademicYear().then(currentAcademicYear => {
+                        document.getElementById('academicYearSelect').value = currentAcademicYear || '2024-2025';
+                    });
                 }
             });
         }
@@ -7768,6 +8229,16 @@
                 }
             }
             
+            // Check for yearly summary specific requirements
+            if (reportType === 'yearly-summary') {
+                const selectedAcademicYear = document.getElementById('academicYearSelect').value;
+                
+                if (!selectedAcademicYear) {
+                    alert('Please select academic year for yearly summary report');
+                    return;
+                }
+            }
+            
             // Show loading
             const btn = document.getElementById('generatePDFBtn');
             const spinner = document.getElementById('modalPdfSpinner');
@@ -7782,11 +8253,12 @@
                     await generateAllStudentsPDF(reportType);
                 } else {
                     if (reportType === 'yearly-summary') {
-                        await generateYearlySummaryPDF(studentId);
+                        const selectedAcademicYear = document.getElementById('academicYearSelect').value;
+                        await generateYearlySummaryPDF(studentId, selectedAcademicYear);
                     } else if (reportType === 'monthly-detailed') {
-                    const selectedMonth = document.getElementById('monthSelect').value;
-                    const selectedYear = document.getElementById('yearSelect').value;
-                    await generateMonthlyDetailedPDF(studentId, selectedYear, selectedMonth);
+                        const selectedMonth = document.getElementById('monthSelect').value;
+                        const selectedYear = document.getElementById('yearSelect').value;
+                        await generateMonthlyDetailedPDF(studentId, selectedYear, selectedMonth);
                     } else if (reportType === 'overall-progress') {
                         await generateOverallProgressPDF(studentId);
                     } else {
@@ -7808,7 +8280,152 @@
             }
         }
 
-        // UPDATED - PDF Generation with app theme colors and styling
+        async function generateAllStudentsPDF(reportType) {
+            const students = await window.getStudents();
+            if (students.length === 0) {
+                alert('No students found');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            
+            // Helper function for rounded rectangles
+            function roundedRect(x, y, width, height, radius, style) {
+                if (typeof pdf.roundedRect !== 'undefined') {
+                    pdf.roundedRect(x, y, width, height, radius, radius, style);
+                } else {
+                    pdf.rect(x, y, width, height, style);
+                }
+            }
+            
+            // Get report type display name
+            const reportTypeNames = {
+                'current-month': 'Current Month Progress',
+                'yearly-summary': 'Yearly Summary',
+                'monthly-detailed': 'Monthly Detailed',
+                'overall-progress': 'Overall Progress'
+            };
+            const reportTypeName = reportTypeNames[reportType] || 'Progress Report';
+            
+            // Cover Page
+            pdf.setFillColor(16, 163, 127);
+            roundedRect(10, 10, 190, 50, 6, 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(24);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('📖 All Students Report', 20, 30);
+            
+            pdf.setFontSize(16);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(reportTypeName, 20, 45);
+            
+            pdf.setFontSize(12);
+            pdf.text(`Generated on ${new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+            })}`, 20, 55);
+            
+            // Student List Section
+            let yPos = 80;
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(`Total Students: ${students.length}`, 20, yPos);
+            yPos += 20;
+            
+            // Create a nice student list with boxes
+            const studentsPerColumn = 15;
+            const columnsNeeded = Math.ceil(students.length / studentsPerColumn);
+            
+            for (let col = 0; col < columnsNeeded; col++) {
+                const startIndex = col * studentsPerColumn;
+                const endIndex = Math.min(startIndex + studentsPerColumn, students.length);
+                const columnStudents = students.slice(startIndex, endIndex);
+                
+                const xPos = 20 + (col * 90); // 90 units per column
+                let columnYPos = yPos;
+                
+                columnStudents.forEach((student, index) => {
+                    // Student box
+                    pdf.setFillColor(248, 249, 250);
+                    roundedRect(xPos, columnYPos - 5, 85, 12, 2, 'F');
+                    
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(xPos, columnYPos - 5, 85, 12, 2, 'S');
+                    
+                    // Student number and name
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text(`${startIndex + index + 1}. ${student.name}`, xPos + 3, columnYPos + 2);
+                    
+                    columnYPos += 15;
+                });
+            }
+            
+            // Add note about report contents
+            yPos = 220;
+            pdf.setFillColor(232, 244, 253);
+            roundedRect(20, yPos, 170, 30, 4, 'F');
+            
+            pdf.setTextColor(30, 64, 175);
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('📋 Report Contents', 25, yPos + 10);
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
+            pdf.text(`• Individual ${reportTypeName} for each student`, 25, yPos + 18);
+            pdf.text('• Each student report starts on a new page', 25, yPos + 24);
+            
+            // Generate individual reports for each student
+            for (let i = 0; i < students.length; i++) {
+                const student = students[i];
+                
+                // Add new page for each student
+                pdf.addPage();
+                
+                try {
+                    // Generate the appropriate report type for this student
+                    if (reportType === 'yearly-summary') {
+                        const selectedAcademicYear = document.getElementById('academicYearSelect')?.value || '2024-2025';
+                        await generateYearlySummaryPDF(student.id, selectedAcademicYear, pdf, true);
+                    } else if (reportType === 'monthly-detailed') {
+                        const selectedMonth = document.getElementById('monthSelect')?.value || String(new Date().getMonth() + 1).padStart(2, '0');
+                        const selectedYear = document.getElementById('yearSelect')?.value || new Date().getFullYear().toString();
+                        await generateMonthlyDetailedPDF(student.id, selectedYear, selectedMonth, pdf, true);
+                    } else if (reportType === 'overall-progress') {
+                        await generateOverallProgressPDF(student.id, pdf, true);
+                    } else {
+                        // Default to current month progress
+                        await generateSingleStudentPDF(student.id, reportType, pdf, true);
+                    }
+                } catch (error) {
+                    console.error(`Error generating report for ${student.name}:`, error);
+                    
+                    // Add error page for this student
+                    pdf.setTextColor(255, 59, 48);
+                    pdf.setFontSize(16);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`Error generating report for ${student.name}`, 20, 50);
+                    
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('Please try generating this student\'s report individually.', 20, 70);
+                }
+            }
+            
+            // Save the combined PDF
+            const fileName = `All_Students_${reportTypeName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+            pdf.save(fileName);
+        }
+
+        // Updated individual PDF generation functions to support skipSave parameter
         async function generateSingleStudentPDF(studentId, reportType, providedPDF = null, skipSave = false) {
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
@@ -7823,30 +8440,86 @@
             
             // Helper function for rounded rectangles
             function roundedRect(x, y, width, height, radius, style) {
-                pdf.roundedRect(x, y, width, height, radius, radius, style);
-            }
-            
-            // Fallback if roundedRect doesn't exist
-            if (typeof pdf.roundedRect === 'undefined') {
-                roundedRect = function(x, y, width, height, radius, style) {
+                if (typeof pdf.roundedRect !== 'undefined') {
+                    pdf.roundedRect(x, y, width, height, radius, radius, style);
+                } else {
                     pdf.rect(x, y, width, height, style);
-                };
+                }
             }
             
-            // Header Section
-            pdf.setFillColor(16, 163, 127);
-            roundedRect(10, 10, 190, 30, 4, 'F');
+            // Helper function to center text in column
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
             
+            // Helper function to add table headers (for new pages)
+            function addTableHeaders(yPosition) {
+                const colStarts = [20, 35, 65, 90, 115, 150];
+                const colWidths = [15, 30, 25, 25, 35, 35];
+                const tableWidth = 165;
+                const rowHeight = 8;
+                
+                // Table headers background
+                pdf.setFillColor(240, 240, 240);
+                pdf.rect(20, yPosition, tableWidth, rowHeight, 'F');
+                
+                // Headers border
+                pdf.setDrawColor(200, 200, 200);
+                pdf.setLineWidth(0.3);
+                pdf.rect(20, yPosition, tableWidth, rowHeight, 'S');
+                
+                // Vertical lines for columns
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPosition, x, yPosition + rowHeight);
+                }
+                
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'bold');
+                
+                const headers = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+                headers.forEach(function(header, index) {
+                    centerTextInColumn(header, colStarts[index], colWidths[index], yPosition + 5);
+                });
+                
+                return yPosition + rowHeight;
+            }
+            
+            // IMPROVED HEADER - Professional design
+            // Main header background (smaller green section)
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 25, 'F');
+            
+            // White section below
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 20, 'F');
+            
+            // Title in green section
             pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(20);
+            pdf.setFontSize(18);
             pdf.setFont(undefined, 'bold');
-            pdf.text('Monthly Progress Report', 20, 25);
+            pdf.text('MONTHLY PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            // Student name and date in white section
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
             
             pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
-            pdf.text(student.name + ' • ' + new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), 20, 32);
+            const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            pdf.text(monthYear, 105, 39, { align: 'center' });
             
-            let yPos = 50;
+            // Decorative line
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
+            
+            let yPos = 55;
             
             // Monthly Progress Section
             pdf.setTextColor(28, 28, 30);
@@ -7855,14 +8528,16 @@
             pdf.text('Monthly Progress', 20, yPos);
             yPos += 10;
             
-            // Calculate monthly stats
+            // Calculate monthly stats with "did not give" tracking
             const currentMonth = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
-            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0 };
+            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
             
             Object.entries(studentData).forEach(function([date, dayData]) {
                 if (date.startsWith(currentMonth)) {
                     if (dayData.absent) {
                         monthlyStats.absent++;
+                    } else if (dayData.didNotGive) {
+                        monthlyStats.didNotGive++;
                     } else {
                         ['sabak', 'para', 'dhor'].forEach(function(type) {
                             if (dayData[type]) monthlyStats[type]++;
@@ -7871,7 +8546,7 @@
                 }
             });
             
-            // Monthly Progress Boxes - Smaller and more compact
+            // Monthly Progress Boxes
             const boxWidth = 38;
             const boxHeight = 22;
             const spacing = 6;
@@ -7916,6 +8591,241 @@
             });
             
             yPos += 32;
+            
+            // Homework Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Homework Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate homework stats
+            const homeworkStats = {
+                total: homework.length,
+                completed: homework.filter(hw => hw.completed).length,
+                pending: homework.filter(hw => !hw.completed && hw.status !== 'did-not-give').length,
+                didNotDo: homework.filter(hw => hw.status === 'did-not-give').length
+            };
+            
+            const homeworkBoxes = [
+                { label: 'TOTAL', value: homeworkStats.total, color: [28, 28, 30] },
+                { label: 'COMPLETED', value: homeworkStats.completed, color: [52, 199, 89] },
+                { label: 'PENDING', value: homeworkStats.pending, color: [255, 149, 0] },
+                { label: 'DID NOT DO', value: homeworkStats.didNotDo, color: [255, 59, 48] }
+            ];
+            
+            homeworkBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Sabak Summary Section  
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate total sabak for the month
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(currentMonth) && dayData.sabak && !dayData.absent && !dayData.didNotGive) {
+                    if (dayData.sabak.lines) {
+                        totalLines += dayData.sabak.lines;
+                    }
+                    if (dayData.sabak.pages) {
+                        totalPages += dayData.sabak.pages;
+                    }
+                    if (dayData.sabak.juz) {
+                        totalJuz += dayData.sabak.juz;
+                    }
+                }
+            });
+            
+            const sabakBoxes = [
+                { label: 'LINES', value: totalLines, color: [16, 163, 127] },
+                { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'JUZ', value: Math.round(totalJuz * 100) / 100, color: [255, 149, 0] }
+            ];
+            
+            // Use wider boxes for Sabak Summary (3 boxes instead of 4)
+            const sabakBoxWidth = 50;
+            const sabakSpacing = 8;
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (sabakBoxWidth + sabakSpacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (sabakBoxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 35;
+            
+            // Daily Breakdown Table
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Daily Breakdown', 20, yPos);
+            yPos += 15;
+            
+            // Consistent table setup throughout
+            const rowHeight = 8;
+            const pageBottomMargin = 280;
+            const colStarts = [20, 35, 65, 90, 115, 150];
+            const colWidths = [15, 30, 25, 25, 35, 35];
+            const tableWidth = 165;
+            
+            // Add table headers
+            yPos = addTableHeaders(yPos);
+            
+            // Get days in current month
+            const year = new Date().getFullYear();
+            const month = new Date().getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Generate table rows for each day
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Check if we need a new page BEFORE adding the row
+                if (yPos + rowHeight > pageBottomMargin) {
+                    if (!skipSave || providedPDF) {
+                        pdf.addPage();
+                        yPos = 20;
+                        
+                        // Add headers on new page
+                        yPos = addTableHeaders(yPos);
+                    } else {
+                        break; // Don't add more pages in single reports
+                    }
+                }
+                
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayData = studentData[dateKey] || {};
+                
+                // Determine row background color
+                let rowColor = [255, 255, 255]; // White (Present)
+                if (dayData.absent) {
+                    rowColor = [255, 235, 235]; // Light Red (Absent)
+                } else if (dayData.didNotGive) {
+                    rowColor = [255, 243, 224]; // Light Orange (Did Not Give)
+                }
+                
+                // Row background - use EXACT tableWidth
+                pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                
+                // Row border - use EXACT tableWidth  
+                pdf.setDrawColor(220, 220, 220);
+                pdf.setLineWidth(0.2);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                
+                // Vertical lines - use EXACT column positions
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPos, x, yPos + rowHeight);
+                }
+                
+                // Cell content - ALL CENTERED
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(7);
+                pdf.setFont(undefined, 'normal');
+                
+                // Date - Centered
+                centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 5);
+                
+                // Sabak - Centered (truncate if too long)
+                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+                
+                // Sabak Para - Centered (truncate if too long)
+                let paraText = dayData.para ? dayData.para.amount : '--';
+                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
+                
+                // Dhor - Centered (truncate if too long)
+                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
+                
+                // Status - Centered
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89]; // Green
+                if (dayData.absent) {
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48]; // Red
+                } else if (dayData.didNotGive) {
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0]; // Orange
+                }
+                
+                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                
+                // Parent Review - Centered
+                const parentReview = dayData.parentChecked ? '✓' : '✗';
+                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+                
+                yPos += rowHeight;
+            }
             
             // Save PDF only if not part of combined report
             if (!skipSave) {
@@ -8088,8 +8998,7 @@ window.selectProfile = selectProfile;
         window.showResetModal = showResetModal;
         window.logout = logout;
 
-        // Additional PDF generation functions for complex reports
-        async function generateYearlySummaryPDF(studentId) {
+        async function generateYearlySummaryPDF(studentId, academicYear = null, providedPDF = null, skipSave = false) {
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -8098,7 +9007,7 @@ window.selectProfile = selectProfile;
             const juzData = await getStudentJuzProgress(studentId);
             
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
+            const pdf = providedPDF || new jsPDF();
             
             // Helper function for rounded rectangles
             function roundedRect(x, y, width, height, radius, style) {
@@ -8109,142 +9018,373 @@ window.selectProfile = selectProfile;
                 }
             }
             
-            // Header Section
+            // Helper function to center text in column
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // Define constants at the top - SMALLER for better fit
+            const startX = 20;
+            const boxWidth = 50;
+            const boxHeight = 18;
+            const spacing = 3;
+            
+            // IMPROVED HEADER - Professional design matching monthly report
+            // Main header background (smaller green section)
             pdf.setFillColor(16, 163, 127);
-            roundedRect(10, 10, 190, 35, 4, 'F');
+            pdf.rect(0, 0, 210, 25, 'F');
             
+            // White section below
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 18, 'F'); // REDUCED height
+            
+            // Title in green section
             pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(22);
+            pdf.setFontSize(18);
             pdf.setFont(undefined, 'bold');
-            pdf.text('📖 Yearly Summary Report', 20, 25);
+            pdf.text('YEARLY SUMMARY REPORT', 105, 15, { align: 'center' });
             
-            pdf.setFontSize(12);
+            // Student name and academic year in white section
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
-            pdf.text(student.name + ' • ' + new Date().getFullYear(), 20, 35);
+            const displayYear = academicYear || new Date().getFullYear();
+            pdf.text('Academic Year: ' + displayYear, 105, 39, { align: 'center' });
             
-            let yPos = 55;
+            // Decorative line
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
             
-            // Overall Stats Section
+            let yPos = 50; // REDUCED starting position
+            
+            // Hifz Duration Section
             pdf.setTextColor(28, 28, 30);
-            pdf.setFontSize(16);
+            pdf.setFontSize(12); // REDUCED font size
             pdf.setFont(undefined, 'bold');
-            pdf.text('Overall Statistics', 20, yPos);
-            yPos += 15;
+            pdf.text('Hifz Journey Overview', 20, yPos);
+            yPos += 8; // REDUCED spacing
             
-            // Calculate yearly stats
-            const currentYear = new Date().getFullYear().toString();
-            const yearlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, totalDays: 0 };
-            
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                if (date.startsWith(currentYear)) {
-                    yearlyStats.totalDays++;
-                    if (dayData.absent) {
-                        yearlyStats.absent++;
-                    } else {
-                        ['sabak', 'para', 'dhor'].forEach(type => {
-                            if (dayData[type]) yearlyStats[type]++;
-                        });
-                    }
-                }
-            });
-            
-            // Stats boxes
-            const boxWidth = 45;
-            const boxHeight = 25;
-            const spacing = 5;
-            
-            const statsBoxes = [
-                { label: 'SABAK DAYS', value: yearlyStats.sabak, color: [16, 163, 127] },
-                { label: 'PARA DAYS', value: yearlyStats.para, color: [142, 68, 173] },
-                { label: 'DHOR DAYS', value: yearlyStats.dhor, color: [255, 149, 0] },
-                { label: 'ABSENT DAYS', value: yearlyStats.absent, color: [255, 59, 48] }
-            ];
-            
-            statsBoxes.forEach((box, index) => {
-                const x = 20 + (index * (boxWidth + spacing));
+            if (juzData.hifzStartDate) {
+                // Calculate duration
+                const totalDuration = calculateDuration(juzData.hifzStartDate);
+                const durationText = formatDuration(totalDuration);
                 
-                // Box background
+                // Duration box - SMALLER
                 pdf.setFillColor(255, 255, 255);
-                roundedRect(x, yPos, boxWidth, boxHeight, 3, 'F');
+                roundedRect(20, yPos, 170, 18, 2, 'F'); // REDUCED height
                 
                 // Top colored bar
-                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
-                roundedRect(x, yPos, boxWidth, 3, 3, 'F');
+                pdf.setFillColor(16, 163, 127);
+                roundedRect(20, yPos, 170, 2, 2, 'F');
                 
                 // Border
                 pdf.setDrawColor(229, 229, 234);
                 pdf.setLineWidth(0.3);
-                roundedRect(x, yPos, boxWidth, boxHeight, 3, 'S');
+                roundedRect(20, yPos, 170, 18, 2, 'S');
                 
-                // Number
-                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
-                pdf.setFontSize(16);
-                pdf.setFont(undefined, 'bold');
-                const numWidth = pdf.getTextWidth(box.value.toString());
-                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 14);
-                
-                // Label
-                pdf.setTextColor(142, 142, 147);
-                pdf.setFontSize(7);
-                pdf.setFont(undefined, 'normal');
-                const labelWidth = pdf.getTextWidth(box.label);
-                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 21);
-            });
-            
-            yPos += 35;
-            
-            // Hifz Progress Section
-            if (juzData.hifzStartDate) {
-                pdf.setTextColor(28, 28, 30);
-                pdf.setFontSize(16);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('Hifz Journey Progress', 20, yPos);
-                yPos += 10;
-                
-                // Duration card
-                const totalDuration = calculateDuration(juzData.hifzStartDate);
-                const durationText = formatDuration(totalDuration);
-                
-                pdf.setFillColor(16, 163, 127);
-                roundedRect(20, yPos, 170, 20, 3, 'F');
-                
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(14);
+                // Duration text
+                pdf.setTextColor(16, 163, 127);
+                pdf.setFontSize(14); // REDUCED font size
                 pdf.setFont(undefined, 'bold');
                 pdf.text('Total Hifz Duration: ' + durationText, 30, yPos + 10);
                 
+                pdf.setFontSize(9); // REDUCED font size
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Started: ' + new Date(juzData.hifzStartDate).toLocaleDateString(), 30, yPos + 15);
+                
+                yPos += 25; // REDUCED spacing
+                
+                // Find current Juz
+                const completedJuz = Object.values(juzData.juzProgress || {}).filter(juz => juz.startDate && juz.finishDate).length;
+                const currentJuzEntries = Object.entries(juzData.juzProgress || {}).filter(([juzNum, juz]) => juz.startDate && !juz.finishDate);
+                const remainingJuz = 30 - completedJuz - currentJuzEntries.length;
+                
+                // FIXED: Show actual Juz number in box instead of count
+                let currentJuzDisplay = '0';
+                if (currentJuzEntries.length > 0) {
+                    currentJuzDisplay = currentJuzEntries[0][0]; // Get the actual Juz number
+                    
+                    // Show which Juz currently on
+                    pdf.setTextColor(59, 130, 246);
+                    pdf.setFontSize(11);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`Currently working on: Juz ${currentJuzDisplay}`, 20, yPos);
+                    yPos += 12;
+                }
+                
+                // Juz Progress Summary - SMALLER boxes
+                const juzBoxes = [
+                    { label: 'COMPLETED', value: completedJuz, color: [52, 199, 89] },
+                    { label: 'CURRENT', value: currentJuzDisplay, color: [59, 130, 246] }, // FIXED: Show actual Juz number
+                    { label: 'REMAINING', value: remainingJuz, color: [142, 142, 147] }
+                ];
+                
+                juzBoxes.forEach(function(box, index) {
+                    const x = startX + (index * (boxWidth + spacing));
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                    
+                    // Top colored bar
+                    pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                    roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                    
+                    // Border
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                    
+                    // Number - Centered
+                    pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                    pdf.setFontSize(12); // REDUCED font size
+                    pdf.setFont(undefined, 'bold');
+                    const numWidth = pdf.getTextWidth(box.value.toString());
+                    pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 10);
+                    
+                    // Label - Centered
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(6);
+                    pdf.setFont(undefined, 'normal');
+                    const labelWidth = pdf.getTextWidth(box.label);
+                    pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 15);
+                });
+                
+                yPos += 25; // REDUCED spacing
+            } else {
+                pdf.setTextColor(142, 142, 147);
                 pdf.setFontSize(10);
                 pdf.setFont(undefined, 'normal');
-                pdf.text('Started: ' + new Date(juzData.hifzStartDate).toLocaleDateString(), 30, yPos + 16);
-                
-                yPos += 30;
-                
-                // Juz completion summary
-                const completedJuz = Object.values(juzData.juzProgress || {}).filter(juz => juz.startDate && juz.finishDate).length;
-                const currentJuz = Object.values(juzData.juzProgress || {}).filter(juz => juz.startDate && !juz.finishDate).length;
-                
-                pdf.setTextColor(28, 28, 30);
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'normal');
-                pdf.text(`Completed Juz: ${completedJuz}/30 (${Math.round(completedJuz/30*100)}%)`, 20, yPos);
-                yPos += 8;
-                pdf.text(`Currently Working On: ${currentJuz} Juz`, 20, yPos);
-                yPos += 8;
-                pdf.text(`Remaining: ${30 - completedJuz - currentJuz} Juz`, 20, yPos);
+                pdf.text('No Hifz start date recorded', 30, yPos + 8);
+                yPos += 20;
             }
             
-            pdf.save(student.name + '_yearly_summary.pdf');
+            // Calculate yearly stats for selected academic year
+            let targetYear;
+            if (academicYear) {
+                const [startYear, endYear] = academicYear.split('-');
+                targetYear = { start: startYear, end: endYear, academicYear: academicYear };
+            } else {
+                const currentYear = new Date().getFullYear();
+                targetYear = { start: currentYear.toString(), end: currentYear.toString(), academicYear: currentYear.toString() };
+            }
+            
+            const yearlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0, totalDays: 0 };
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(([date, dayData]) => {
+                // Filter by academic year if specified
+                if (academicYear && !isDateInAcademicYear(date, academicYear)) {
+                    return;
+                } else if (!academicYear && !date.startsWith(targetYear.start)) {
+                    return;
+                }
+                
+                yearlyStats.totalDays++;
+                if (dayData.absent) {
+                    yearlyStats.absent++;
+                } else if (dayData.didNotGive) {
+                    yearlyStats.didNotGive++;
+                } else {
+                    ['sabak', 'para', 'dhor'].forEach(type => {
+                        if (dayData[type]) yearlyStats[type]++;
+                    });
+                    
+                    // Calculate Sabak totals
+                    if (dayData.sabak && !dayData.absent && !dayData.didNotGive) {
+                        if (dayData.sabak.lines) {
+                            totalLines += dayData.sabak.lines;
+                        }
+                        if (dayData.sabak.pages) {
+                            totalPages += dayData.sabak.pages;
+                        }
+                        if (dayData.sabak.juz) {
+                            totalJuz += dayData.sabak.juz;
+                        }
+                    }
+                }
+            });
+            
+            // Sabak Summary Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12); // REDUCED font size
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 8; // REDUCED spacing
+            
+            const sabakBoxes = [
+                { label: 'SABAK DAYS', value: yearlyStats.sabak, color: [16, 163, 127] },
+                { label: 'TOTAL LINES', value: totalLines, color: [142, 68, 173] },
+                { label: 'TOTAL JUZ', value: Math.round(totalJuz * 100) / 100, color: [255, 149, 0] }
+            ];
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(12); // REDUCED font size
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 10);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 15);
+            });
+            
+            yPos += 25; // REDUCED spacing
+            
+            // Monthly Breakdown Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(12); // REDUCED font size
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Breakdown', 20, yPos);
+            yPos += 10; // REDUCED spacing
+            
+            // FIXED: Generate monthly breakdown table - removed extra column
+            const colStarts = [20, 45, 65, 85, 105, 125];  // FIXED: Removed extra column start
+            const colWidths = [25, 20, 20, 20, 20, 25];    // FIXED: Removed extra column width
+            const tableWidth = 130;                          // FIXED: Adjusted table width
+            const rowHeight = 8;                             // INCREASED row height as requested
+            
+            // Table headers
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+            
+            pdf.setDrawColor(200, 200, 200);
+            pdf.setLineWidth(0.3);
+            pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+            
+            // FIXED: Vertical lines for columns - correct number of lines
+            for (let i = 0; i <= colStarts.length; i++) {
+                const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                pdf.line(x, yPos, x, yPos + rowHeight);
+            }
+            
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(7); // REDUCED font size
+            pdf.setFont(undefined, 'bold');
+            
+            const headers = ['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Did Not Give'];
+            headers.forEach(function(header, index) {
+                centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 5);
+            });
+            
+            yPos += rowHeight;
+            
+            // Generate monthly data - COMPACT
+            if (academicYear) {
+                const [startYear, endYear] = academicYear.split('-');
+                const months = [
+                    { key: `${startYear}-09`, name: 'Sep' }, // SHORTENED month names
+                    { key: `${startYear}-10`, name: 'Oct' },
+                    { key: `${startYear}-11`, name: 'Nov' },
+                    { key: `${startYear}-12`, name: 'Dec' },
+                    { key: `${endYear}-01`, name: 'Jan' },
+                    { key: `${endYear}-02`, name: 'Feb' },
+                    { key: `${endYear}-03`, name: 'Mar' },
+                    { key: `${endYear}-04`, name: 'Apr' },
+                    { key: `${endYear}-05`, name: 'May' },
+                    { key: `${endYear}-06`, name: 'Jun' },
+                    { key: `${endYear}-07`, name: 'Jul' },
+                    { key: `${endYear}-08`, name: 'Aug' }
+                ];
+                
+                months.forEach((month, index) => {
+                    // Calculate monthly stats
+                    const monthStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
+                    
+                    Object.entries(studentData).forEach(([date, dayData]) => {
+                        if (date.startsWith(month.key)) {
+                            if (dayData.absent) {
+                                monthStats.absent++;
+                            } else if (dayData.didNotGive) {
+                                monthStats.didNotGive++;
+                            } else {
+                                ['sabak', 'para', 'dhor'].forEach(type => {
+                                    if (dayData[type]) monthStats[type]++;
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Row background
+                    const rowColor = index % 2 === 0 ? [255, 255, 255] : [248, 249, 250];
+                    pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                    
+                    // Row border
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.2);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                    
+                    // FIXED: Vertical lines - correct number
+                    for (let i = 0; i <= colStarts.length; i++) {
+                        const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                        pdf.line(x, yPos, x, yPos + rowHeight);
+                    }
+                    
+                    // Cell content
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(7); // INCREASED font size for better readability
+                    pdf.setFont(undefined, 'normal');
+                    
+                    centerTextInColumn(month.name, colStarts[0], colWidths[0], yPos + 5);
+                    centerTextInColumn(monthStats.sabak.toString(), colStarts[1], colWidths[1], yPos + 5);
+                    centerTextInColumn(monthStats.para.toString(), colStarts[2], colWidths[2], yPos + 5);
+                    centerTextInColumn(monthStats.dhor.toString(), colStarts[3], colWidths[3], yPos + 5);
+                    centerTextInColumn(monthStats.absent.toString(), colStarts[4], colWidths[4], yPos + 5);
+                    centerTextInColumn(monthStats.didNotGive.toString(), colStarts[5], colWidths[5], yPos + 5);
+                    
+                    yPos += rowHeight;
+                });
+            }
+            
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                const fileName = student.name + '_yearly_summary_' + displayYear + '.pdf';
+                pdf.save(fileName);
+            }
         }
 
-        async function generateMonthlyDetailedPDF(studentId, year, month) {
+        // COMPLETE MONTHLY DETAILED PDF - Same design as current month but for selected month/year
+        async function generateMonthlyDetailedPDF(studentId, year, month, providedPDF = null, skipSave = false) {
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
             
             const studentData = await window.getStudentData(studentId);
+            const homework = await getStudentHomework(studentId);
             
+            // Create PDF or use provided one
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
+            const pdf = providedPDF || new jsPDF();
             
             // Helper function for rounded rectangles
             function roundedRect(x, y, width, height, radius, style) {
@@ -8255,128 +9395,404 @@ window.selectProfile = selectProfile;
                 }
             }
             
+            // Helper function to center text in column
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // Helper function to add table headers (for new pages)
+            function addTableHeaders(yPosition) {
+                // Consistent column definitions used everywhere
+                const colStarts = [20, 35, 65, 90, 115, 150];
+                const colWidths = [15, 30, 25, 25, 35, 35];
+                const tableWidth = 165; // Total table width
+                const rowHeight = 8;
+                
+                // Table headers background
+                pdf.setFillColor(240, 240, 240);
+                pdf.rect(20, yPosition, tableWidth, rowHeight, 'F');
+                
+                // Headers border
+                pdf.setDrawColor(200, 200, 200);
+                pdf.setLineWidth(0.3);
+                pdf.rect(20, yPosition, tableWidth, rowHeight, 'S');
+                
+                // Vertical lines for columns
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPosition, x, yPosition + rowHeight);
+                }
+                
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'bold');
+                
+                const headers = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+                headers.forEach(function(header, index) {
+                    centerTextInColumn(header, colStarts[index], colWidths[index], yPosition + 5);
+                });
+                
+                return yPosition + rowHeight;
+            }
+            
+            // IMPROVED HEADER - Professional design
+            // Main header background (smaller green section)
+            pdf.setFillColor(16, 163, 127);
+            pdf.rect(0, 0, 210, 25, 'F');
+            
+            // White section below
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 20, 'F');
+            
+            // Title in green section
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(18);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('MONTHLY PROGRESS REPORT', 105, 15, { align: 'center' });
+            
+            // Student name and selected month/year in white section
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, 'normal');
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                               'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthYear = `${monthNames[parseInt(month) - 1]} ${year}`;
+            pdf.text(monthYear, 105, 39, { align: 'center' });
             
-            // Header Section
-            pdf.setFillColor(16, 163, 127);
-            roundedRect(10, 10, 190, 35, 4, 'F');
-            
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(20);
-            pdf.setFont(undefined, 'bold');
-            pdf.text('📅 Monthly Detailed Report', 20, 25);
-            
-            pdf.setFontSize(12);
-            pdf.setFont(undefined, 'normal');
-            pdf.text(`${student.name} • ${monthNames[parseInt(month) - 1]} ${year}`, 20, 35);
+            // Decorative line
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
             
             let yPos = 55;
             
-            // Get all days for the specified month
-            const monthPrefix = `${year}-${month.padStart(2, '0')}`;
-            const monthData = {};
+            // Monthly Progress Section
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Monthly Progress', 20, yPos);
+            yPos += 10;
             
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                if (date.startsWith(monthPrefix)) {
-                    monthData[date] = dayData;
+            // Calculate monthly stats for SELECTED month with "did not give" tracking
+            const selectedMonth = `${year}-${String(month).padStart(2, '0')}`;
+            const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(selectedMonth)) {
+                    if (dayData.absent) {
+                        monthlyStats.absent++;
+                    } else if (dayData.didNotGive) {
+                        monthlyStats.didNotGive++;
+                    } else {
+                        ['sabak', 'para', 'dhor'].forEach(function(type) {
+                            if (dayData[type]) monthlyStats[type]++;
+                        });
+                    }
                 }
             });
             
-            // Daily Progress Section
+            // Monthly Progress Boxes
+            const boxWidth = 38;
+            const boxHeight = 22;
+            const spacing = 6;
+            const startX = 20;
+            
+            const progressBoxes = [
+                { label: 'SABAK', value: monthlyStats.sabak, color: [16, 163, 127] },
+                { label: 'SABAK PARA', value: monthlyStats.para, color: [142, 68, 173] },
+                { label: 'DHOR', value: monthlyStats.dhor, color: [255, 149, 0] },
+                { label: 'ABSENT', value: monthlyStats.absent, color: [255, 59, 48] }
+            ];
+            
+            progressBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Homework Summary Section
             pdf.setTextColor(28, 28, 30);
-            pdf.setFontSize(16);
+            pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
-            pdf.text('Daily Progress Details', 20, yPos);
+            pdf.text('Homework Summary', 20, yPos);
+            yPos += 10;
+            
+            // Filter homework for selected month
+            const selectedMonthHomework = homework.filter(hw => {
+                const assignedDate = new Date(hw.assignedDate);
+                const hwMonth = `${assignedDate.getFullYear()}-${String(assignedDate.getMonth() + 1).padStart(2, '0')}`;
+                return hwMonth === selectedMonth;
+            });
+            
+            // Calculate homework stats for selected month
+            const homeworkStats = {
+                total: selectedMonthHomework.length,
+                completed: selectedMonthHomework.filter(hw => hw.completed).length,
+                pending: selectedMonthHomework.filter(hw => !hw.completed && hw.status !== 'did-not-give').length,
+                didNotDo: selectedMonthHomework.filter(hw => hw.status === 'did-not-give').length
+            };
+            
+            const homeworkBoxes = [
+                { label: 'TOTAL', value: homeworkStats.total, color: [28, 28, 30] },
+                { label: 'COMPLETED', value: homeworkStats.completed, color: [52, 199, 89] },
+                { label: 'PENDING', value: homeworkStats.pending, color: [255, 149, 0] },
+                { label: 'DID NOT DO', value: homeworkStats.didNotDo, color: [255, 59, 48] }
+            ];
+            
+            homeworkBoxes.forEach(function(box, index) {
+                const x = startX + (index * (boxWidth + spacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 32;
+            
+            // Sabak Summary Section  
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Sabak Summary', 20, yPos);
+            yPos += 10;
+            
+            // Calculate total sabak for the SELECTED month
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
+            
+            Object.entries(studentData).forEach(function([date, dayData]) {
+                if (date.startsWith(selectedMonth) && dayData.sabak && !dayData.absent && !dayData.didNotGive) {
+                    if (dayData.sabak.lines) {
+                        totalLines += dayData.sabak.lines;
+                    }
+                    if (dayData.sabak.pages) {
+                        totalPages += dayData.sabak.pages;
+                    }
+                    if (dayData.sabak.juz) {
+                        totalJuz += dayData.sabak.juz;
+                    }
+                }
+            });
+            
+            const sabakBoxes = [
+                { label: 'LINES', value: totalLines, color: [16, 163, 127] },
+                { label: 'PAGES', value: Math.round(totalPages * 10) / 10, color: [142, 68, 173] },
+                { label: 'JUZ', value: Math.round(totalJuz * 100) / 100, color: [255, 149, 0] }
+            ];
+            
+            // Use wider boxes for Sabak Summary (3 boxes instead of 4)
+            const sabakBoxWidth = 50;
+            const sabakSpacing = 8;
+            
+            sabakBoxes.forEach(function(box, index) {
+                const x = startX + (index * (sabakBoxWidth + sabakSpacing));
+                
+                // Box background
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
+                
+                // Top colored bar
+                pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
+                
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
+                
+                // Number - Centered
+                pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                const numWidth = pdf.getTextWidth(box.value.toString());
+                pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
+                
+                // Label - Centered
+                pdf.setTextColor(142, 142, 147);
+                pdf.setFontSize(6);
+                pdf.setFont(undefined, 'normal');
+                const labelWidth = pdf.getTextWidth(box.label);
+                pdf.text(box.label, x + (sabakBoxWidth - labelWidth)/2, yPos + 18);
+            });
+            
+            yPos += 35;
+            
+            // Daily Breakdown Table
+            pdf.setTextColor(28, 28, 30);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text('Daily Breakdown', 20, yPos);
             yPos += 15;
             
-            const sortedDates = Object.keys(monthData).sort();
+            // Consistent table setup throughout
+            const rowHeight = 8;
+            const pageBottomMargin = 280;
+            const colStarts = [20, 35, 65, 90, 115, 150];
+            const colWidths = [15, 30, 25, 25, 35, 35];
+            const tableWidth = 165; // Total table width
             
-            if (sortedDates.length === 0) {
-                pdf.setTextColor(142, 142, 147);
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'normal');
-                pdf.text('No progress recorded for this month', 20, yPos);
-            } else {
-                sortedDates.forEach(date => {
-                    const dayData = monthData[date];
-                    const dayDate = new Date(date);
-                    const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
-                    
-                    // Day header
-                    pdf.setFillColor(248, 249, 250);
-                    roundedRect(20, yPos, 170, 12, 2, 'F');
-                    
-                    pdf.setTextColor(28, 28, 30);
-                    pdf.setFontSize(11);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text(dayName, 25, yPos + 8);
-                    
-                    yPos += 15;
-                    
-                    if (dayData.absent) {
-                        pdf.setTextColor(255, 59, 48);
-                        pdf.setFontSize(10);
-                        pdf.setFont(undefined, 'normal');
-                        pdf.text('🔴 Absent', 30, yPos);
-                        yPos += 8;
-                    } else {
-                        ['sabak', 'para', 'dhor'].forEach(type => {
-                            if (dayData[type]) {
-                                const entry = dayData[type];
-                                const typeLabel = type === 'para' ? 'Sabak Para' : type.charAt(0).toUpperCase() + type.slice(1);
-                                
-                                pdf.setTextColor(28, 28, 30);
-                                pdf.setFontSize(10);
-                                pdf.setFont(undefined, 'bold');
-                                pdf.text(`${typeLabel}:`, 30, yPos);
-                                
-                                pdf.setFont(undefined, 'normal');
-                                let amountText = entry.amount;
-                                if (type === 'sabak' && entry.fraction) {
-                                    amountText += ` (${entry.fraction})`;
-                                }
-                                pdf.text(amountText, 60, yPos);
-                                
-                                // Grade indicator
-                                const gradeColors = {
-                                    excellent: [52, 199, 89],
-                                    good: [142, 68, 173],
-                                    okay: [255, 149, 0],
-                                    poor: [255, 59, 48]
-                                };
-                                
-                                const gradeColor = gradeColors[entry.grade] || [142, 142, 147];
-                                pdf.setFillColor(gradeColor[0], gradeColor[1], gradeColor[2]);
-                                pdf.circle(130, yPos - 2, 2, 'F');
-                                
-                                yPos += 8;
-                            }
-                        });
-                        
-                        if (dayData.parentChecked) {
-                            pdf.setTextColor(0, 122, 255);
-                            pdf.setFontSize(9);
-                            pdf.setFont(undefined, 'normal');
-                            pdf.text('✓ Checked by Parent', 30, yPos);
-                            yPos += 6;
-                        }
-                    }
-                    
-                    yPos += 5; // Space between days
-                    
-                    // Check if we need a new page
-                    if (yPos > 270) {
+            // Add table headers
+            yPos = addTableHeaders(yPos);
+            
+            // Get days in SELECTED month
+            const selectedYear = parseInt(year);
+            const selectedMonthNum = parseInt(month) - 1; // JavaScript months are 0-based
+            const daysInMonth = new Date(selectedYear, selectedMonthNum + 1, 0).getDate();
+            
+            // Generate table rows for each day
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Check if we need a new page BEFORE adding the row
+                if (yPos + rowHeight > pageBottomMargin) {
+                    if (!skipSave || providedPDF) {
                         pdf.addPage();
                         yPos = 20;
+                        
+                        // Add headers on new page
+                        yPos = addTableHeaders(yPos);
+                    } else {
+                        break; // Don't add more pages in single reports
                     }
-                });
+                }
+                
+                const dateKey = `${selectedYear}-${String(selectedMonthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayData = studentData[dateKey] || {};
+                
+                // Determine row background color
+                let rowColor = [255, 255, 255]; // White (Present)
+                if (dayData.absent) {
+                    rowColor = [255, 235, 235]; // Light Red (Absent)
+                } else if (dayData.didNotGive) {
+                    rowColor = [255, 243, 224]; // Light Orange (Did Not Give)
+                }
+                
+                // Row background - use EXACT tableWidth
+                pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                
+                // Row border - use EXACT tableWidth  
+                pdf.setDrawColor(220, 220, 220);
+                pdf.setLineWidth(0.2);
+                pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                
+                // Vertical lines - use EXACT column positions
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPos, x, yPos + rowHeight);
+                }
+                
+                // Cell content - ALL CENTERED
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(7);
+                pdf.setFont(undefined, 'normal');
+                
+                // Date - Centered
+                centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 5);
+                
+                // Sabak - Centered (truncate if too long)
+                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+                
+                // Sabak Para - Centered (truncate if too long)
+                let paraText = dayData.para ? dayData.para.amount : '--';
+                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
+                
+                // Dhor - Centered (truncate if too long)
+                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
+                
+                // Status - Centered
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89]; // Green
+                if (dayData.absent) {
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48]; // Red
+                } else if (dayData.didNotGive) {
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0]; // Orange
+                }
+                
+                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                
+                // Parent Review - Centered
+                const parentReview = dayData.parentChecked ? '✓' : '✗';
+                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                pdf.setFont(undefined, 'bold');
+                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+                
+                yPos += rowHeight;
             }
             
-            pdf.save(`${student.name}_${monthNames[parseInt(month) - 1]}_${year}_detailed.pdf`);
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                const fileName = `${student.name}_${monthNames[parseInt(month) - 1]}_${year}_detailed.pdf`;
+                pdf.save(fileName);
+            }
         }
 
-        async function generateOverallProgressPDF(studentId) {
+        async function generateOverallProgressPDF(studentId, providedPDF = null, skipSave = false) {
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -8384,7 +9800,7 @@ window.selectProfile = selectProfile;
             const juzData = await getStudentJuzProgress(studentId);
             
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
+            const pdf = providedPDF || new jsPDF();
             
             // Helper function for rounded rectangles
             function roundedRect(x, y, width, height, radius, style) {
@@ -8395,112 +9811,317 @@ window.selectProfile = selectProfile;
                 }
             }
             
-            // Header Section
+            // Helper function to center text in column
+            function centerTextInColumn(text, colStart, colWidth, yPos) {
+                const textWidth = pdf.getTextWidth(text);
+                const centerX = colStart + (colWidth / 2) - (textWidth / 2);
+                pdf.text(text, centerX, yPos);
+            }
+            
+            // PROFESSIONAL HEADER - Matching other reports
+            // Main header background
             pdf.setFillColor(16, 163, 127);
-            roundedRect(10, 10, 190, 35, 4, 'F');
+            pdf.rect(0, 0, 210, 25, 'F');
             
+            // White section below
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(0, 25, 210, 18, 'F');
+            
+            // Title in green section
             pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(22);
+            pdf.setFontSize(18);
             pdf.setFont(undefined, 'bold');
-            pdf.text('📖 Overall Hifz Progress', 20, 25);
+            pdf.text('OVERALL PROGRESS REPORT', 105, 15, { align: 'center' });
             
-            pdf.setFontSize(12);
+            // Student name in white section
+            pdf.setTextColor(60, 60, 60);
+            pdf.setFontSize(14);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(student.name.toUpperCase(), 105, 32, { align: 'center' });
+            
+            pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
-            pdf.text(student.name, 20, 35);
+            pdf.text('Complete Hifz Journey Overview', 105, 39, { align: 'center' });
             
-            let yPos = 55;
+            // Decorative line
+            pdf.setDrawColor(16, 163, 127);
+            pdf.setLineWidth(0.5);
+            pdf.line(20, 42, 190, 42);
+            
+            let yPos = 48;
             
             if (!juzData.hifzStartDate) {
+                // No data message
                 pdf.setTextColor(142, 142, 147);
                 pdf.setFontSize(14);
                 pdf.setFont(undefined, 'normal');
-                pdf.text('No Hifz progress data available', 20, yPos);
+                pdf.text('No Hifz progress data available', 105, yPos + 50, { align: 'center' });
+                
+                pdf.setFontSize(12);
+                pdf.text('Please contact the teacher to set up Hifz tracking', 105, yPos + 70, { align: 'center' });
             } else {
-                // Duration Section
+                // Hifz Duration Section - COMPACT
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Hifz Journey Overview', 20, yPos);
+                yPos += 6;
+                
+                // Calculate total duration
                 const totalDuration = calculateDuration(juzData.hifzStartDate);
                 const durationText = formatDuration(totalDuration);
                 
+                // Duration card - SMALLER
+                pdf.setFillColor(255, 255, 255);
+                roundedRect(20, yPos, 170, 16, 2, 'F');
+                
+                // Top colored bar
                 pdf.setFillColor(16, 163, 127);
-                roundedRect(20, yPos, 170, 25, 4, 'F');
+                roundedRect(20, yPos, 170, 2, 2, 'F');
                 
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(16);
+                // Border
+                pdf.setDrawColor(229, 229, 234);
+                pdf.setLineWidth(0.3);
+                roundedRect(20, yPos, 170, 16, 2, 'S');
+                
+                // Duration text
+                pdf.setTextColor(16, 163, 127);
+                pdf.setFontSize(10);
                 pdf.setFont(undefined, 'bold');
-                pdf.text('Total Hifz Duration', 30, yPos + 10);
+                pdf.text('Total Hifz Duration: ' + durationText, 25, yPos + 8);
                 
-                pdf.setFontSize(14);
+                pdf.setFontSize(8);
                 pdf.setFont(undefined, 'normal');
-                pdf.text(durationText, 30, yPos + 18);
+                const startDateStr = new Date(juzData.hifzStartDate).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                pdf.text('Started: ' + startDateStr, 25, yPos + 13);
                 
-                yPos += 35;
+                yPos += 22;
                 
-                // Juz Progress List
-                pdf.setTextColor(28, 28, 30);
-                pdf.setFontSize(16);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('Juz Progress Details', 20, yPos);
-                yPos += 15;
+                // Calculate Juz statistics
+                const completedJuz = [];
+                const currentJuz = [];
+                const notStartedJuz = [];
                 
-                // Process Juz data
-                const juzEntries = [];
                 for (let juzNumber = 1; juzNumber <= 30; juzNumber++) {
                     const juzInfo = juzData.juzProgress[juzNumber];
-                    if (juzInfo && juzInfo.startDate) {
-                        juzEntries.push({ number: juzNumber, ...juzInfo });
+                    if (juzInfo && juzInfo.startDate && juzInfo.finishDate) {
+                        completedJuz.push({ number: juzNumber, ...juzInfo });
+                    } else if (juzInfo && juzInfo.startDate && !juzInfo.finishDate) {
+                        currentJuz.push({ number: juzNumber, ...juzInfo });
+                    } else {
+                        notStartedJuz.push(juzNumber);
                     }
                 }
                 
-                // Sort by start date
-                juzEntries.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                // Progress Summary Boxes - COMPACT
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Progress Summary', 20, yPos);
+                yPos += 6;
                 
-                if (juzEntries.length === 0) {
-                    pdf.setTextColor(142, 142, 147);
+                const boxWidth = 50;
+                const boxHeight = 18;
+                const spacing = 8;
+                const startX = 20;
+                
+                // Show actual Juz number instead of count for CURRENT
+                const currentJuzNumber = currentJuz.length > 0 ? currentJuz[0].number : 0;
+                
+                const progressBoxes = [
+                    { label: 'COMPLETED', value: completedJuz.length, color: [52, 199, 89] },
+                    { label: 'CURRENT', value: currentJuzNumber, color: [59, 130, 246] },
+                    { label: 'REMAINING', value: notStartedJuz.length, color: [142, 142, 147] }
+                ];
+                
+                progressBoxes.forEach(function(box, index) {
+                    const x = startX + (index * (boxWidth + spacing));
+                    
+                    // Box background
+                    pdf.setFillColor(255, 255, 255);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
+                    
+                    // Top colored bar
+                    pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
+                    roundedRect(x, yPos, boxWidth, 2, 2, 'F');
+                    
+                    // Border
+                    pdf.setDrawColor(229, 229, 234);
+                    pdf.setLineWidth(0.3);
+                    roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
+                    
+                    // Number - Centered
+                    pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
                     pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    const numWidth = pdf.getTextWidth(box.value.toString());
+                    pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 10);
+                    
+                    // Label - Centered
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(6);
                     pdf.setFont(undefined, 'normal');
-                    pdf.text('No Juz progress recorded yet', 20, yPos);
+                    const labelWidth = pdf.getTextWidth(box.label);
+                    pdf.text(box.label, x + (boxWidth - labelWidth)/2, yPos + 15);
+                });
+                
+                yPos += 24;
+                
+                // Detailed Progress Table - WITH FULL DATES
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Detailed Juz Progress', 20, yPos);
+                yPos += 8;
+                
+                // Combine and sort all Juz with data
+                const allJuzWithData = [...completedJuz, ...currentJuz].sort((a, b) => a.number - b.number);
+                
+                if (allJuzWithData.length === 0) {
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('No Juz progress recorded yet', 20, yPos + 8);
+                    yPos += 16;
                 } else {
-                    juzEntries.forEach(juz => {
+                    // Table setup - Slightly adjusted widths for full dates
+                    const rowHeight = 8;
+                    const colStarts = [20, 35, 75, 115, 155]; // Adjusted to accommodate full dates
+                    const colWidths = [15, 40, 40, 40, 30];   // Increased date column widths
+                    const tableWidth = 165;
+                    
+                    // Table headers
+                    pdf.setFillColor(240, 240, 240);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+                    
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.3);
+                    pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+                    
+                    // Vertical lines for 5 columns
+                    for (let i = 0; i <= colStarts.length; i++) {
+                        const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                        pdf.line(x, yPos, x, yPos + rowHeight);
+                    }
+                    
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(7);
+                    pdf.setFont(undefined, 'bold');
+                    
+                    const headers = ['Juz', 'Start Date', 'End Date', 'Duration', 'Status'];
+                    headers.forEach(function(header, index) {
+                        centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 5);
+                    });
+                    
+                    yPos += rowHeight;
+                    
+                    // Add rows for each Juz - REMOVE LAST ROW
+                    const maxRows = Math.min(allJuzWithData.length - 1, 21); // Remove last row (-1)
+                    
+                    for (let i = 0; i < maxRows; i++) {
+                        const juz = allJuzWithData[i];
                         const isCompleted = juz.startDate && juz.finishDate;
                         
-                        // Juz box
-                        const boxColor = isCompleted ? [52, 199, 89] : [59, 130, 246];
-                        pdf.setFillColor(boxColor[0], boxColor[1], boxColor[2]);
-                        roundedRect(20, yPos, 170, 18, 3, 'F');
+                        // Row background
+                        let rowColor = isCompleted ? [240, 253, 244] : [239, 246, 255];
+                        pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
+                        pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
                         
-                        pdf.setTextColor(255, 255, 255);
-                        pdf.setFontSize(12);
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text(`Juz ${juz.number}`, 25, yPos + 8);
+                        // Row border
+                        pdf.setDrawColor(220, 220, 220);
+                        pdf.setLineWidth(0.2);
+                        pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
                         
-                        const statusText = isCompleted ? 'Completed' : 'Currently On';
-                        pdf.setFontSize(10);
+                        // Vertical lines for 5 columns
+                        for (let j = 0; j <= colStarts.length; j++) {
+                            const x = j === colStarts.length ? (20 + tableWidth) : colStarts[j];
+                            pdf.line(x, yPos, x, yPos + rowHeight);
+                        }
+                        
+                        // Cell content
+                        pdf.setTextColor(28, 28, 30);
+                        pdf.setFontSize(6);
                         pdf.setFont(undefined, 'normal');
-                        pdf.text(statusText, 25, yPos + 14);
                         
-                        // Duration
+                        // Juz number
+                        centerTextInColumn(juz.number.toString(), colStarts[0], colWidths[0], yPos + 5);
+                        
+                        // UPDATED: Start date with full year
+                        const startDate = new Date(juz.startDate).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric'  // ADDED: Include year
+                        });
+                        centerTextInColumn(startDate, colStarts[1], colWidths[1], yPos + 5);
+                        
+                        // UPDATED: End date with full year
+                        const endDate = isCompleted ? 
+                            new Date(juz.finishDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'  // ADDED: Include year
+                            }) : '--';
+                        centerTextInColumn(endDate, colStarts[2], colWidths[2], yPos + 5);
+                        
+                        // Duration - FULL TEXT FORMAT
                         let durationText;
                         if (isCompleted) {
                             const duration = calculateDuration(juz.startDate, juz.finishDate);
                             durationText = formatDuration(duration);
                         } else {
                             const duration = calculateDuration(juz.startDate);
-                            durationText = formatDuration(duration) + ' (ongoing)';
+                            durationText = formatDuration(duration);
                         }
+                        centerTextInColumn(durationText, colStarts[3], colWidths[3], yPos + 5);
                         
-                        pdf.text(durationText, 120, yPos + 11);
+                        // Status
+                        const statusText = isCompleted ? 'Completed' : 'Current';
+                        const statusColor = isCompleted ? [52, 199, 89] : [59, 130, 246];
+                        pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                        pdf.setFont(undefined, 'bold');
+                        centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
                         
-                        yPos += 22;
-                        
-                        // Check if we need a new page
-                        if (yPos > 260) {
-                            pdf.addPage();
-                            yPos = 20;
-                        }
-                    });
+                        yPos += rowHeight;
+                    }
+                    
+                    yPos += 6;
+                }
+                
+                // Remaining Juz Section - COMPACT
+                if (notStartedJuz.length > 0) {
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Remaining Juz to Complete', 20, yPos);
+                    yPos += 6;
+                    
+                    // Show remaining Juz in a compact format
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFontSize(9);
+                    pdf.setFont(undefined, 'normal');
+                    
+                    let remainingText = 'Juz ' + notStartedJuz.join(', ');
+                    pdf.text(remainingText, 20, yPos);
+                    yPos += 10;
+                    
+                    // Progress percentage
+                    const progressPercentage = Math.round((completedJuz.length / 30) * 100);
+                    pdf.setTextColor(16, 163, 127);
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(`Overall Progress: ${progressPercentage}% Complete`, 20, yPos);
                 }
             }
             
-            pdf.save(student.name + '_overall_progress.pdf');
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                const fileName = student.name + '_overall_progress.pdf';
+                pdf.save(fileName);
+            }
         }
 
         async function generateAllStudentsPDF(reportType) {
