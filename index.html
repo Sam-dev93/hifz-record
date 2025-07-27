@@ -1008,6 +1008,281 @@
             }
         }
 
+        /* Message Styles */
+        .message-type-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .message-type-badge.info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .message-type-badge.reminder {
+            background: #FED7AA;
+            color: #C2410C;
+        }
+
+        .message-type-badge.urgent {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .message-item {
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-item.unread {
+            border-left: 4px solid #3B82F6;
+            background: #F8FAFC;
+        }
+
+        .message-item.read {
+            opacity: 0.8;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .message-date {
+            font-size: 12px;
+            color: #8E8E93;
+            font-weight: 600;
+        }
+
+        .message-content {
+            color: #1C1C1E;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .message-review-btn {
+            background: #10A37F;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message-review-btn:hover {
+            background: #0D7A5F;
+        }
+
+        .message-notification {
+            background: #E8F4FD;
+            border: 2px solid #3B82F6;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            animation: messageGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes messageGlow {
+            0%, 100% { 
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); 
+            }
+            50% { 
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5); 
+            }
+        }
+
+        .message-notification-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1E40AF;
+            margin-bottom: 8px;
+        }
+
+        .message-notification-desc {
+            font-size: 14px;
+            color: #3730A3;
+            margin-bottom: 16px;
+        }
+
+        /* Message Type Button States */
+        .grade-button[data-type] {
+            background: #F2F2F7;
+            color: #8E8E93;
+            transition: all 0.3s ease;
+        }
+
+        .grade-button[data-type].selected.info {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .grade-button[data-type].selected.reminder {
+            background: #FF9500;
+            color: white;
+        }
+
+        .grade-button[data-type].selected.urgent {
+            background: #FF3B30;
+            color: white;
+        }
+
+        /* Message Management Styles - Match Homework Theme */
+        .message-management-item {
+            background: white;
+            border: 1px solid #E5E5EA;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .message-management-item.hidden {
+            display: none;
+        }
+
+        .message-info {
+            flex: 1;
+        }
+
+        .message-student-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 8px;
+        }
+
+        .message-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .message-type-tag {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .message-type-tag.info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .message-type-tag.reminder {
+            background: #FED7AA;
+            color: #C2410C;
+        }
+
+        .message-type-tag.urgent {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .message-due-date {
+            font-size: 14px;
+            color: #8E8E93;
+            font-weight: 500;
+        }
+
+        .message-preview {
+            font-size: 14px;
+            color: #8E8E93;
+            margin-top: 4px;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .message-status-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message-status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .message-status-badge.read {
+            background: #D1FAE5;
+            color: #047857;
+        }
+
+        .message-status-badge.unread {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .message-delete-btn {
+            background: #FF3B30;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message-delete-btn:hover {
+            background: #D70015;
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 50px 30px;
+            color: #8E8E93;
+        }
+
+        .no-messages h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #1C1C1E;
+        }
+
+        .no-messages p {
+            color: #8E8E93;
+            font-size: 16px;
+        }
+
         /* Calendar styles */
         .calendar-container { 
             background: white; 
@@ -2622,7 +2897,7 @@
 
                 <!-- Statistics -->
                 <div class="section">
-                    <h2 class="section-title">Monthly Progress</h2>
+                    <h2 class="section-title" id="monthlyProgressTitle">Monthly Progress</h2>
                     <div class="stats-container">
                         <div class="stat-card sabak">
                             <div class="stat-number" id="sabakCount">0</div>
@@ -2643,7 +2918,7 @@
                 <div class="section" id="homeworkSection" style="display: none;">
                     <div id="homeworkNotification" class="homework-notification">
                         <div class="homework-notification-title">📚 New Homework Assigned</div>
-                        <div class="homework-notification-desc" id="homeworkNotificationDesc">You have new homework from your teacher</div>
+                        <div class="homework-notification-desc" id="homeworkNotificationDesc">You have new homework from your Ustaadh</div>
                         <div class="homework-due-date" id="homeworkDueDate">Due: Tomorrow</div>
                         <div style="display: flex; gap: 8px;">
                             <button class="homework-button" onclick="showViewHomeworkModal()" style="flex: 1; margin-top: 0;">
@@ -2754,6 +3029,8 @@
                             <button class="control-button" onclick="showStudentTargetsModal()">🎯 Student Targets</button>
                             <button class="control-button" onclick="showAssignHomeworkModal()">📚 Assign Homework</button>
                             <button class="control-button" onclick="showViewAllHomeworkModal()">📋 View All Homework</button>
+                            <button class="control-button" onclick="showSendMessageModal()">💬 Send Message to Parent</button>
+                            <button class="control-button" onclick="showManageMessagesModal()">📬 Manage Messages</button>
                             <button class="control-button" onclick="showHolidayModal()">🗓️ Manage Holidays</button>
                             <button class="control-button" onclick="showAcademicYearModal()">📅 Set Academic Year</button>
                             <button class="control-button pdf-export-button" onclick="exportStudentPDF()">
@@ -2778,6 +3055,7 @@
                             <button class="control-button" onclick="showHomeworkSummaryModal()">📊 Homework Summary</button>
                             <button class="control-button" onclick="showOverallProgressModal()">📈 Overall Progress</button>
                             <button class="control-button" onclick="showViewTargetsModal()">🎯 View Targets</button>
+                            <button class="control-button" onclick="showParentMessagesHistory()">📬 View Messages</button>
                         </div>
 
                         <button class="logout-button" onclick="logout()">Logout</button>
@@ -3046,6 +3324,134 @@
             <div class="modal-body">
                 <div id="homeworkSummaryContent">
                     <!-- Content will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Message Modal -->
+    <div id="sendMessageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💬 Send Message to Parent</h2>
+                <span class="close" onclick="closeModal('sendMessageModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="homework-section">
+                    <div class="homework-section-title">
+                        📝 Message Details
+                    </div>
+                    <div class="entry-form">
+                        <div class="form-group">
+                            <label class="form-label">Select Student</label>
+                            <select class="form-select" id="messageStudentSelect">
+                                <option value="">Choose student</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message Type</label>
+                            <div class="grade-buttons" style="gap: 8px;">
+                                <div class="grade-button" data-type="info" onclick="selectMessageType('info')">ℹ️ Info</div>
+                                <div class="grade-button" data-type="reminder" onclick="selectMessageType('reminder')">⏰ Reminder</div>
+                                <div class="grade-button" data-type="urgent" onclick="selectMessageType('urgent')">🚨 Urgent</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="homework-description" id="messageContent" 
+                                    placeholder="Enter your message to the parent..."></textarea>
+                        </div>
+                        <button class="save-button" onclick="sendMessage()">Send Message</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent Message Modal -->
+    <div id="parentMessageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💬 New Message from Ustaadh</h2>
+                <span class="close" onclick="closeModal('parentMessageModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="parentMessageContent">
+                    <!-- Message content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent Messages History Modal -->
+    <div id="parentMessagesHistoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📬 All Messages</h2>
+                <span class="close" onclick="closeModal('parentMessagesHistoryModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="parentMessagesHistoryContent">
+                    <!-- Messages history will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Message Management Modal -->
+    <div id="manageMessagesModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 class="modal-title">📬 Message Management</h2>
+                <span class="close" onclick="closeModal('manageMessagesModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Summary Section - Matching Homework Style -->
+                <div class="homework-section">
+                    <div class="homework-section-title">
+                        📊 Overall Message Summary
+                    </div>
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <div class="summary-stat-number" id="totalMessages">0</div>
+                            <div class="summary-stat-label">Total</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-number" style="color: #10A37F;" id="readMessages">0</div>
+                            <div class="summary-stat-label">Read</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-number" style="color: #FF9500;" id="unreadMessages">0</div>
+                            <div class="summary-stat-label">Unread</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-number" style="color: #3B82F6;" id="infoMessages">0</div>
+                            <div class="summary-stat-label">Info</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-number" style="color: #FF9500;" id="reminderMessages">0</div>
+                            <div class="summary-stat-label">Reminder</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-number" style="color: #FF3B30;" id="urgentMessages">0</div>
+                            <div class="summary-stat-label">Urgent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="homework-filters">
+                    <div class="filter-button active" data-filter="all" onclick="filterMessages('all')">All</div>
+                    <div class="filter-button" data-filter="unread" onclick="filterMessages('unread')">Unread</div>
+                    <div class="filter-button" data-filter="read" onclick="filterMessages('read')">Read</div>
+                    <div class="filter-button" data-filter="info" onclick="filterMessages('info')">Info</div>
+                    <div class="filter-button" data-filter="reminder" onclick="filterMessages('reminder')">Reminder</div>
+                    <div class="filter-button" data-filter="urgent" onclick="filterMessages('urgent')">Urgent</div>
+                </div>
+
+                <!-- Messages List -->
+                <div id="allMessagesContent">
+                    <!-- Messages will be populated here -->
                 </div>
             </div>
         </div>
@@ -3970,6 +4376,10 @@
         }
 
         function showMainInterface() {
+            // Always start on current month when showing main interface
+            currentDisplayMonth = new Date().getMonth() + 1;
+            currentDisplayYear = new Date().getFullYear();
+
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('appControls').style.display = 'block';
@@ -4087,6 +4497,8 @@
                         selectStudent(currentStudent);
                         // Check for homework
                         await checkForHomework();
+                        // ADD THIS LINE:
+                        await checkForMessages();
                     }
                 } else {
                     // Teachers and office see all students
@@ -4521,7 +4933,7 @@
                         <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
                             <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Hifz Data Available</h3>
-                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set up ${student ? student.name + "'s" : 'this student\'s'} Hifz progress tracking yet.</p>
+                            <p style="color: #8E8E93; font-size: 16px;">The Ustaadh hasn't set up ${student ? student.name + "'s" : 'this student\'s'} Hifz progress tracking yet.</p>
                         </div>
                     `;
                 } else {
@@ -4567,7 +4979,7 @@
                             <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
                                 <div style="font-size: 40px; margin-bottom: 16px;">📚</div>
                                 <h3 style="font-size: 18px; margin-bottom: 8px; font-weight: 600; color: #1C1C1E;">No Juz Progress Yet</h3>
-                                <p>The teacher will update Juz progress as the student advances.</p>
+                                <p>The Ustaadh will update Juz progress as the student advances.</p>
                             </div>
                         `;
                     } else {
@@ -4647,7 +5059,7 @@
                         <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
                             <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Hifz Data Available</h3>
-                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set up ${student.name}'s Hifz progress tracking yet.</p>
+                            <p style="color: #8E8E93; font-size: 16px;">The Ustaadh hasn't set up ${student.name}'s Hifz progress tracking yet.</p>
                         </div>
                     `;
                 } else {
@@ -4693,7 +5105,7 @@
                             <div style="text-align: center; padding: 40px 20px; color: #8E8E93;">
                                 <div style="font-size: 40px; margin-bottom: 16px;">📚</div>
                                 <h3 style="font-size: 18px; margin-bottom: 8px; font-weight: 600; color: #1C1C1E;">No Juz Progress Yet</h3>
-                                <p>The teacher will update Juz progress as the student advances.</p>
+                                <p>The Ustaadh will update Juz progress as the student advances.</p>
                             </div>
                         `;
                     } else {
@@ -5893,7 +6305,7 @@
                         <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
                             <div style="font-size: 48px; margin-bottom: 20px;">🎯</div>
                             <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Targets Set</h3>
-                            <p style="color: #8E8E93; font-size: 16px;">The teacher hasn't set any targets for academic year ${academicYear} yet.</p>
+                            <p style="color: #8E8E93; font-size: 16px;">The Ustaadh hasn't set any targets for academic year ${academicYear} yet.</p>
                         </div>
                     `;
                 } else {
@@ -6144,6 +6556,112 @@
             } catch (error) {
                 console.error('Error loading student targets:', error);
                 content.innerHTML = '<p style="color: #FF3B30; text-align: center;">Error loading targets</p>';
+            }
+        }
+
+        // Message Functions
+        async function saveMessage(messageData) {
+            try {
+                const { setDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const messageId = `${messageData.studentId}_${Date.now()}`;
+                
+                await setDoc(doc(db, 'messages', messageId), {
+                    ...messageData,
+                    messageId: messageId,
+                    sentDate: new Date().toISOString(),
+                    read: false
+                });
+                
+                console.log('Message saved:', messageId);
+            } catch (error) {
+                console.error('Error saving message:', error);
+                throw error;
+            }
+        }
+
+        async function getStudentMessages(studentId) {
+            try {
+                const { getDocs, collection, query, where } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                const q = query(
+                    collection(db, 'messages'), 
+                    where('studentId', '==', studentId)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const messages = [];
+                
+                querySnapshot.forEach((doc) => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by sent date (newest first)
+                messages.sort((a, b) => new Date(b.sentDate) - new Date(a.sentDate));
+                
+                return messages;
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+                return [];
+            }
+        }
+
+        async function markMessageAsRead(messageId) {
+            try {
+                const { updateDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await updateDoc(doc(db, 'messages', messageId), {
+                    read: true,
+                    readDate: new Date().toISOString()
+                });
+                
+                console.log('Message marked as read:', messageId);
+            } catch (error) {
+                console.error('Error marking message as read:', error);
+                throw error;
+            }
+        }
+
+        async function getAllMessages() {
+            try {
+                const { getDocs, collection, orderBy, query } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                // Try to get all messages first to see what's there
+                const messagesRef = collection(db, 'messages');
+                const querySnapshot = await getDocs(messagesRef);
+                const messages = [];
+                
+                console.log('Raw message documents found:', querySnapshot.size);
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    console.log('Message document:', doc.id, data);
+                    
+                    // Make sure we have the messageId field
+                    messages.push({ 
+                        messageId: doc.id, // Use document ID as messageId
+                        id: doc.id, 
+                        ...data 
+                    });
+                });
+                
+                // Sort by sentDate manually if needed
+                messages.sort((a, b) => {
+                    const dateA = new Date(a.sentDate || 0);
+                    const dateB = new Date(b.sentDate || 0);
+                    return dateB - dateA; // Newest first
+                });
+                
+                console.log('Processed messages:', messages);
+                return messages;
+                
+            } catch (error) {
+                console.error('Error fetching all messages:', error);
+                return [];
             }
         }
 
@@ -6538,6 +7056,14 @@
             
             const currentMonth = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}`;
             
+            // Update the monthly progress title with current viewing month/year
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                            'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthlyProgressTitle = document.getElementById('monthlyProgressTitle');
+            if (monthlyProgressTitle) {
+                monthlyProgressTitle.textContent = `${monthNames[currentDisplayMonth - 1]} ${currentDisplayYear} Progress`;
+            }
+            
             Object.entries(studentData).forEach(([date, dayData]) => {
                 // Filter by academic year for Parents and Office
                 if (currentUserType === 'parent' || currentUserType === 'office') {
@@ -6794,27 +7320,181 @@
             if (currentUserType !== 'parent' || !currentStudent) return;
             
             const targetDate = dateKey || getDateKey();
-            const studentData = await window.getStudentData(currentStudent);
             
-            if (!studentData[targetDate]) {
-                studentData[targetDate] = {};
+            // Get button references
+            const dayModal = document.getElementById('dayModal');
+            let parentCheckButton = null;
+            
+            if (dayModal && dayModal.style.display === 'block') {
+                parentCheckButton = dayModal.querySelector('button[onclick*="toggleParentCheck"]');
             }
             
-            studentData[targetDate].parentChecked = !studentData[targetDate].parentChecked;
+            const mainParentCheckButton = document.getElementById('parentCheckButton');
             
-            await window.saveStudentData(currentStudent, studentData);
-            
-            // Update UI based on which date was modified
-            if (!dateKey || dateKey === getDateKey()) {
-                updateTodaysProgress();
+            // Get current state
+            let currentData;
+            try {
+                currentData = await window.getStudentData(currentStudent);
+            } catch (error) {
+                console.error('Error getting student data:', error);
+                return;
             }
-            generateCalendar();
             
-            // If modal is open for this date, refresh it
-            const dayModalTitle = document.getElementById('dayModalTitle').textContent;
-            if (dayModalTitle.includes(new Date(targetDate).toLocaleDateString('en-US', { day: 'numeric' }))) {
-                const day = parseInt(targetDate.split('-')[2]);
-                setTimeout(() => openDayModal(day), 100);
+            if (!currentData[targetDate]) {
+                currentData[targetDate] = {};
+            }
+            
+            const wasChecked = currentData[targetDate].parentChecked || false;
+            const isNowChecked = !wasChecked;
+            
+            // IMMEDIATELY update UI (optimistic update)
+            if (parentCheckButton) {
+                const buttonText = isNowChecked ? '✓ Checked by Parent' : '✓ Mark as Checked';
+                const buttonColor = isNowChecked ? '#8E8E93' : '#34C759';
+                
+                parentCheckButton.textContent = buttonText;
+                parentCheckButton.style.background = buttonColor;
+                
+                // Brief animation
+                parentCheckButton.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    parentCheckButton.style.transform = 'scale(1)';
+                }, 150);
+            }
+            
+            if (mainParentCheckButton && (!dateKey || dateKey === getDateKey())) {
+                if (isNowChecked) {
+                    mainParentCheckButton.textContent = '✓ Checked';
+                    mainParentCheckButton.classList.add('checked');
+                } else {
+                    mainParentCheckButton.textContent = '✓ Mark as Checked';
+                    mainParentCheckButton.classList.remove('checked');
+                }
+            }
+            
+            // Update parent status indicators in modal
+            if (dayModal && dayModal.style.display === 'block') {
+                const parentStatusRows = dayModal.querySelectorAll('div[style*="background: #F0F9FF"], div[style*="background: #FEF2F2"]');
+                parentStatusRows.forEach(row => {
+                    if (row.textContent.includes('Reviewed by Parent') || row.textContent.includes('Not yet reviewed')) {
+                        if (isNowChecked) {
+                            row.style.cssText = 'padding: 16px 24px; background: #F0F9FF; border-top: 1px solid #E0F2FE; text-align: center; color: #0369A1; font-size: 14px; font-weight: 600;';
+                            row.innerHTML = '✓ Reviewed by Parent';
+                        } else {
+                            row.style.cssText = 'padding: 16px 24px; background: #FEF2F2; border-top: 1px solid #FECACA; text-align: center; color: #DC2626; font-size: 14px; font-weight: 600;';
+                            row.innerHTML = '✗ Not yet reviewed by Parent';
+                        }
+                    }
+                });
+            }
+            
+            // Show immediate success message
+            const successMessage = document.createElement('div');
+            successMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10A37F;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            successMessage.textContent = isNowChecked ? '✓ Marked as checked' : '✓ Unmarked';
+            document.body.appendChild(successMessage);
+            
+            setTimeout(() => {
+                if (document.body.contains(successMessage)) {
+                    document.body.removeChild(successMessage);
+                }
+            }, 2000);
+            
+            // Now save in background (don't block UI)
+            try {
+                // Update data
+                currentData[targetDate].parentChecked = isNowChecked;
+                currentData[targetDate].parentCheckTimestamp = new Date().toISOString();
+                
+                // Save with retry logic
+                let saveSuccess = false;
+                let attempts = 0;
+                const maxAttempts = 3;
+                
+                while (!saveSuccess && attempts < maxAttempts) {
+                    attempts++;
+                    console.log(`Parent check save attempt ${attempts}/${maxAttempts}`);
+                    
+                    try {
+                        await window.saveStudentData(currentStudent, currentData);
+                        saveSuccess = true;
+                        console.log(`Parent check ${isNowChecked ? 'marked' : 'unmarked'} for ${targetDate} (attempt ${attempts})`);
+                        
+                    } catch (saveError) {
+                        console.error(`Save attempt ${attempts} failed:`, saveError);
+                        
+                        if (attempts >= maxAttempts) {
+                            throw saveError;
+                        }
+                        
+                        // Wait before retry (exponential backoff)
+                        await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+                    }
+                }
+                
+                // Update other UI components in background (non-blocking)
+                setTimeout(async () => {
+                    try {
+                        if (!dateKey || dateKey === getDateKey()) {
+                            await updateTodaysProgress();
+                        }
+                        generateCalendar();
+                    } catch (uiError) {
+                        console.warn('Non-critical UI update error:', uiError);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error saving parent check:', error);
+                
+                // REVERT UI on save failure
+                if (parentCheckButton) {
+                    const buttonText = wasChecked ? '✓ Checked by Parent' : '✓ Mark as Checked';
+                    const buttonColor = wasChecked ? '#8E8E93' : '#34C759';
+                    
+                    parentCheckButton.textContent = buttonText;
+                    parentCheckButton.style.background = buttonColor;
+                }
+                
+                if (mainParentCheckButton && (!dateKey || dateKey === getDateKey())) {
+                    if (wasChecked) {
+                        mainParentCheckButton.textContent = '✓ Checked';
+                        mainParentCheckButton.classList.add('checked');
+                    } else {
+                        mainParentCheckButton.textContent = '✓ Mark as Checked';
+                        mainParentCheckButton.classList.remove('checked');
+                    }
+                }
+                
+                // Revert parent status indicators
+                if (dayModal && dayModal.style.display === 'block') {
+                    const parentStatusRows = dayModal.querySelectorAll('div[style*="background: #F0F9FF"], div[style*="background: #FEF2F2"]');
+                    parentStatusRows.forEach(row => {
+                        if (row.textContent.includes('Reviewed by Parent') || row.textContent.includes('Not yet reviewed')) {
+                            if (wasChecked) {
+                                row.style.cssText = 'padding: 16px 24px; background: #F0F9FF; border-top: 1px solid #E0F2FE; text-align: center; color: #0369A1; font-size: 14px; font-weight: 600;';
+                                row.innerHTML = '✓ Reviewed by Parent';
+                            } else {
+                                row.style.cssText = 'padding: 16px 24px; background: #FEF2F2; border-top: 1px solid #FECACA; text-align: center; color: #DC2626; font-size: 14px; font-weight: 600;';
+                                row.innerHTML = '✗ Not yet reviewed by Parent';
+                            }
+                        }
+                    });
+                }
+                
+                // Log error for debugging but don't show to user since optimistic update worked
+                console.warn('Background save may have failed, but UI was updated optimistically:', error);
             }
         }
 
@@ -7279,10 +7959,15 @@
             } else {
                 // Weekday view
                 if (dayData.absent) {
+                    // Get student name for personalized message
+                    const students = await window.getStudents();
+                    const student = students.find(s => s.id === currentStudent);
+                    const studentName = student ? student.name : 'Student';
+                    
                     let absentHtml = `
                         <div style="text-align: center; padding: 50px 30px; color: #FF3B30;">
                             <div style="font-size: 48px; margin-bottom: 20px;">😴</div>
-                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">Student was Absent</h3>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600;">${studentName} was Absent</h3>
                             <p style="color: #8E8E93; font-size: 16px; margin-bottom: 20px;">No progress recorded for this day</p>
                     `;
                     
@@ -7549,15 +8234,81 @@
             }
         }
 
-        function changeMonth(direction) {
-            currentDisplayMonth += direction;
-            
-            if (currentDisplayMonth > 12) {
-                currentDisplayMonth = 1;
-                currentDisplayYear++;
-            } else if (currentDisplayMonth < 1) {
-                currentDisplayMonth = 12;
-                currentDisplayYear--;
+        async function changeMonth(direction) {
+            // For parents and office users, restrict navigation to academic year only
+            if (currentUserType === 'parent' || currentUserType === 'office') {
+                const academicYear = currentAcademicYear || await getCurrentAcademicYear();
+                
+                if (academicYear) {
+                    const [startYear, endYear] = academicYear.split('-');
+                    const academicStartMonth = 9; // September
+                    const academicEndMonth = 8;   // August
+                    
+                    // Calculate the new month/year
+                    let newMonth = currentDisplayMonth + direction;
+                    let newYear = currentDisplayYear;
+                    
+                    if (newMonth > 12) {
+                        newMonth = 1;
+                        newYear++;
+                    } else if (newMonth < 1) {
+                        newMonth = 12;
+                        newYear--;
+                    }
+                    
+                    // Check if the new date is within academic year bounds
+                    let isWithinBounds = false;
+                    
+                    // Check if in start year (September to December)
+                    if (newYear == parseInt(startYear) && newMonth >= academicStartMonth) {
+                        isWithinBounds = true;
+                    }
+                    // Check if in end year (January to August)  
+                    else if (newYear == parseInt(endYear) && newMonth <= academicEndMonth) {
+                        isWithinBounds = true;
+                    }
+                    
+                    // Only update if within bounds
+                    if (isWithinBounds) {
+                        currentDisplayMonth = newMonth;
+                        currentDisplayYear = newYear;
+                    } else {
+                        // Show a brief message that they've reached the limit
+                        const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                                        'July', 'August', 'September', 'October', 'November', 'December'];
+                        
+                        if (direction > 0) {
+                            // Trying to go forward past August of end year
+                            console.log(`Navigation limited to academic year ${academicYear}`);
+                        } else {
+                            // Trying to go back past September of start year  
+                            console.log(`Navigation limited to academic year ${academicYear}`);
+                        }
+                        return; // Exit without updating
+                    }
+                } else {
+                    // Fallback if no academic year is set
+                    currentDisplayMonth += direction;
+                    
+                    if (currentDisplayMonth > 12) {
+                        currentDisplayMonth = 1;
+                        currentDisplayYear++;
+                    } else if (currentDisplayMonth < 1) {
+                        currentDisplayMonth = 12;
+                        currentDisplayYear--;
+                    }
+                }
+            } else {
+                // Teachers have unlimited navigation
+                currentDisplayMonth += direction;
+                
+                if (currentDisplayMonth > 12) {
+                    currentDisplayMonth = 1;
+                    currentDisplayYear++;
+                } else if (currentDisplayMonth < 1) {
+                    currentDisplayMonth = 12;
+                    currentDisplayYear--;
+                }
             }
             
             generateCalendar();
@@ -8041,6 +8792,462 @@
                 const button = document.querySelector('.save-button.permanent-delete');
                 button.textContent = '🗑️ PERMANENTLY DELETE';
                 button.disabled = false;
+            }
+        }
+
+        // Message Functions
+        let selectedMessageType = null;
+
+        function showSendMessageModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            // Populate student dropdown
+            window.getStudents().then(students => {
+                const select = document.getElementById('messageStudentSelect');
+                select.innerHTML = '<option value="">Choose student</option>';
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            });
+            
+            // Reset form
+            document.getElementById('messageContent').value = '';
+            selectedMessageType = null;
+            document.querySelectorAll('.grade-button[data-type]').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            document.getElementById('sendMessageModal').style.display = 'block';
+        }
+
+        function selectMessageType(type) {
+            selectedMessageType = type;
+            
+            // Remove selected class and type-specific classes from all buttons
+            document.querySelectorAll('.grade-button[data-type]').forEach(btn => {
+                btn.classList.remove('selected', 'info', 'reminder', 'urgent');
+            });
+            
+            // Add selected class and type-specific class to clicked button
+            const selectedButton = document.querySelector(`[data-type="${type}"]`);
+            selectedButton.classList.add('selected', type);
+        }
+
+        async function sendMessage() {
+            if (currentUserType !== 'teacher') return;
+            
+            const studentId = document.getElementById('messageStudentSelect').value;
+            const content = document.getElementById('messageContent').value.trim();
+            
+            if (!studentId || !selectedMessageType || !content) {
+                alert('Please fill in all fields and select a message type');
+                return;
+            }
+            
+            try {
+                const messageData = {
+                    studentId: studentId,
+                    type: selectedMessageType,
+                    content: content,
+                    sentBy: 'Ustaadh'
+                };
+                
+                await saveMessage(messageData);
+                
+                closeModal('sendMessageModal');
+                
+                const students = await window.getStudents();
+                const student = students.find(s => s.id === studentId);
+                const studentName = student ? student.name : 'Student';
+                
+                alert(`Message sent to ${studentName}'s parent successfully!`);
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error sending message: ' + error.message);
+            }
+        }
+
+        async function checkForMessages() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const messages = await getStudentMessages(currentStudent);
+                const unreadMessages = messages.filter(msg => !msg.read);
+                
+                if (unreadMessages.length > 0) {
+                    // Show the latest unread message
+                    showParentMessageModal(unreadMessages[0]);
+                }
+                
+            } catch (error) {
+                console.error('Error checking for messages:', error);
+            }
+        }
+
+        function showParentMessageModal(message) {
+            const content = document.getElementById('parentMessageContent');
+            
+            const messageTypeIcons = {
+                'info': 'ℹ️',
+                'reminder': '⏰',
+                'urgent': '🚨'
+            };
+            
+            const messageTypeColors = {
+                'info': '#DBEAFE',
+                'reminder': '#FED7AA', 
+                'urgent': '#FEE2E2'
+            };
+            
+            const messageTypeTextColors = {
+                'info': '#1E40AF',
+                'reminder': '#C2410C',
+                'urgent': '#991B1B'
+            };
+            
+            const sentDate = new Date(message.sentDate).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+            
+            content.innerHTML = `
+                <div class="message-notification">
+                    <div class="message-notification-title">
+                        ${messageTypeIcons[message.type]} New Message from Ustaadh
+                    </div>
+                    <div class="message-notification-desc">
+                        You have received a ${message.type} message
+                    </div>
+                </div>
+                
+                <div class="message-item unread">
+                    <div class="message-header">
+                        <span class="message-type-badge ${message.type}">${messageTypeIcons[message.type]} ${message.type.toUpperCase()}</span>
+                        <span class="message-date">${sentDate}</span>
+                    </div>
+                    
+                    <div class="message-content">
+                        ${message.content}
+                    </div>
+                    
+                    <div class="message-actions">
+                        <button class="message-review-btn" onclick="reviewMessage('${message.messageId}')">
+                            ✓ Review & Dismiss
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('parentMessageModal').style.display = 'block';
+        }
+
+        async function reviewMessage(messageId) {
+            try {
+                await markMessageAsRead(messageId);
+                closeModal('parentMessageModal');
+                
+                // Show success message
+                const successDiv = document.createElement('div');
+                successDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10A37F;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                successDiv.textContent = '✓ Message reviewed';
+                document.body.appendChild(successDiv);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successDiv)) {
+                        document.body.removeChild(successDiv);
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error reviewing message:', error);
+                alert('Error reviewing message: ' + error.message);
+            }
+        }
+
+        async function showParentMessagesHistory() {
+            if (currentUserType !== 'parent' || !currentStudent) return;
+            
+            try {
+                const messages = await getStudentMessages(currentStudent);
+                const content = document.getElementById('parentMessagesHistoryContent');
+                
+                if (messages.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 50px 30px; color: #8E8E93;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">📬</div>
+                            <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">No Messages</h3>
+                            <p style="color: #8E8E93; font-size: 16px;">You haven't received any messages from the Ustaadh yet.</p>
+                        </div>
+                    `;
+                } else {
+                    let messagesHtml = '';
+                    
+                    messages.forEach(message => {
+                        const messageTypeIcons = {
+                            'info': 'ℹ️',
+                            'reminder': '⏰',
+                            'urgent': '🚨'
+                        };
+                        
+                        const sentDate = new Date(message.sentDate).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        });
+                        
+                        const readStatus = message.read ? 'read' : 'unread';
+                        
+                        messagesHtml += `
+                            <div class="message-item ${readStatus}">
+                                <div class="message-header">
+                                    <span class="message-type-badge ${message.type}">${messageTypeIcons[message.type]} ${message.type.toUpperCase()}</span>
+                                    <span class="message-date">${sentDate}</span>
+                                </div>
+                                
+                                <div class="message-content">
+                                    ${message.content}
+                                </div>
+                                
+                                ${!message.read ? `
+                                    <div class="message-actions">
+                                        <button class="message-review-btn" onclick="reviewMessageFromHistory('${message.messageId}')">
+                                            ✓ Mark as Read
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    content.innerHTML = messagesHtml;
+                }
+                
+                document.getElementById('parentMessagesHistoryModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading messages history:', error);
+                alert('Error loading messages: ' + error.message);
+            }
+        }
+
+        async function reviewMessageFromHistory(messageId) {
+            try {
+                await markMessageAsRead(messageId);
+                
+                // Refresh the history display
+                showParentMessagesHistory();
+                
+            } catch (error) {
+                console.error('Error marking message as read:', error);
+                alert('Error updating message: ' + error.message);
+            }
+        }
+
+        // Updated Message Management Functions - FIXED
+        let currentMessageFilter = 'all';
+        let allMessagesData = [];
+
+        async function showManageMessagesModal() {
+            if (currentUserType !== 'teacher') return;
+            
+            try {
+                const messages = await getAllMessages();
+                const students = await window.getStudents();
+                allMessagesData = messages;
+                
+                console.log('Messages found:', messages.length);
+                console.log('Students found:', students.length);
+                
+                // Update summary stats
+                updateMessagesSummary(messages);
+                
+                // Reset filter
+                currentMessageFilter = 'all';
+                document.querySelectorAll('.filter-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector('[data-filter="all"]').classList.add('active');
+                
+                // Display messages
+                await displayFilteredMessages(messages, students);
+                
+                document.getElementById('manageMessagesModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading messages management:', error);
+                alert('Error loading messages: ' + error.message);
+            }
+        }
+
+        function updateMessagesSummary(messages) {
+            const totalMessages = messages.length;
+            const readMessages = messages.filter(msg => msg.read).length;
+            const unreadMessages = totalMessages - readMessages;
+            const infoMessages = messages.filter(msg => msg.type === 'info').length;
+            const reminderMessages = messages.filter(msg => msg.type === 'reminder').length;
+            const urgentMessages = messages.filter(msg => msg.type === 'urgent').length;
+            
+            document.getElementById('totalMessages').textContent = totalMessages;
+            document.getElementById('readMessages').textContent = readMessages;
+            document.getElementById('unreadMessages').textContent = unreadMessages;
+            document.getElementById('infoMessages').textContent = infoMessages;
+            document.getElementById('reminderMessages').textContent = reminderMessages;
+            document.getElementById('urgentMessages').textContent = urgentMessages;
+        }
+
+        async function filterMessages(filterType) {
+            currentMessageFilter = filterType;
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filterType}"]`).classList.add('active');
+            
+            // Filter and display messages
+            let filteredMessages = allMessagesData;
+            
+            switch(filterType) {
+                case 'read':
+                    filteredMessages = allMessagesData.filter(msg => msg.read);
+                    break;
+                case 'unread':
+                    filteredMessages = allMessagesData.filter(msg => !msg.read);
+                    break;
+                case 'info':
+                    filteredMessages = allMessagesData.filter(msg => msg.type === 'info');
+                    break;
+                case 'reminder':
+                    filteredMessages = allMessagesData.filter(msg => msg.type === 'reminder');
+                    break;
+                case 'urgent':
+                    filteredMessages = allMessagesData.filter(msg => msg.type === 'urgent');
+                    break;
+                default:
+                    filteredMessages = allMessagesData;
+            }
+            
+            const students = await window.getStudents();
+            await displayFilteredMessages(filteredMessages, students);
+        }
+
+        async function displayFilteredMessages(messages, students) {
+            const content = document.getElementById('allMessagesContent');
+            
+            console.log('Displaying messages:', messages.length);
+            console.log('Students available:', students.length);
+            
+            if (messages.length === 0) {
+                const filterText = currentMessageFilter === 'all' ? '' : ` (${currentMessageFilter})`;
+                content.innerHTML = `
+                    <div class="no-messages">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📭</div>
+                        <h3>No Messages Found${filterText}</h3>
+                        <p>No messages match the current filter.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let messagesHtml = '';
+            
+            messages.forEach(message => {
+                const student = students.find(s => s.id === message.studentId);
+                const studentName = student ? student.name : `Student ID: ${message.studentId}`;
+                
+                const messageTypeIcons = {
+                    'info': 'ℹ️',
+                    'reminder': '⏰', 
+                    'urgent': '🚨'
+                };
+                
+                const sentDate = new Date(message.sentDate).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                const readStatus = message.read ? 'read' : 'unread';
+                const messagePreview = message.content && message.content.length > 50 ? 
+                    message.content.substring(0, 50) + '...' : (message.content || 'No content');
+                
+                messagesHtml += `
+                    <div class="homework-item" data-type="${message.type}" data-status="${readStatus}">
+                        <div class="homework-info">
+                            <div class="homework-student-name">${studentName}</div>
+                            <div class="homework-details">
+                                <span class="homework-type-tag ${message.type}">${messageTypeIcons[message.type] || '📧'} ${(message.type || 'message').toUpperCase()}</span>
+                                <span class="homework-due-date">Sent: ${sentDate}</span>
+                            </div>
+                            <div class="homework-description">${messagePreview}</div>
+                        </div>
+                        <div class="homework-status-section">
+                            <div class="homework-status ${readStatus}">${readStatus}</div>
+                            <button class="delete-homework-btn" onclick="confirmDeleteMessage('${message.messageId || message.id}', '${studentName}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = messagesHtml;
+        }
+
+        async function deleteMessageAndRefresh(messageId) {
+            try {
+                await deleteMessage(messageId);
+                
+                // Show success message
+                const successDiv = document.createElement('div');
+                successDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10A37F;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                successDiv.textContent = '✓ Message deleted successfully';
+                document.body.appendChild(successDiv);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successDiv)) {
+                        document.body.removeChild(successDiv);
+                    }
+                }, 2000);
+                
+                // Refresh the messages display
+                await showManageMessagesModal();
+                
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                alert('Error deleting message: ' + error.message);
             }
         }
 
@@ -8921,6 +10128,10 @@
                 currentUser = null;
                 selectedProfile = null;
                 
+                // Reset to current month
+                currentDisplayMonth = new Date().getMonth() + 1;
+                currentDisplayYear = new Date().getFullYear();
+                
                 // Show profile selection
                 showProfileSelection();
                 
@@ -8931,13 +10142,18 @@
                 currentUserType = null;
                 currentUser = null;
                 selectedProfile = null;
+                
+                // Reset to current month
+                currentDisplayMonth = new Date().getMonth() + 1;
+                currentDisplayYear = new Date().getFullYear();
+                
                 showProfileSelection();
             }
         }
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'manageStudentsModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal', 'studentTargetsModal', 'viewTargetsModal'];
+            const modals = ['progressModal', 'manageStudentsModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal', 'studentTargetsModal', 'viewTargetsModal', 'sendMessageModal', 'parentMessageModal', 'parentMessagesHistoryModal', 'manageMessagesModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -8964,9 +10180,12 @@
             }
         });
 
-        // Initialize app when page loads
         function initializeApp() {
             try {
+                // Always start on current month when app initializes
+                currentDisplayMonth = new Date().getMonth() + 1;
+                currentDisplayYear = new Date().getFullYear();
+                
                 updateCurrentDate();
                 initializeFirebaseConnection();
                 console.log('App initialized successfully');
@@ -9054,6 +10273,18 @@ window.selectProfile = selectProfile;
         window.showOfficeStudentTargetsModal = showOfficeStudentTargetsModal;
         window.loadAllStudentTargetsForYear = loadAllStudentTargetsForYear;
         window.showViewTargetsModal = showViewTargetsModal;
+        window.showSendMessageModal = showSendMessageModal;
+        window.selectMessageType = selectMessageType;
+        window.sendMessage = sendMessage;
+        window.checkForMessages = checkForMessages;
+        window.showParentMessageModal = showParentMessageModal;
+        window.reviewMessage = reviewMessage;
+        window.showParentMessagesHistory = showParentMessagesHistory;
+        window.reviewMessageFromHistory = reviewMessageFromHistory;
+        window.showManageMessagesModal = showManageMessagesModal;
+        window.filterMessages = filterMessages;
+        window.confirmDeleteMessage = confirmDeleteMessage;
+        window.deleteMessageAndRefresh = deleteMessageAndRefresh;
         window.exportStudentPDF = exportStudentPDF;
         window.generateSelectedPDF = generateSelectedPDF;
         window.generateAllStudentsPDF = generateAllStudentsPDF;
@@ -9956,7 +11187,7 @@ window.selectProfile = selectProfile;
                 pdf.text('No Hifz progress data available', 105, yPos + 50, { align: 'center' });
                 
                 pdf.setFontSize(12);
-                pdf.text('Please contact the teacher to set up Hifz tracking', 105, yPos + 70, { align: 'center' });
+                pdf.text('Please contact the Ustaadh to set up Hifz tracking', 105, yPos + 70, { align: 'center' });
             } else {
                 // Hifz Duration Section - COMPACT
                 pdf.setTextColor(28, 28, 30);
@@ -11487,7 +12718,7 @@ window.selectProfile = selectProfile;
                 pdf.text('No Hifz progress data available', 105, yPos + 50, { align: 'center' });
                 
                 pdf.setFontSize(12);
-                pdf.text('Please contact the teacher to set up Hifz tracking', 105, yPos + 70, { align: 'center' });
+                pdf.text('Please contact the Ustaadh to set up Hifz tracking', 105, yPos + 70, { align: 'center' });
             } else {
                 // Hifz Duration Section - COMPACT
                 pdf.setTextColor(28, 28, 30);
