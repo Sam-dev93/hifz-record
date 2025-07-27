@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Hifz Record">
+    <meta name="apple-mobile-web-app-title" content="Hifz Tracker">
     <meta name="theme-color" content="#F2F2F7">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
-    <title>Hifz Record - Progress Tracking</title>
+    <title>Hifz Tracker</title>
 
     <!-- iOS Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
@@ -2540,7 +2540,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="app-title">📖 Hifz Record</h1>
+            <h1 class="app-title">📖 Hifz Tracker</h1>
             <div class="current-date" id="currentDate">Loading...</div>
             <div class="cloud-status connecting" id="cloudStatus">🔄 Connecting to Cloud...</div>
             <div class="user-info" id="userInfo" style="display: none;"></div>
@@ -8403,7 +8403,7 @@
             pdf.setTextColor(30, 64, 175);
             pdf.setFontSize(12);
             pdf.setFont(undefined, 'bold');
-            pdf.text('📋 Report Contents', 25, yPos + 10);
+            pdf.text('Report Contents', 25, yPos + 10);
             
             pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
@@ -10321,7 +10321,7 @@ window.selectProfile = selectProfile;
             pdf.setTextColor(30, 64, 175);
             pdf.setFontSize(12);
             pdf.setFont(undefined, 'bold');
-            pdf.text('📋 Report Contents', 25, yPos + 10);
+            pdf.text('Report Contents', 25, yPos + 10);
             
             pdf.setFontSize(10);
             pdf.setFont(undefined, 'normal');
@@ -10710,6 +10710,10 @@ window.selectProfile = selectProfile;
             const studentData = await window.getStudentData(studentId);
             const juzData = await getStudentJuzProgress(studentId);
             
+            // ADDED: Fetch target data for the student and academic year
+            const targetYear = academicYear || await getCurrentAcademicYear();
+            const targetData = await getStudentTargetsForYear(studentId, targetYear);
+            
             // Helper function for rounded rectangles
             function roundedRect(x, y, width, height, radius, style) {
                 if (typeof pdf.roundedRect !== 'undefined') {
@@ -10853,13 +10857,13 @@ window.selectProfile = selectProfile;
             }
             
             // Calculate yearly stats for selected academic year
-            let targetYear;
+            let targetYear_calc;
             if (academicYear) {
                 const [startYear, endYear] = academicYear.split('-');
-                targetYear = { start: startYear, end: endYear, academicYear: academicYear };
+                targetYear_calc = { start: startYear, end: endYear, academicYear: academicYear };
             } else {
                 const currentYear = new Date().getFullYear();
-                targetYear = { start: currentYear.toString(), end: currentYear.toString(), academicYear: currentYear.toString() };
+                targetYear_calc = { start: currentYear.toString(), end: currentYear.toString(), academicYear: currentYear.toString() };
             }
             
             const yearlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0, totalDays: 0 };
@@ -10871,7 +10875,7 @@ window.selectProfile = selectProfile;
                 // Filter by academic year if specified
                 if (academicYear && !isDateInAcademicYear(date, academicYear)) {
                     return;
-                } else if (!academicYear && !date.startsWith(targetYear.start)) {
+                } else if (!academicYear && !date.startsWith(targetYear_calc.start)) {
                     return;
                 }
                 
@@ -10948,10 +10952,10 @@ window.selectProfile = selectProfile;
             pdf.text('Monthly Breakdown', 20, yPos);
             yPos += 10;
             
-            // Generate monthly breakdown table
-            const colStarts = [20, 45, 65, 85, 105, 125];
-            const colWidths = [25, 20, 20, 20, 20, 25];
-            const tableWidth = 130;
+            // UPDATED: Generate monthly breakdown table with Target column (7 columns now)
+            const colStarts = [20, 45, 65, 85, 105, 125, 145];    // ADDED 7th column
+            const colWidths = [25, 20, 20, 20, 20, 20, 20];       // ADDED 7th width
+            const tableWidth = 145;                                // INCREASED table width
             const rowHeight = 8;
             
             // Table headers
@@ -10962,7 +10966,7 @@ window.selectProfile = selectProfile;
             pdf.setLineWidth(0.3);
             pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
             
-            // Vertical lines for columns
+            // UPDATED: Vertical lines for 7 columns
             for (let i = 0; i <= colStarts.length; i++) {
                 const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
                 pdf.line(x, yPos, x, yPos + rowHeight);
@@ -10972,7 +10976,8 @@ window.selectProfile = selectProfile;
             pdf.setFontSize(7);
             pdf.setFont(undefined, 'bold');
             
-            const headers = ['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Did Not Give'];
+            // UPDATED: Added 'Target' to headers
+            const headers = ['Month', 'Sabak', 'Para', 'Dhor', 'Absent', 'Did Not Give', 'Target'];
             headers.forEach(function(header, index) {
                 centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 5);
             });
@@ -11015,6 +11020,28 @@ window.selectProfile = selectProfile;
                         }
                     });
                     
+                    // ADDED: Get target status for this month
+                    let targetStatus = '--';
+                    let targetColor = [142, 142, 147]; // Default gray
+                    
+                    if (targetData.monthly && targetData.monthly[month.key] && targetData.monthly[month.key].status) {
+                        const status = targetData.monthly[month.key].status;
+                        switch(status) {
+                            case 'above':
+                                targetStatus = 'Above';
+                                targetColor = [52, 199, 89]; // Green
+                                break;
+                            case 'on':
+                                targetStatus = 'On';
+                                targetColor = [59, 130, 246]; // Blue
+                                break;
+                            case 'below':
+                                targetStatus = 'Below';
+                                targetColor = [255, 59, 48]; // Red
+                                break;
+                        }
+                    }
+                    
                     // Row background
                     const rowColor = index % 2 === 0 ? [255, 255, 255] : [248, 249, 250];
                     pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
@@ -11025,7 +11052,7 @@ window.selectProfile = selectProfile;
                     pdf.setLineWidth(0.2);
                     pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
                     
-                    // Vertical lines
+                    // UPDATED: Vertical lines for 7 columns
                     for (let i = 0; i <= colStarts.length; i++) {
                         const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
                         pdf.line(x, yPos, x, yPos + rowHeight);
@@ -11042,6 +11069,11 @@ window.selectProfile = selectProfile;
                     centerTextInColumn(monthStats.dhor.toString(), colStarts[3], colWidths[3], yPos + 5);
                     centerTextInColumn(monthStats.absent.toString(), colStarts[4], colWidths[4], yPos + 5);
                     centerTextInColumn(monthStats.didNotGive.toString(), colStarts[5], colWidths[5], yPos + 5);
+                    
+                    // ADDED: Target status with appropriate color
+                    pdf.setTextColor(targetColor[0], targetColor[1], targetColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(targetStatus, colStarts[6], colWidths[6], yPos + 5);
                     
                     yPos += rowHeight;
                 });
