@@ -1620,7 +1620,7 @@
         
         .grade-button.selected { 
             background: #10A37F; 
-            border-color: #10A37F; 
+            /*border-color: #10A37F;*/
             color: white; 
         }
         
@@ -3406,50 +3406,6 @@
                 <span class="close" onclick="closeModal('manageMessagesModal')">&times;</span>
             </div>
             <div class="modal-body">
-                <!-- Summary Section - Matching Homework Style -->
-                <div class="homework-section">
-                    <div class="homework-section-title">
-                        📊 Overall Message Summary
-                    </div>
-                    <div class="summary-stats">
-                        <div class="summary-stat">
-                            <div class="summary-stat-number" id="totalMessages">0</div>
-                            <div class="summary-stat-label">Total</div>
-                        </div>
-                        <div class="summary-stat">
-                            <div class="summary-stat-number" style="color: #10A37F;" id="readMessages">0</div>
-                            <div class="summary-stat-label">Read</div>
-                        </div>
-                        <div class="summary-stat">
-                            <div class="summary-stat-number" style="color: #FF9500;" id="unreadMessages">0</div>
-                            <div class="summary-stat-label">Unread</div>
-                        </div>
-                        <div class="summary-stat">
-                            <div class="summary-stat-number" style="color: #3B82F6;" id="infoMessages">0</div>
-                            <div class="summary-stat-label">Info</div>
-                        </div>
-                        <div class="summary-stat">
-                            <div class="summary-stat-number" style="color: #FF9500;" id="reminderMessages">0</div>
-                            <div class="summary-stat-label">Reminder</div>
-                        </div>
-                        <div class="summary-stat">
-                            <div class="summary-stat-number" style="color: #FF3B30;" id="urgentMessages">0</div>
-                            <div class="summary-stat-label">Urgent</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filter Buttons -->
-                <div class="homework-filters">
-                    <div class="filter-button active" data-filter="all" onclick="filterMessages('all')">All</div>
-                    <div class="filter-button" data-filter="unread" onclick="filterMessages('unread')">Unread</div>
-                    <div class="filter-button" data-filter="read" onclick="filterMessages('read')">Read</div>
-                    <div class="filter-button" data-filter="info" onclick="filterMessages('info')">Info</div>
-                    <div class="filter-button" data-filter="reminder" onclick="filterMessages('reminder')">Reminder</div>
-                    <div class="filter-button" data-filter="urgent" onclick="filterMessages('urgent')">Urgent</div>
-                </div>
-
-                <!-- Messages List -->
                 <div id="allMessagesContent">
                     <!-- Messages will be populated here -->
                 </div>
@@ -5404,11 +5360,11 @@
             
             const filtersHtml = `
                 <div class="homework-filters">
-                    <button class="filter-button ${currentFilter === 'all' ? 'active' : ''}" onclick="loadAllHomework('all')">All</button>
-                    <button class="filter-button ${currentFilter === 'pending' ? 'active' : ''}" onclick="loadAllHomework('pending')">Pending</button>
-                    <button class="filter-button ${currentFilter === 'completed' ? 'active' : ''}" onclick="loadAllHomework('completed')">Completed</button>
-                    <button class="filter-button ${currentFilter === 'overdue' ? 'active' : ''}" onclick="loadAllHomework('overdue')">Overdue</button>
-                    <button class="filter-button ${currentFilter === 'did-not-give' ? 'active' : ''}" onclick="loadAllHomework('did-not-give')">Did Not Give</button>
+                    <div class="filter-button ${currentFilter === 'all' ? 'active' : ''}" onclick="loadAllHomework('all')">All</div>
+                    <div class="filter-button ${currentFilter === 'pending' ? 'active' : ''}" onclick="loadAllHomework('pending')">Pending</div>
+                    <div class="filter-button ${currentFilter === 'completed' ? 'active' : ''}" onclick="loadAllHomework('completed')">Completed</div>
+                    <div class="filter-button ${currentFilter === 'overdue' ? 'active' : ''}" onclick="loadAllHomework('overdue')">Overdue</div>
+                    <div class="filter-button ${currentFilter === 'did-not-give' ? 'active' : ''}" onclick="loadAllHomework('did-not-give')">Did Not Give</div>
                 </div>
             `;
             
@@ -5422,7 +5378,7 @@
             const summaryHtml = `
                 <div class="homework-summary-section">
                     <h3 class="homework-summary-title">📊 Overall Homework Summary</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                    <div class="homework-summary-grid">
                         <div class="homework-summary-stat">
                             <div class="homework-summary-number" style="color: #1C1C1E;">${totalCount}</div>
                             <div class="homework-summary-label">Total</div>
@@ -5473,9 +5429,8 @@
                     day: 'numeric' 
                 });
                 
-                // FIXED: Show proper subject name
                 const typeDisplay = hw.type === 'para' ? 'Sabak Para' : 
-                                  hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
+                                hw.type.charAt(0).toUpperCase() + hw.type.slice(1);
                 
                 let statusHtml = '';
                 let itemClass = '';
@@ -5495,7 +5450,6 @@
                 const descriptionHtml = hw.description ? 
                     `<div class="homework-description-display">${hw.description}</div>` : '';
                 
-                // Action buttons based on status
                 let actionButtonsHtml = '';
                 if (hw.status === 'did-not-give') {
                     actionButtonsHtml = `
@@ -5542,7 +5496,17 @@
                             <div>
                                 <div class="homework-student-name">${studentName}</div>
                                 <div class="homework-details">
-                                    <span class="homework-type-badge ${hw.type}">${typeDisplay}</span>
+                                    <span class="homework-type-badge" style="
+                                        background-color: ${hw.type === 'sabak' ? '#E8F5E8' : hw.type === 'para' ? '#F3E5F5' : hw.type === 'dhor' ? '#FFF3E0' : '#E8F5E8'}; 
+                                        color: ${hw.type === 'sabak' ? '#2E7D32' : hw.type === 'para' ? '#7B1FA2' : hw.type === 'dhor' ? '#E65100' : '#2E7D32'}; 
+                                        padding: 6px 12px; 
+                                        border-radius: 16px; 
+                                        font-size: 12px; 
+                                        font-weight: 600; 
+                                        display: inline-flex; 
+                                        align-items: center; 
+                                        gap: 4px;
+                                    ">${typeDisplay}</span>
                                     Due: ${dueDateStr}
                                 </div>
                             </div>
@@ -9079,18 +9043,11 @@
                 console.log('Messages found:', messages.length);
                 console.log('Students found:', students.length);
                 
-                // Update summary stats
-                updateMessagesSummary(messages);
-                
                 // Reset filter
                 currentMessageFilter = 'all';
-                document.querySelectorAll('.filter-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelector('[data-filter="all"]').classList.add('active');
                 
-                // Display messages
-                await displayFilteredMessages(messages, students);
+                // Display messages with summary
+                await displayFilteredMessages(messages, students, 'all');
                 
                 document.getElementById('manageMessagesModal').style.display = 'block';
                 
@@ -9100,30 +9057,8 @@
             }
         }
 
-        function updateMessagesSummary(messages) {
-            const totalMessages = messages.length;
-            const readMessages = messages.filter(msg => msg.read).length;
-            const unreadMessages = totalMessages - readMessages;
-            const infoMessages = messages.filter(msg => msg.type === 'info').length;
-            const reminderMessages = messages.filter(msg => msg.type === 'reminder').length;
-            const urgentMessages = messages.filter(msg => msg.type === 'urgent').length;
-            
-            document.getElementById('totalMessages').textContent = totalMessages;
-            document.getElementById('readMessages').textContent = readMessages;
-            document.getElementById('unreadMessages').textContent = unreadMessages;
-            document.getElementById('infoMessages').textContent = infoMessages;
-            document.getElementById('reminderMessages').textContent = reminderMessages;
-            document.getElementById('urgentMessages').textContent = urgentMessages;
-        }
-
         async function filterMessages(filterType) {
             currentMessageFilter = filterType;
-            
-            // Update active filter button
-            document.querySelectorAll('.filter-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-filter="${filterType}"]`).classList.add('active');
             
             // Filter and display messages
             let filteredMessages = allMessagesData;
@@ -9149,22 +9084,75 @@
             }
             
             const students = await window.getStudents();
-            await displayFilteredMessages(filteredMessages, students);
+            await displayFilteredMessages(filteredMessages, students, filterType);
         }
 
-        async function displayFilteredMessages(messages, students) {
+        async function displayFilteredMessages(messages, students, filterType = 'all') {
             const content = document.getElementById('allMessagesContent');
             
             console.log('Displaying messages:', messages.length);
             console.log('Students available:', students.length);
             
+            // Calculate message stats (same logic as homework)
+            const totalCount = allMessagesData.length;
+            const readCount = allMessagesData.filter(msg => msg.read).length;
+            const unreadCount = totalCount - readCount;
+            const infoCount = allMessagesData.filter(msg => msg.type === 'info').length;
+            const reminderCount = allMessagesData.filter(msg => msg.type === 'reminder').length;
+            const urgentCount = allMessagesData.filter(msg => msg.type === 'urgent').length;
+            
+            // Summary section - EXACT same structure as homework
+            const summaryHtml = `
+                <div class="homework-summary-section">
+                    <h3 class="homework-summary-title">📊 Overall Message Summary</h3>
+                    <div class="homework-summary-grid">
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #1C1C1E;">${totalCount}</div>
+                            <div class="homework-summary-label">Total</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #10A37F;">${readCount}</div>
+                            <div class="homework-summary-label">Read</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #FF9500;">${unreadCount}</div>
+                            <div class="homework-summary-label">Unread</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #3B82F6;">${infoCount}</div>
+                            <div class="homework-summary-label">Info</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #FF9500;">${reminderCount}</div>
+                            <div class="homework-summary-label">Reminder</div>
+                        </div>
+                        <div class="homework-summary-stat">
+                            <div class="homework-summary-number" style="color: #FF3B30;">${urgentCount}</div>
+                            <div class="homework-summary-label">Urgent</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Filter buttons - EXACT same structure as homework
+            const filtersHtml = `
+                <div class="homework-filters">
+                    <div class="filter-button ${filterType === 'all' ? 'active' : ''}" data-filter="all" onclick="filterMessages('all')">All</div>
+                    <div class="filter-button ${filterType === 'unread' ? 'active' : ''}" data-filter="unread" onclick="filterMessages('unread')">Unread</div>
+                    <div class="filter-button ${filterType === 'read' ? 'active' : ''}" data-filter="read" onclick="filterMessages('read')">Read</div>
+                    <div class="filter-button ${filterType === 'info' ? 'active' : ''}" data-filter="info" onclick="filterMessages('info')">Info</div>
+                    <div class="filter-button ${filterType === 'reminder' ? 'active' : ''}" data-filter="reminder" onclick="filterMessages('reminder')">Reminder</div>
+                    <div class="filter-button ${filterType === 'urgent' ? 'active' : ''}" data-filter="urgent" onclick="filterMessages('urgent')">Urgent</div>
+                </div>
+            `;
+            
             if (messages.length === 0) {
-                const filterText = currentMessageFilter === 'all' ? '' : ` (${currentMessageFilter})`;
-                content.innerHTML = `
-                    <div class="no-messages">
-                        <div style="font-size: 48px; margin-bottom: 20px;">📭</div>
-                        <h3>No Messages Found${filterText}</h3>
-                        <p>No messages match the current filter.</p>
+                const filterText = filterType === 'all' ? '' : ` (${filterType})`;
+                content.innerHTML = summaryHtml + filtersHtml + `
+                    <div class="no-homework">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+                        <h3 style="font-size: 18px; margin-bottom: 8px;">No Messages Found</h3>
+                        <p>No messages match the current filter${filterText}.</p>
                     </div>
                 `;
                 return;
@@ -9189,22 +9177,43 @@
                 });
                 
                 const readStatus = message.read ? 'read' : 'unread';
-                const messagePreview = message.content && message.content.length > 50 ? 
-                    message.content.substring(0, 50) + '...' : (message.content || 'No content');
+                const itemClass = message.read ? 'completed' : 'pending';
+                const messagePreview = message.content && message.content.length > 100 ? 
+                    message.content.substring(0, 100) + '...' : (message.content || 'No content');
                 
+                // Message item - EXACT same structure as homework item
                 messagesHtml += `
-                    <div class="homework-item" data-type="${message.type}" data-status="${readStatus}">
-                        <div class="homework-info">
-                            <div class="homework-student-name">${studentName}</div>
-                            <div class="homework-details">
-                                <span class="homework-type-tag ${message.type}">${messageTypeIcons[message.type] || '📧'} ${(message.type || 'message').toUpperCase()}</span>
-                                <span class="homework-due-date">Sent: ${sentDate}</span>
+                    <div class="homework-item ${itemClass}">
+                        <div class="homework-header">
+                            <div>
+                                <div class="homework-student-name">${studentName}</div>
+                                <div class="homework-details">
+                                    <span class="message-type-badge" style="
+                                        background-color: ${message.type === 'info' ? '#E3F2FD' : message.type === 'reminder' ? '#FFF3E0' : message.type === 'urgent' ? '#FFEBEE' : '#E3F2FD'}; 
+                                        color: ${message.type === 'info' ? '#1565C0' : message.type === 'reminder' ? '#E65100' : message.type === 'urgent' ? '#C62828' : '#1565C0'}; 
+                                        padding: 6px 12px; 
+                                        border-radius: 16px; 
+                                        font-size: 12px; 
+                                        font-weight: 600; 
+                                        display: inline-flex; 
+                                        align-items: center; 
+                                        gap: 4px;
+                                    ">${messageTypeIcons[message.type] || '📧'} ${(message.type || 'message').toUpperCase()}</span>
+                                    Sent: ${sentDate}
+                                </div>
                             </div>
-                            <div class="homework-description">${messagePreview}</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="homework-status ${readStatus}">${message.read ? 'Read' : 'Unread'}</span>
+                            </div>
                         </div>
-                        <div class="homework-status-section">
-                            <div class="homework-status ${readStatus}">${readStatus}</div>
-                            <button class="delete-homework-btn" onclick="confirmDeleteMessage('${message.messageId || message.id}', '${studentName}')">
+                        
+                        <div class="homework-description-display">
+                            ${messagePreview}
+                        </div>
+                        
+                        <div class="homework-actions">
+                            <button class="homework-toggle incomplete" onclick="deleteMessageAndRefresh('${message.messageId || message.id}')" 
+                                    style="background: #FF3B30;">
                                 🗑️ Delete
                             </button>
                         </div>
@@ -9212,10 +9221,14 @@
                 `;
             });
             
-            content.innerHTML = messagesHtml;
+            content.innerHTML = summaryHtml + filtersHtml + messagesHtml;
         }
 
         async function deleteMessageAndRefresh(messageId) {
+            if (!confirm('Are you sure you want to delete this message?')) {
+                return;
+            }
+            
             try {
                 await deleteMessage(messageId);
                 
@@ -9243,11 +9256,26 @@
                 }, 2000);
                 
                 // Refresh the messages display
-                await showManageMessagesModal();
+                const messages = await getAllMessages();
+                allMessagesData = messages;
+                await filterMessages(currentMessageFilter);
                 
             } catch (error) {
                 console.error('Error deleting message:', error);
                 alert('Error deleting message: ' + error.message);
+            }
+        }
+
+        async function deleteMessage(messageId) {
+            try {
+                const { deleteDoc, doc } = window.firebaseModules;
+                const { db } = window.firebase;
+                
+                await deleteDoc(doc(db, 'messages', messageId));
+                console.log('Message deleted:', messageId);
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                throw error;
             }
         }
 
@@ -10215,7 +10243,7 @@
         });
 
 // Ensure all functions are available globally for onclick handlers
-window.selectProfile = selectProfile;
+        window.selectProfile = selectProfile;
         window.continueToLogin = continueToLogin;
         window.goBackToProfiles = goBackToProfiles;
         window.login = login;
