@@ -7117,29 +7117,11 @@
                 }
             });
             
-            // Helper function to convert decimal pages to nearest 1/2 fraction
-            function convertToFraction(decimalPages) {
-                // Round to nearest 0.5
-                const roundedToHalf = Math.round(decimalPages * 2) / 2;
-                const wholePart = Math.floor(roundedToHalf);
-                const hasHalf = (roundedToHalf - wholePart) === 0.5;
-                
-                if (hasHalf) {
-                    if (wholePart === 0) {
-                        return "1/2";
-                    } else {
-                        return `${wholePart} & 1/2`;
-                    }
-                } else {
-                    return Math.round(roundedToHalf).toString();
-                }
-            }
-            
-            // Display total pages for SABAK (converted to nearest 1/2 fraction)
-            const totalPagesDisplay = convertToFraction(stats.sabakPages);
+            // Display total pages for SABAK (rounded to nearest whole page)
+            const totalPagesDisplay = Math.round(stats.sabakPages);
             document.getElementById('sabakCount').textContent = totalPagesDisplay;
             
-            // Update SABAK label to show "SABAK PAGES"
+            // Update SABAK label to show "SABAK PAGES" 
             const sabakLabel = document.querySelector('.stat-card.sabak .stat-label');
             if (sabakLabel) {
                 sabakLabel.textContent = 'SABAK PAGES';
