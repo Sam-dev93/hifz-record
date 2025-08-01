@@ -3056,6 +3056,10 @@
                             <button class="control-button" onclick="showOverallProgressModal()">📈 Overall Progress</button>
                             <button class="control-button" onclick="showViewTargetsModal()">🎯 View Targets</button>
                             <button class="control-button" onclick="showParentMessagesHistory()">📬 View Messages</button>
+                            <button class="control-button pdf-export-button" onclick="showParentExportModal()">
+                                <div class="loading-spinner" id="parentPdfSpinner"></div>
+                                <span id="parentPdfBtnText">📄 Download Report</span>
+                            </button>
                         </div>
 
                         <button class="logout-button" onclick="logout()">Logout</button>
@@ -3737,6 +3741,60 @@
                     <button class="save-button pdf-export-button" onclick="generateSelectedPDF()" id="generatePDFBtn">
                         <div class="loading-spinner" id="modalPdfSpinner"></div>
                         <span id="modalPdfBtnText">📄 Generate PDF Report</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent Export PDF Modal -->
+    <div id="parentExportPDFModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📄 Download Your Child's Report</h2>
+                <span class="close" onclick="closeModal('parentExportPDFModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="entry-form">
+                    <div class="form-group">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select" id="parentPdfReportType" onchange="toggleParentDatePicker()">
+                            <option value="current-month">Current Month Progress</option>
+                            <option value="monthly-detailed">Monthly Detailed Report</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="parentMonthYearPicker" style="display: none;">
+                        <label class="form-label">Select Month & Year</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select class="form-select" id="parentMonthSelect" style="flex: 1;">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select class="form-select" id="parentYearSelect" style="flex: 1;">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="background: #E8F4FD; padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                        <div style="font-size: 14px; color: #1E40AF; font-weight: 600;">
+                            📋 Report will include your child's progress data only
+                        </div>
+                    </div>
+                    <button class="save-button pdf-export-button" onclick="generateParentPDF()" id="generateParentPDFBtn">
+                        <div class="loading-spinner" id="parentModalPdfSpinner"></div>
+                        <span id="parentModalPdfBtnText">📄 Generate PDF Report</span>
                     </button>
                 </div>
             </div>
@@ -7016,7 +7074,11 @@
             if (!currentStudent) return;
             
             const studentData = await window.getStudentData(currentStudent);
-            const stats = { sabak: 0, para: 0, dhor: 0 };
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === currentStudent);
+            const quranType = student ? student.quranType || 13 : 13;
+            
+            const stats = { sabak: 0, sabakPages: 0, para: 0, dhor: 0 };
             
             const currentMonth = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}`;
             
@@ -7037,17 +7099,64 @@
                 }
                 
                 if (date.startsWith(currentMonth)) {
-                    progressTypes.forEach(type => {
-                        if (dayData[type]) {
-                            stats[type]++;
-                        }
-                    });
+                    // Calculate SABAK pages instead of days
+                    if (dayData.sabak && dayData.sabak.lines && !dayData.absent && !dayData.didNotGive) {
+                        const lines = dayData.sabak.lines;
+                        const pages = lines / quranType; // Convert lines to pages based on Quran type
+                        stats.sabakPages += pages;
+                        stats.sabak++; // Keep day count for reference if needed
+                    }
+                    
+                    // Count days for Para and Dhor (unchanged)
+                    if (dayData.para && !dayData.absent && !dayData.didNotGive) {
+                        stats.para++;
+                    }
+                    if (dayData.dhor && !dayData.absent && !dayData.didNotGive) {
+                        stats.dhor++;
+                    }
                 }
             });
             
-            document.getElementById('sabakCount').textContent = stats.sabak;
+            // Helper function to convert decimal pages to nearest 1/2 fraction
+            function convertToFraction(decimalPages) {
+                // Round to nearest 0.5
+                const roundedToHalf = Math.round(decimalPages * 2) / 2;
+                const wholePart = Math.floor(roundedToHalf);
+                const hasHalf = (roundedToHalf - wholePart) === 0.5;
+                
+                if (hasHalf) {
+                    if (wholePart === 0) {
+                        return "1/2";
+                    } else {
+                        return `${wholePart} & 1/2`;
+                    }
+                } else {
+                    return Math.round(roundedToHalf).toString();
+                }
+            }
+            
+            // Display total pages for SABAK (converted to nearest 1/2 fraction)
+            const totalPagesDisplay = convertToFraction(stats.sabakPages);
+            document.getElementById('sabakCount').textContent = totalPagesDisplay;
+            
+            // Update SABAK label to show "SABAK PAGES"
+            const sabakLabel = document.querySelector('.stat-card.sabak .stat-label');
+            if (sabakLabel) {
+                sabakLabel.textContent = 'SABAK PAGES';
+            }
+            
+            // Keep Para and Dhor as day counts with "DAYS" labels
             document.getElementById('paraCount').textContent = stats.para;
+            const paraLabel = document.querySelector('.stat-card.para .stat-label');
+            if (paraLabel) {
+                paraLabel.textContent = 'SABAK PARA';
+            }
+            
             document.getElementById('dhorCount').textContent = stats.dhor;
+            const dhorLabel = document.querySelector('.stat-card.dhor .stat-label');
+            if (dhorLabel) {
+                dhorLabel.textContent = 'DHOR';
+            }
         }
 
         function openProgressModal(type, title) {
@@ -9689,6 +9798,11 @@
 
         // Updated individual PDF generation functions to support skipSave parameter
         async function generateSingleStudentPDF(studentId, reportType, providedPDF = null, skipSave = false) {
+            // ADD THIS SECURITY CHECK
+            if (currentUserType === 'parent' && studentId !== currentStudent) {
+                throw new Error('Access denied: Cannot access other student data');
+            }
+            
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -9714,6 +9828,12 @@
                 const textWidth = pdf.getTextWidth(text);
                 const centerX = colStart + (colWidth / 2) - (textWidth / 2);
                 pdf.text(text, centerX, yPos);
+            }
+            
+            // Helper function to check if date is weekend
+            function isDateWeekend(dateObj) {
+                const day = dateObj.getDay();
+                return day === 0 || day === 6; // Sunday = 0, Saturday = 6
             }
             
             // Helper function to add table headers (for new pages)
@@ -9982,7 +10102,7 @@
             pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
-            pdf.text('Daily Breakdown', 20, yPos);
+            pdf.text('Daily Breakdown (Weekdays Only)', 20, yPos);
             yPos += 15;
             
             // Consistent table setup throughout
@@ -10000,8 +10120,15 @@
             const month = new Date().getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // Generate table rows for each day
+            // MODIFIED: Generate table rows for each day - SKIP WEEKENDS and GREY OUT HOLIDAYS
             for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                
+                // SKIP WEEKENDS ENTIRELY
+                if (isDateWeekend(currentDate)) {
+                    continue; // Skip this day completely
+                }
+                
                 // Check if we need a new page BEFORE adding the row
                 if (yPos + rowHeight > pageBottomMargin) {
                     if (!skipSave || providedPDF) {
@@ -10018,12 +10145,28 @@
                 const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayData = studentData[dateKey] || {};
                 
+                // Check if this day is a holiday
+                const isHoliday = isHolidayDate(currentDate);
+                const holidayInfo = isHoliday ? getHolidayInfo(currentDate) : null;
+                
                 // Determine row background color
                 let rowColor = [255, 255, 255]; // White (Present)
-                if (dayData.absent) {
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89]; // Green
+                
+                if (isHoliday) {
+                    // HOLIDAY: Grey background, no progress data
+                    rowColor = [240, 240, 240]; // Light Grey
+                    statusText = 'Holiday';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (dayData.absent) {
                     rowColor = [255, 235, 235]; // Light Red (Absent)
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48]; // Red
                 } else if (dayData.didNotGive) {
                     rowColor = [255, 243, 224]; // Light Orange (Did Not Give)
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0]; // Orange
                 }
                 
                 // Row background - use EXACT tableWidth
@@ -10049,42 +10192,51 @@
                 // Date - Centered
                 centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 5);
                 
-                // Sabak - Centered (truncate if too long)
-                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
-                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
-                
-                // Sabak Para - Centered (truncate if too long)
-                let paraText = dayData.para ? dayData.para.amount : '--';
-                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
-                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
-                
-                // Dhor - Centered (truncate if too long)
-                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
-                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
-                
-                // Status - Centered
-                let statusText = 'Present';
-                let statusColor = [52, 199, 89]; // Green
-                if (dayData.absent) {
-                    statusText = 'Absent';
-                    statusColor = [255, 59, 48]; // Red
-                } else if (dayData.didNotGive) {
-                    statusText = 'Did Not Give';
-                    statusColor = [255, 149, 0]; // Orange
+                if (isHoliday) {
+                    // HOLIDAY ROW: Show dashes for all progress columns
+                    pdf.setTextColor(142, 142, 147); // Grey text for holiday
+                    centerTextInColumn('--', colStarts[1], colWidths[1], yPos + 5); // Sabak
+                    centerTextInColumn('--', colStarts[2], colWidths[2], yPos + 5); // Para
+                    centerTextInColumn('--', colStarts[3], colWidths[3], yPos + 5); // Dhor
+                    
+                    // Status - Holiday
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                    
+                    // Parent Review - N/A for holidays
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFont(undefined, 'normal');
+                    centerTextInColumn('N/A', colStarts[5], colWidths[5], yPos + 5);
+                } else {
+                    // REGULAR WEEKDAY ROW: Show actual data
+                    // Sabak - Centered (truncate if too long)
+                    let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                    centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+                    
+                    // Sabak Para - Centered (truncate if too long)
+                    let paraText = dayData.para ? dayData.para.amount : '--';
+                    if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                    centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
+                    
+                    // Dhor - Centered (truncate if too long)
+                    let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                    centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
+                    
+                    // Status - Centered
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                    
+                    // Parent Review - Centered
+                    const parentReview = dayData.parentChecked ? '✓' : '✗';
+                    const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
                 }
-                
-                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
-                
-                // Parent Review - Centered
-                const parentReview = dayData.parentChecked ? '✓' : '✗';
-                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
                 
                 yPos += rowHeight;
             }
@@ -10126,6 +10278,97 @@
                 }
                 
                 throw error; // Re-throw to be caught by parent function
+            }
+        }
+
+        // Parent PDF Export Functions
+        function showParentExportModal() {
+            if (currentUserType !== 'parent' || !currentStudent) {
+                alert('Access denied: Parent access required');
+                return;
+            }
+            
+            // Set current month and year as default
+            const now = new Date();
+            const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+            const currentYear = now.getFullYear();
+            
+            document.getElementById('parentMonthSelect').value = currentMonth;
+            document.getElementById('parentYearSelect').value = currentYear;
+            
+            // Reset to current month option
+            document.getElementById('parentPdfReportType').value = 'current-month';
+            toggleParentDatePicker();
+            
+            document.getElementById('parentExportPDFModal').style.display = 'block';
+        }
+
+        function toggleParentDatePicker() {
+            const reportType = document.getElementById('parentPdfReportType').value;
+            const monthYearPicker = document.getElementById('parentMonthYearPicker');
+            
+            if (reportType === 'monthly-detailed') {
+                monthYearPicker.style.display = 'block';
+            } else {
+                monthYearPicker.style.display = 'none';
+            }
+        }
+
+        async function generateParentPDF() {
+            if (currentUserType !== 'parent' || !currentStudent) {
+                alert('Access denied: Parent access required');
+                return;
+            }
+            
+            const reportType = document.getElementById('parentPdfReportType').value;
+            let selectedMonth, selectedYear;
+            
+            if (reportType === 'monthly-detailed') {
+                selectedMonth = document.getElementById('parentMonthSelect').value;
+                selectedYear = document.getElementById('parentYearSelect').value;
+                
+                if (!selectedMonth || !selectedYear) {
+                    alert('Please select both month and year');
+                    return;
+                }
+            }
+            
+            // Show loading state
+            const button = document.getElementById('generateParentPDFBtn');
+            const spinner = document.getElementById('parentModalPdfSpinner');
+            const buttonText = document.getElementById('parentModalPdfBtnText');
+            
+            button.disabled = true;
+            spinner.style.display = 'inline-block';
+            buttonText.textContent = 'Generating PDF...';
+            
+            try {
+                // Security check - ensure parent can only access their own child
+                if (currentUserType !== 'parent' || !currentStudent) {
+                    throw new Error('Access denied: Parent access only');
+                }
+                
+                // Generate PDF using existing functions
+                if (reportType === 'current-month') {
+                    // Use existing generateSingleStudentPDF function
+                    await generateSingleStudentPDF(currentStudent, 'current-month');
+                } else if (reportType === 'monthly-detailed') {
+                    // Use existing generateMonthlyDetailedPDF function
+                    await generateMonthlyDetailedPDF(currentStudent, selectedYear, selectedMonth);
+                }
+                
+                // Close modal and show success
+                closeModal('parentExportPDFModal');
+                alert('PDF report generated successfully!');
+                
+            } catch (error) {
+                console.error('Error generating parent PDF:', error);
+                alert('Error generating PDF: ' + error.message);
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.textContent = '📄 Generate PDF Report';
             }
         }
 
@@ -10181,7 +10424,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            const modals = ['progressModal', 'manageStudentsModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'exportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal', 'studentTargetsModal', 'viewTargetsModal', 'sendMessageModal', 'parentMessageModal', 'parentMessagesHistoryModal', 'manageMessagesModal'];
+            const modals = ['progressModal', 'manageStudentsModal', 'assignHomeworkModal', 'viewHomeworkModal', 'homeworkSummaryModal', 'viewAllHomeworkModal', 'exportPDFModal', 'parentExportPDFModal', 'dayModal', 'holidayModal', 'updateStudentOverviewModal', 'overallProgressModal', 'studentTargetsModal', 'viewTargetsModal', 'sendMessageModal', 'parentMessageModal', 'parentMessagesHistoryModal', 'manageMessagesModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -10732,6 +10975,10 @@
 
         // COMPLETE MONTHLY DETAILED PDF - Same design as current month but for selected month/year
         async function generateMonthlyDetailedPDF(studentId, year, month, providedPDF = null, skipSave = false) {
+            // ADD THIS SECURITY CHECK
+            if (currentUserType === 'parent' && studentId !== currentStudent) {
+                throw new Error('Access denied: Cannot access other student data');
+            }
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -10757,6 +11004,12 @@
                 const textWidth = pdf.getTextWidth(text);
                 const centerX = colStart + (colWidth / 2) - (textWidth / 2);
                 pdf.text(text, centerX, yPos);
+            }
+            
+            // Helper function to check if date is weekend
+            function isDateWeekend(dateObj) {
+                const day = dateObj.getDay();
+                return day === 0 || day === 6; // Sunday = 0, Saturday = 6
             }
             
             // Helper function to add table headers (for new pages)
@@ -11053,8 +11306,10 @@
             const selectedMonthNum = parseInt(month) - 1; // JavaScript months are 0-based
             const daysInMonth = new Date(selectedYear, selectedMonthNum + 1, 0).getDate();
             
-            // Generate table rows for each day
+            // MODIFIED: Generate table rows for each day - GREY OUT WEEKENDS and HOLIDAYS
             for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(selectedYear, selectedMonthNum, day);
+                
                 // Check if we need a new page BEFORE adding the row
                 if (yPos + rowHeight > pageBottomMargin) {
                     if (!skipSave || providedPDF) {
@@ -11071,12 +11326,34 @@
                 const dateKey = `${selectedYear}-${String(selectedMonthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayData = studentData[dateKey] || {};
                 
-                // Determine row background color
+                // Check if this day is a weekend or holiday
+                const isWeekend = isDateWeekend(currentDate);
+                const isHoliday = isHolidayDate(currentDate);
+                const holidayInfo = isHoliday ? getHolidayInfo(currentDate) : null;
+                
+                // Determine row background color and status
                 let rowColor = [255, 255, 255]; // White (Present)
-                if (dayData.absent) {
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89]; // Green
+                
+                if (isWeekend) {
+                    // WEEKEND: Grey background, no progress data
+                    rowColor = [240, 240, 240]; // Light Grey
+                    statusText = 'Weekend';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (isHoliday) {
+                    // HOLIDAY: Grey background, no progress data
+                    rowColor = [240, 240, 240]; // Light Grey
+                    statusText = 'Holiday';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (dayData.absent) {
                     rowColor = [255, 235, 235]; // Light Red (Absent)
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48]; // Red
                 } else if (dayData.didNotGive) {
                     rowColor = [255, 243, 224]; // Light Orange (Did Not Give)
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0]; // Orange
                 }
                 
                 // Row background - use EXACT tableWidth
@@ -11102,42 +11379,51 @@
                 // Date - Centered
                 centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 5);
                 
-                // Sabak - Centered (truncate if too long)
-                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
-                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
-                
-                // Sabak Para - Centered (truncate if too long)
-                let paraText = dayData.para ? dayData.para.amount : '--';
-                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
-                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
-                
-                // Dhor - Centered (truncate if too long)
-                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
-                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
-                
-                // Status - Centered
-                let statusText = 'Present';
-                let statusColor = [52, 199, 89]; // Green
-                if (dayData.absent) {
-                    statusText = 'Absent';
-                    statusColor = [255, 59, 48]; // Red
-                } else if (dayData.didNotGive) {
-                    statusText = 'Did Not Give';
-                    statusColor = [255, 149, 0]; // Orange
+                if (isWeekend || isHoliday) {
+                    // WEEKEND/HOLIDAY ROW: Show dashes for all progress columns
+                    pdf.setTextColor(142, 142, 147); // Grey text for weekend/holiday
+                    centerTextInColumn('--', colStarts[1], colWidths[1], yPos + 5); // Sabak
+                    centerTextInColumn('--', colStarts[2], colWidths[2], yPos + 5); // Para
+                    centerTextInColumn('--', colStarts[3], colWidths[3], yPos + 5); // Dhor
+                    
+                    // Status - Weekend/Holiday
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                    
+                    // Parent Review - N/A for weekends/holidays
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFont(undefined, 'normal');
+                    centerTextInColumn('N/A', colStarts[5], colWidths[5], yPos + 5);
+                } else {
+                    // REGULAR WEEKDAY ROW: Show actual data
+                    // Sabak - Centered (truncate if too long)
+                    let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                    centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+                    
+                    // Sabak Para - Centered (truncate if too long)
+                    let paraText = dayData.para ? dayData.para.amount : '--';
+                    if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                    centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
+                    
+                    // Dhor - Centered (truncate if too long)
+                    let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                    centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
+                    
+                    // Status - Centered
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                    
+                    // Parent Review - Centered
+                    const parentReview = dayData.parentChecked ? '✓' : '✗';
+                    const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
                 }
-                
-                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
-                
-                // Parent Review - Centered
-                const parentReview = dayData.parentChecked ? '✓' : '✗';
-                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
                 
                 yPos += rowHeight;
             }
@@ -11626,15 +11912,23 @@
             pdf.save(fileName);
         }
 
-        // STEP 2: Create specialized functions for combined reports that start fresh on each page
-
-        async function generateSingleStudentPDFForCombined(studentId, pdf) {
+        // Updated individual PDF generation functions to support skipSave parameter
+        async function generateSingleStudentPDF(studentId, reportType, providedPDF = null, skipSave = false) {
+            // ADD THIS SECURITY CHECK
+            if (currentUserType === 'parent' && studentId !== currentStudent) {
+                throw new Error('Access denied: Cannot access other student data');
+            }
+            
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
             
             const studentData = await window.getStudentData(studentId);
             const homework = await getStudentHomework(studentId);
+            
+            // Create PDF or use provided one
+            const { jsPDF } = window.jspdf;
+            const pdf = providedPDF || new jsPDF();
             
             // Helper function for rounded rectangles
             function roundedRect(x, y, width, height, radius, style) {
@@ -11652,18 +11946,62 @@
                 pdf.text(text, centerX, yPos);
             }
             
-            // Header - starts at top of fresh page
+            // Helper function to check if date is weekend
+            function isDateWeekend(dateObj) {
+                const day = dateObj.getDay();
+                return day === 0 || day === 6; // Sunday = 0, Saturday = 6
+            }
+            
+            // Helper function to add table headers (for new pages)
+            function addTableHeaders(yPosition) {
+                const colStarts = [20, 35, 65, 90, 115, 150];
+                const colWidths = [15, 30, 25, 25, 35, 35];
+                const tableWidth = 165;
+                const rowHeight = 8;
+                
+                // Table headers background
+                pdf.setFillColor(240, 240, 240);
+                pdf.rect(20, yPosition, tableWidth, rowHeight, 'F');
+                
+                // Headers border
+                pdf.setDrawColor(200, 200, 200);
+                pdf.setLineWidth(0.3);
+                pdf.rect(20, yPosition, tableWidth, rowHeight, 'S');
+                
+                // Vertical lines for columns
+                for (let i = 0; i <= colStarts.length; i++) {
+                    const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
+                    pdf.line(x, yPosition, x, yPosition + rowHeight);
+                }
+                
+                pdf.setTextColor(28, 28, 30);
+                pdf.setFontSize(8);
+                pdf.setFont(undefined, 'bold');
+                
+                const headers = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
+                headers.forEach(function(header, index) {
+                    centerTextInColumn(header, colStarts[index], colWidths[index], yPosition + 5);
+                });
+                
+                return yPosition + rowHeight;
+            }
+            
+            // IMPROVED HEADER - Professional design
+            // Main header background (smaller green section)
             pdf.setFillColor(16, 163, 127);
             pdf.rect(0, 0, 210, 25, 'F');
             
+            // White section below
             pdf.setFillColor(250, 250, 250);
             pdf.rect(0, 25, 210, 20, 'F');
             
+            // Title in green section
             pdf.setTextColor(255, 255, 255);
             pdf.setFontSize(18);
             pdf.setFont(undefined, 'bold');
             pdf.text('MONTHLY PROGRESS REPORT', 105, 15, { align: 'center' });
             
+            // Student name and date in white section
             pdf.setTextColor(60, 60, 60);
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
@@ -11674,6 +12012,7 @@
             const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             pdf.text(monthYear, 105, 39, { align: 'center' });
             
+            // Decorative line
             pdf.setDrawColor(16, 163, 127);
             pdf.setLineWidth(0.5);
             pdf.line(20, 42, 190, 42);
@@ -11687,7 +12026,7 @@
             pdf.text('Monthly Progress', 20, yPos);
             yPos += 10;
             
-            // Calculate monthly stats
+            // Calculate monthly stats with "did not give" tracking
             const currentMonth = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
             const monthlyStats = { sabak: 0, para: 0, dhor: 0, absent: 0, didNotGive: 0 };
             
@@ -11705,7 +12044,7 @@
                 }
             });
             
-            // Progress boxes
+            // Monthly Progress Boxes
             const boxWidth = 38;
             const boxHeight = 22;
             const spacing = 6;
@@ -11721,22 +12060,27 @@
             progressBoxes.forEach(function(box, index) {
                 const x = startX + (index * (boxWidth + spacing));
                 
+                // Box background
                 pdf.setFillColor(255, 255, 255);
                 roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
                 
+                // Top colored bar
                 pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
                 roundedRect(x, yPos, boxWidth, 2, 2, 'F');
                 
+                // Border
                 pdf.setDrawColor(229, 229, 234);
                 pdf.setLineWidth(0.3);
                 roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
                 
+                // Number - Centered
                 pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
                 pdf.setFontSize(14);
                 pdf.setFont(undefined, 'bold');
                 const numWidth = pdf.getTextWidth(box.value.toString());
                 pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
                 
+                // Label - Centered
                 pdf.setTextColor(142, 142, 147);
                 pdf.setFontSize(6);
                 pdf.setFont(undefined, 'normal');
@@ -11753,6 +12097,7 @@
             pdf.text('Homework Summary', 20, yPos);
             yPos += 10;
             
+            // Calculate homework stats
             const homeworkStats = {
                 total: homework.length,
                 completed: homework.filter(hw => hw.completed).length,
@@ -11770,22 +12115,27 @@
             homeworkBoxes.forEach(function(box, index) {
                 const x = startX + (index * (boxWidth + spacing));
                 
+                // Box background
                 pdf.setFillColor(255, 255, 255);
                 roundedRect(x, yPos, boxWidth, boxHeight, 2, 'F');
                 
+                // Top colored bar
                 pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
                 roundedRect(x, yPos, boxWidth, 2, 2, 'F');
                 
+                // Border
                 pdf.setDrawColor(229, 229, 234);
                 pdf.setLineWidth(0.3);
                 roundedRect(x, yPos, boxWidth, boxHeight, 2, 'S');
                 
+                // Number - Centered
                 pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
                 pdf.setFontSize(14);
                 pdf.setFont(undefined, 'bold');
                 const numWidth = pdf.getTextWidth(box.value.toString());
                 pdf.text(box.value.toString(), x + (boxWidth - numWidth)/2, yPos + 12);
                 
+                // Label - Centered
                 pdf.setTextColor(142, 142, 147);
                 pdf.setFontSize(6);
                 pdf.setFont(undefined, 'normal');
@@ -11795,20 +12145,29 @@
             
             yPos += 32;
             
-            // Sabak Summary Section
+            // Sabak Summary Section  
             pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
             pdf.text('Sabak Summary', 20, yPos);
             yPos += 10;
             
-            let totalLines = 0, totalPages = 0, totalJuz = 0;
+            // Calculate total sabak for the month
+            let totalLines = 0;
+            let totalPages = 0;
+            let totalJuz = 0;
             
             Object.entries(studentData).forEach(function([date, dayData]) {
                 if (date.startsWith(currentMonth) && dayData.sabak && !dayData.absent && !dayData.didNotGive) {
-                    if (dayData.sabak.lines) totalLines += dayData.sabak.lines;
-                    if (dayData.sabak.pages) totalPages += dayData.sabak.pages;
-                    if (dayData.sabak.juz) totalJuz += dayData.sabak.juz;
+                    if (dayData.sabak.lines) {
+                        totalLines += dayData.sabak.lines;
+                    }
+                    if (dayData.sabak.pages) {
+                        totalPages += dayData.sabak.pages;
+                    }
+                    if (dayData.sabak.juz) {
+                        totalJuz += dayData.sabak.juz;
+                    }
                 }
             });
             
@@ -11818,28 +12177,34 @@
                 { label: 'JUZ', value: convertJuzToFraction(totalJuz), color: [255, 149, 0] }
             ];
             
+            // Use wider boxes for Sabak Summary (3 boxes instead of 4)
             const sabakBoxWidth = 50;
             const sabakSpacing = 8;
             
             sabakBoxes.forEach(function(box, index) {
                 const x = startX + (index * (sabakBoxWidth + sabakSpacing));
                 
+                // Box background
                 pdf.setFillColor(255, 255, 255);
                 roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'F');
                 
+                // Top colored bar
                 pdf.setFillColor(box.color[0], box.color[1], box.color[2]);
                 roundedRect(x, yPos, sabakBoxWidth, 2, 2, 'F');
                 
+                // Border
                 pdf.setDrawColor(229, 229, 234);
                 pdf.setLineWidth(0.3);
                 roundedRect(x, yPos, sabakBoxWidth, boxHeight, 2, 'S');
                 
+                // Number - Centered
                 pdf.setTextColor(box.color[0], box.color[1], box.color[2]);
                 pdf.setFontSize(14);
                 pdf.setFont(undefined, 'bold');
                 const numWidth = pdf.getTextWidth(box.value.toString());
                 pdf.text(box.value.toString(), x + (sabakBoxWidth - numWidth)/2, yPos + 12);
                 
+                // Label - Centered
                 pdf.setTextColor(142, 142, 147);
                 pdf.setFontSize(6);
                 pdf.setFont(undefined, 'normal');
@@ -11849,119 +12214,163 @@
             
             yPos += 35;
             
-            // CONDENSED Daily Breakdown Table for combined report
+            // Daily Breakdown Table
             pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
-            pdf.text('Daily Breakdown (Top 10 Days)', 20, yPos);
-            yPos += 10;
+            pdf.text('Daily Breakdown', 20, yPos);
+            yPos += 15;
             
-            // Get days with data in current month and show top 10
-            const year = new Date().getFullYear();
-            const month = new Date().getMonth();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
-            const rowHeight = 6; // Smaller rows for combined report
+            // Consistent table setup throughout
+            const rowHeight = 8;
+            const pageBottomMargin = 280;
             const colStarts = [20, 35, 65, 90, 115, 150];
             const colWidths = [15, 30, 25, 25, 35, 35];
             const tableWidth = 165;
             
-            // Table headers
-            pdf.setFillColor(240, 240, 240);
-            pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
+            // Add table headers
+            yPos = addTableHeaders(yPos);
             
-            pdf.setDrawColor(200, 200, 200);
-            pdf.setLineWidth(0.3);
-            pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
+            // Get days in current month
+            const year = new Date().getFullYear();
+            const month = new Date().getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            for (let i = 0; i <= colStarts.length; i++) {
-                const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
-                pdf.line(x, yPos, x, yPos + rowHeight);
-            }
-            
-            pdf.setTextColor(28, 28, 30);
-            pdf.setFontSize(6);
-            pdf.setFont(undefined, 'bold');
-            
-            const headers = ['Date', 'Sabak', 'Sabak Para', 'Dhor', 'Status', 'Parent Review'];
-            headers.forEach(function(header, index) {
-                centerTextInColumn(header, colStarts[index], colWidths[index], yPos + 4);
-            });
-            
-            yPos += rowHeight;
-            
-            // Show only first 10 days or days with data (whichever is fewer)
-            const maxDaysToShow = Math.min(10, daysInMonth);
-            
-            for (let day = 1; day <= maxDaysToShow; day++) {
+            // MODIFIED: Generate table rows for each day - GREY OUT WEEKENDS and HOLIDAYS
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                
+                // Check if we need a new page BEFORE adding the row
+                if (yPos + rowHeight > pageBottomMargin) {
+                    if (!skipSave || providedPDF) {
+                        pdf.addPage();
+                        yPos = 20;
+                        
+                        // Add headers on new page
+                        yPos = addTableHeaders(yPos);
+                    } else {
+                        break; // Don't add more pages in single reports
+                    }
+                }
+                
                 const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayData = studentData[dateKey] || {};
                 
-                // Determine row background color
-                let rowColor = [255, 255, 255];
-                if (dayData.absent) {
-                    rowColor = [255, 235, 235];
+                // Check if this day is a weekend or holiday
+                const isWeekend = isDateWeekend(currentDate);
+                const isHoliday = isHolidayDate(currentDate);
+                const holidayInfo = isHoliday ? getHolidayInfo(currentDate) : null;
+                
+                // Determine row background color and status
+                let rowColor = [255, 255, 255]; // White (Present)
+                let statusText = 'Present';
+                let statusColor = [52, 199, 89]; // Green
+                
+                if (isWeekend) {
+                    // WEEKEND: Grey background, no progress data
+                    rowColor = [240, 240, 240]; // Light Grey
+                    statusText = 'Weekend';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (isHoliday) {
+                    // HOLIDAY: Grey background, no progress data
+                    rowColor = [240, 240, 240]; // Light Grey
+                    statusText = 'Holiday';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (dayData.absent) {
+                    rowColor = [255, 235, 235]; // Light Red (Absent)
+                    statusText = 'Absent';
+                    statusColor = [255, 59, 48]; // Red
                 } else if (dayData.didNotGive) {
-                    rowColor = [255, 243, 224];
+                    rowColor = [255, 243, 224]; // Light Orange (Did Not Give)
+                    statusText = 'Did Not Give';
+                    statusColor = [255, 149, 0]; // Orange
                 }
                 
+                // Row background - use EXACT tableWidth
                 pdf.setFillColor(rowColor[0], rowColor[1], rowColor[2]);
                 pdf.rect(20, yPos, tableWidth, rowHeight, 'F');
                 
+                // Row border - use EXACT tableWidth  
                 pdf.setDrawColor(220, 220, 220);
                 pdf.setLineWidth(0.2);
                 pdf.rect(20, yPos, tableWidth, rowHeight, 'S');
                 
+                // Vertical lines - use EXACT column positions
                 for (let i = 0; i <= colStarts.length; i++) {
                     const x = i === colStarts.length ? (20 + tableWidth) : colStarts[i];
                     pdf.line(x, yPos, x, yPos + rowHeight);
                 }
                 
+                // Cell content - ALL CENTERED
                 pdf.setTextColor(28, 28, 30);
-                pdf.setFontSize(6);
+                pdf.setFontSize(7);
                 pdf.setFont(undefined, 'normal');
                 
-                centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 4);
+                // Date - Centered
+                centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 5);
                 
-                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
-                centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 4);
-                
-                let paraText = dayData.para ? dayData.para.amount : '--';
-                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
-                centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 4);
-                
-                let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
-                centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 4);
-                
-                let statusText = 'Present';
-                let statusColor = [52, 199, 89];
-                if (dayData.absent) {
-                    statusText = 'Absent';
-                    statusColor = [255, 59, 48];
-                } else if (dayData.didNotGive) {
-                    statusText = 'Did Not Give';
-                    statusColor = [255, 149, 0];
+                if (isWeekend || isHoliday) {
+                    // WEEKEND/HOLIDAY ROW: Show dashes for all progress columns
+                    pdf.setTextColor(142, 142, 147); // Grey text for weekend/holiday
+                    centerTextInColumn('--', colStarts[1], colWidths[1], yPos + 5); // Sabak
+                    centerTextInColumn('--', colStarts[2], colWidths[2], yPos + 5); // Para
+                    centerTextInColumn('--', colStarts[3], colWidths[3], yPos + 5); // Dhor
+                    
+                    // Status - Weekend/Holiday
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                    
+                    // Parent Review - N/A for weekends/holidays
+                    pdf.setTextColor(142, 142, 147);
+                    pdf.setFont(undefined, 'normal');
+                    centerTextInColumn('N/A', colStarts[5], colWidths[5], yPos + 5);
+                } else {
+                    // REGULAR WEEKDAY ROW: Show actual data
+                    // Sabak - Centered (truncate if too long)
+                    let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
+                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                    centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+                    
+                    // Sabak Para - Centered (truncate if too long)
+                    let paraText = dayData.para ? dayData.para.amount : '--';
+                    if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                    centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
+                    
+                    // Dhor - Centered (truncate if too long)
+                    let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
+                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                    centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
+                    
+                    // Status - Centered
+                    pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
+                    
+                    // Parent Review - Centered
+                    const parentReview = dayData.parentChecked ? '✓' : '✗';
+                    const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
+                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
                 }
                 
-                pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 4);
-                
-                const parentReview = dayData.parentChecked ? '✓' : '✗';
-                const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 4);
-                
                 yPos += rowHeight;
+            }
+            
+            // Save PDF only if not part of combined report
+            if (!skipSave) {
+                pdf.save(student.name + '_monthly_report.pdf');
             }
         }
 
         // STEP 3: Create complete specialized functions for combined reports
 
         async function generateYearlySummaryPDFForCombined(studentId, academicYear, pdf) {
+            // ADD THIS SECURITY CHECK  
+            if (currentUserType === 'parent' && studentId !== currentStudent) {
+                throw new Error('Access denied: Cannot access other student data');
+            }
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -12690,6 +13099,10 @@
         }
 
         async function generateOverallProgressPDFForCombined(studentId, pdf) {
+            // ADD THIS SECURITY CHECK
+            if (currentUserType === 'parent' && studentId !== currentStudent) {
+                throw new Error('Access denied: Cannot access other student data');
+            }
             const students = await window.getStudents();
             const student = students.find(s => s.id === studentId);
             if (!student) return;
