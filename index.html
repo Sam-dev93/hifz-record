@@ -10101,7 +10101,7 @@
             const year = new Date().getFullYear();
             const month = new Date().getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
+
             // MODIFIED: Generate table rows for each day - SKIP WEEKENDS and GREY OUT HOLIDAYS
             for (let day = 1; day <= daysInMonth; day++) {
                 const currentDate = new Date(year, month, day);
@@ -10131,7 +10131,12 @@
                 const isHoliday = isHolidayDate(currentDate);
                 const holidayInfo = isHoliday ? getHolidayInfo(currentDate) : null;
                 
-                // Determine row background color
+                // ADD THIS: Check if this date is in the future
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+                const isFutureDate = currentDate > today;
+                
+                // Determine row background color and status
                 let rowColor = [255, 255, 255]; // White (Present)
                 let statusText = 'Present';
                 let statusColor = [52, 199, 89]; // Green
@@ -10140,6 +10145,10 @@
                     // HOLIDAY: Grey background, no progress data
                     rowColor = [240, 240, 240]; // Light Grey
                     statusText = 'Holiday';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (isFutureDate) {
+                    // ADD THIS: FUTURE DATE: Show dash instead of present
+                    statusText = '--';
                     statusColor = [142, 142, 147]; // Grey
                 } else if (dayData.absent) {
                     rowColor = [255, 235, 235]; // Light Red (Absent)
@@ -11312,6 +11321,11 @@
                 const isWeekend = isDateWeekend(currentDate);
                 const isHoliday = isHolidayDate(currentDate);
                 const holidayInfo = isHoliday ? getHolidayInfo(currentDate) : null;
+
+                // ADDED: Check if this date is in the future
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+                const isFutureDate = currentDate > today;
                 
                 // Determine row background color and status
                 let rowColor = [255, 255, 255]; // White (Present)
@@ -11327,6 +11341,10 @@
                     // HOLIDAY: Grey background, no progress data
                     rowColor = [240, 240, 240]; // Light Grey
                     statusText = 'Holiday';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (isFutureDate) {
+                    // ADDED: FUTURE DATE: Show dash instead of present
+                    statusText = '--';
                     statusColor = [142, 142, 147]; // Grey
                 } else if (dayData.absent) {
                     rowColor = [255, 235, 235]; // Light Red (Absent)
@@ -12200,7 +12218,7 @@
             pdf.setTextColor(28, 28, 30);
             pdf.setFontSize(14);
             pdf.setFont(undefined, 'bold');
-            pdf.text('Daily Breakdown', 20, yPos);
+            pdf.text('Daily Breakdown (Weekdays Only)', 20, yPos);
             yPos += 15;
             
             // Consistent table setup throughout
@@ -12218,9 +12236,14 @@
             const month = new Date().getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // MODIFIED: Generate table rows for each day - GREY OUT WEEKENDS and HOLIDAYS
+            // MODIFIED: Generate table rows for each day - SKIP WEEKENDS and GREY OUT HOLIDAYS
             for (let day = 1; day <= daysInMonth; day++) {
                 const currentDate = new Date(year, month, day);
+                
+                // SKIP WEEKENDS ENTIRELY
+                if (isDateWeekend(currentDate)) {
+                    continue; // Skip this day completely
+                }
                 
                 // Check if we need a new page BEFORE adding the row
                 if (yPos + rowHeight > pageBottomMargin) {
@@ -12238,25 +12261,28 @@
                 const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayData = studentData[dateKey] || {};
                 
-                // Check if this day is a weekend or holiday
-                const isWeekend = isDateWeekend(currentDate);
+                // Check if this day is a holiday
                 const isHoliday = isHolidayDate(currentDate);
                 const holidayInfo = isHoliday ? getHolidayInfo(currentDate) : null;
                 
-                // Determine row background color and status
+                // FIXED: Check if this date is in the future
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+                const isFutureDate = currentDate > today;
+                
+                // Determine row background color
                 let rowColor = [255, 255, 255]; // White (Present)
                 let statusText = 'Present';
                 let statusColor = [52, 199, 89]; // Green
                 
-                if (isWeekend) {
-                    // WEEKEND: Grey background, no progress data
-                    rowColor = [240, 240, 240]; // Light Grey
-                    statusText = 'Weekend';
-                    statusColor = [142, 142, 147]; // Grey
-                } else if (isHoliday) {
+                if (isHoliday) {
                     // HOLIDAY: Grey background, no progress data
                     rowColor = [240, 240, 240]; // Light Grey
                     statusText = 'Holiday';
+                    statusColor = [142, 142, 147]; // Grey
+                } else if (isFutureDate) {
+                    // FIXED: FUTURE DATE: Show dash instead of present
+                    statusText = '--';
                     statusColor = [142, 142, 147]; // Grey
                 } else if (dayData.absent) {
                     rowColor = [255, 235, 235]; // Light Red (Absent)
@@ -12291,19 +12317,19 @@
                 // Date - Centered
                 centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 5);
                 
-                if (isWeekend || isHoliday) {
-                    // WEEKEND/HOLIDAY ROW: Show dashes for all progress columns
-                    pdf.setTextColor(142, 142, 147); // Grey text for weekend/holiday
+                if (isHoliday) {
+                    // HOLIDAY ROW: Show dashes for all progress columns
+                    pdf.setTextColor(142, 142, 147); // Grey text for holiday
                     centerTextInColumn('--', colStarts[1], colWidths[1], yPos + 5); // Sabak
                     centerTextInColumn('--', colStarts[2], colWidths[2], yPos + 5); // Para
                     centerTextInColumn('--', colStarts[3], colWidths[3], yPos + 5); // Dhor
                     
-                    // Status - Weekend/Holiday
+                    // Status - Holiday
                     pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
                     pdf.setFont(undefined, 'bold');
                     centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
                     
-                    // Parent Review - N/A for weekends/holidays
+                    // Parent Review - N/A for holidays
                     pdf.setTextColor(142, 142, 147);
                     pdf.setFont(undefined, 'normal');
                     centerTextInColumn('N/A', colStarts[5], colWidths[5], yPos + 5);
