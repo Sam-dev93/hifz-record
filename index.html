@@ -2810,6 +2810,229 @@
             line-height: 1.5;
             margin-bottom: 8px;
         }
+
+        /* Add to your existing CSS - Pause Buttons */
+        .pause-section {
+            margin-top: 25px;
+        }
+
+        .pause-section label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #1C1C1E;
+            font-size: 14px;
+        }
+
+        .pause-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .pause-buttons {
+                gap: 16px;
+            }
+        }
+
+        .pause-btn {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #E5E5EA;
+            border-radius: 10px;
+            background: #F2F2F7;
+            color: #8E8E93;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .pause-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+
+        .pause-btn:hover {
+            border-color: #FF3B30;
+            color: #FF3B30;
+            background: #FFF5F5;
+        }
+
+        .pause-btn.selected {
+            background: #FF3B30;
+            border-color: #FF3B30;
+            color: white;
+        }
+
+        .paused-indicator {
+            color: #FF3B30;
+            font-style: italic;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        /* Paused Days in Calendar */
+        .paused-day {
+            background-color: #FFF5F5 !important;
+            border: 2px solid #FF3B30 !important;
+            color: #1C1C1E !important;
+        }
+
+        .paused-indicator {
+            font-size: 12px;
+            margin-top: 2px;
+            color: #FF3B30;
+        }
+
+        .progress-paused {
+            background-color: #F2F2F7;
+            color: #8E8E93;
+            opacity: 0.6;
+            border-left: 4px solid #FF3B30;
+        }
+
+        .progress-paused h4 {
+            color: #8E8E93;
+        }
+
+        .progress-overview {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .progress-overview {
+                gap: 16px;
+            }
+        }
+
+        .progress-container {
+            padding: 16px;
+            border: 1px solid #E5E5EA;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .progress-container {
+                padding: 20px;
+            }
+        }
+
+        .progress-container h4 {
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+        }
+
+        @media (min-width: 768px) {
+            .progress-container h4 {
+                font-size: 18px;
+            }
+        }
+
+        .progress-container span {
+            color: #8E8E93;
+            font-size: 14px;
+        }
+
+        .progress-container.progress-paused {
+            background: #F2F2F7;
+            border-left: 4px solid #FF3B30;
+        }
+
+        .progress-container.progress-paused span.paused-indicator {
+            color: #FF3B30;
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        /* Affected Lessons Display */
+        .affected-lessons {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .affected-lessons {
+                gap: 12px;
+            }
+        }
+
+        .lesson-paused {
+            padding: 12px 16px;
+            margin: 0;
+            background-color: #FFF5F5;
+            border-left: 4px solid #FF3B30;
+            border-radius: 8px;
+            color: #8E8E93;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        @media (min-width: 768px) {
+            .lesson-paused {
+                padding: 16px 20px;
+                font-size: 16px;
+            }
+        }
+
+        .lesson-active {
+            padding: 12px 16px;
+            margin: 0;
+            background-color: #F0FDF4;
+            border-left: 4px solid #34C759;
+            border-radius: 8px;
+            color: #065F46;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @media (min-width: 768px) {
+            .lesson-active {
+                padding: 16px 20px;
+                font-size: 16px;
+            }
+        }
+
+        .pause-dropdown {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #495057;
+            background-color: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pause-dropdown:hover {
+            border-color: #ced4da;
+        }
+
+        .pause-dropdown:focus {
+            outline: none;
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .pause-dropdown option {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -3098,6 +3321,17 @@
                             <div class="grade-button" data-grade="good" onclick="selectGrade('good')">Good</div>
                             <div class="grade-button" data-grade="okay" onclick="selectGrade('okay')">Okay</div>
                             <div class="grade-button" data-grade="poor" onclick="selectGrade('poor')">Poor</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="pause-section">
+                            <label class="form-label">Sabak Paused:</label>
+                            <select id="pauseSelect" class="pause-dropdown" onchange="selectPauseDropdown()">
+                                <option value="">Select pause reason...</option>
+                                <option value="stopped-for-dhor">Stopped for Dhor</option>
+                                <option value="stopped-for-juz-dhor">Stopped for Juz Dhor</option>
+                                <option value="stopped-for-sabak-para">Stopped for Sabak Para</option>
+                            </select>
                         </div>
                     </div>
                     <button class="save-button" onclick="saveProgress()">Save Progress</button>
@@ -6854,6 +7088,7 @@
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
+        // ===== COMPLETE: updateTodaysProgress Function with Debug =====
         async function updateTodaysProgress() {
             if (!currentStudent) return;
             
@@ -6861,11 +7096,6 @@
             const todayKey = getDateKey(today);
             const studentData = await window.getStudentData(currentStudent);
             const todayData = studentData[todayKey] || {};
-            
-            // Check if current student is Dhor-only
-            const students = await window.getStudents();
-            const student = students.find(s => s.id === currentStudent);
-            const isDhorOnly = student ? student.dhorOnly : false;
             
             // Check if today is weekend or holiday
             const isWeekendToday = isWeekend(today);
@@ -6877,6 +7107,18 @@
             const progressContainer = document.getElementById('todayProgressContainer');
             const absentButton = document.getElementById('absentButton');
             const didNotGiveButton = document.getElementById('didNotGiveButton');
+            
+            // Get current student info to check if Dhor-only
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === currentStudent);
+            const isDhorOnly = student ? student.dhorOnly : false;
+            
+            // DEBUG LINES - Add these
+            console.log('DEBUG - updateTodaysProgress called');
+            console.log('DEBUG - Current student:', currentStudent);
+            console.log('DEBUG - Student object:', student);
+            console.log('DEBUG - Is Dhor Only:', isDhorOnly);
+            console.log('DEBUG - About to generate HTML layout...');
             
             if (isWeekendToday) {
                 // Weekend mode - show mosque closed message
@@ -6941,7 +7183,7 @@
                 
                 return;
             } else if (todayData.didNotGive) {
-                // Did Not Give mode - show special message
+                // UPDATED: Did Not Give mode - show special message
                 progressSectionTitle.textContent = 'Did Not Give Today';
                 
                 // Hide buttons
@@ -6976,10 +7218,22 @@
                 return;
             }
             
-            // Weekday mode - restore normal progress display
-            progressSectionTitle.textContent = 'Today\'s Progress';
+            // NEW: Handle paused days - add pause notice but keep normal progress rows
+            if (todayData.paused) {
+                const pauseReasons = {
+                    'stopped-for-dhor': 'Stopped for Dhor',
+                    'stopped-for-juz-dhor': 'Stopped for Juz Dhor',
+                    'stopped-for-sabak-para': 'Stopped for Sabak Para'
+                };
+                
+                progressSectionTitle.textContent = `Sabak Paused (${pauseReasons[todayData.pauseReason]})`;
+            } else {
+                // Normal weekday mode
+                progressSectionTitle.textContent = 'Today\'s Progress';
+            }
             
-            // Show buttons for teachers
+            // Weekday mode - restore normal progress display
+            // UPDATED: Show buttons for teachers
             if (currentUserType === 'teacher') {
                 if (absentButton) {
                     absentButton.style.display = 'inline-block';
@@ -6989,9 +7243,12 @@
                 }
             }
             
-            // Generate progress rows based on Dhor-only mode
+            // FIXED: Check if student is Dhor-only and show appropriate layout
+            console.log('DEBUG - Creating HTML layout, isDhorOnly:', isDhorOnly);
+            
             if (isDhorOnly) {
-                // Dhor-only mode: Show Dhor 1, Dhor 2, Dhor 3
+                console.log('DEBUG - Creating Dhor-only layout');
+                // Dhor-only student layout
                 progressContainer.innerHTML = `
                     <div class="progress-row" onclick="openProgressModal('dhor1', 'Dhor 1')" id="dhor1Row">
                         <div class="progress-info">
@@ -7031,7 +7288,8 @@
                     </div>
                 `;
             } else {
-                // Regular mode: Show Sabak, Sabak Para, Dhor
+                console.log('DEBUG - Creating regular student layout');
+                // Regular student layout
                 progressContainer.innerHTML = `
                     <div class="progress-row" onclick="openProgressModal('sabak', 'Sabak')" id="sabakRow">
                         <div class="progress-info">
@@ -7072,19 +7330,34 @@
                 `;
             }
             
+            console.log('DEBUG - HTML layout created');
+            
+            // NEW: Grey out paused lessons after creating the rows
+            if (todayData.paused) {
+                const greyedOutLessons = todayData.greyedOutLessons || [];
+                greyedOutLessons.forEach(lessonType => {
+                    const lessonRow = document.getElementById(`${lessonType}Row`);
+                    if (lessonRow) {
+                        lessonRow.style.opacity = '0.5';
+                        lessonRow.style.pointerEvents = 'none';
+                        lessonRow.style.cursor = 'not-allowed';
+                    }
+                });
+            }
+            
             // Update UI based on user type for weekdays
             updateUIForUserType();
             
-            // Update progress display
-            const progressTypesToCheck = isDhorOnly ? ['dhor1', 'dhor2', 'dhor3'] : ['sabak', 'para', 'dhor'];
-            progressTypesToCheck.forEach(type => {
+            // Update progress display - FIXED for Dhor-only students
+            const progressTypes = isDhorOnly ? ['dhor1', 'dhor2', 'dhor3'] : ['sabak', 'para', 'dhor'];
+            console.log('DEBUG - Progress types:', progressTypes);
+            
+            progressTypes.forEach(type => {
                 const statusEl = document.getElementById(`${type}Status`);
-                if (!statusEl) return; // Skip if element doesn't exist
-                
                 const entry = todayData[type];
                 
                 if (entry) {
-                    if (type === 'sabak' && entry.lines && !isDhorOnly) {
+                    if (type === 'sabak' && entry.lines) {
                         const conversionInfo = entry.fraction ? `<div class="conversion-badge">${entry.fraction}</div>` : '';
                         let parentCheckHtml = '';
                         
@@ -7132,9 +7405,8 @@
                 }
             });
 
-            // Update absent and did not give buttons for teachers
+            // UPDATED: Update absent and did not give buttons for teachers
             if (currentUserType === 'teacher' && absentButton && didNotGiveButton) {
-                const progressContainer = document.getElementById('todayProgressContainer');
                 const isAbsent = todayData.absent || false;
                 const isDidNotGive = todayData.didNotGive || false;
                 
@@ -7180,6 +7452,8 @@
                     }
                 }
             }
+            
+            console.log('DEBUG - updateTodaysProgress completed');
         }
 
         async function updateStats() {
@@ -7293,9 +7567,10 @@
         function openProgressModal(type, title) {
             // Only allow teachers to open progress modal
             if (currentUserType !== 'teacher') return;
-            
+
             currentProgressType = type;
             currentDate = null;
+            
             document.getElementById('modalTitle').textContent = `${title} Progress`;
             
             // Show appropriate input fields based on type
@@ -7303,6 +7578,20 @@
             const amountInputGroup = document.getElementById('amountInputGroup');
             const linesInput = document.getElementById('linesInput');
             const amountInput = document.getElementById('amountInput');
+            
+            // NEW: Hide/show pause section based on lesson type
+            const pauseSection = document.querySelector('.pause-section');
+            if (pauseSection) {
+                if (type === 'sabak') {
+                    pauseSection.parentElement.style.display = 'block'; // Show for Sabak
+                } else {
+                    pauseSection.parentElement.style.display = 'none';  // Hide for Para/Dhor
+                    // Reset dropdown selection when switching to non-Sabak lessons
+                    const pauseDropdown = document.getElementById('pauseSelect');
+                    if (pauseDropdown) pauseDropdown.value = '';
+                    window.selectedPause = null;
+                }
+            }
             
             if (type === 'sabak') {
                 linesInputGroup.style.display = 'block';
@@ -7333,9 +7622,75 @@
             document.querySelector(`[data-grade="${grade}"]`).classList.add('selected');
         }
 
+        // Replace your entire selectPause function with this:
+        function selectPauseDropdown() {
+            const dropdown = document.getElementById('pauseSelect');
+            const selectedValue = dropdown.value;
+            
+            if (selectedValue) {
+                console.log('Pause selected:', selectedValue);
+                window.selectedPause = selectedValue;
+                console.log('Global selectedPause set to:', window.selectedPause);
+            } else {
+                window.selectedPause = null;
+                console.log('Pause selection cleared');
+            }
+        }
+
+       // ===== Step 4: getGreyedOutLessons Helper Function =====
+       function getGreyedOutLessons(pauseReason) {
+            switch(pauseReason) {
+                case 'stopped-for-dhor':
+                    return ['sabak', 'para']; // Sabak and Sabak Para paused, Dhor available
+                case 'stopped-for-juz-dhor':
+                    return ['sabak', 'para']; // Sabak and Sabak Para paused, Dhor available
+                case 'stopped-for-sabak-para':
+                    return ['sabak', 'dhor']; // Sabak and Dhor paused, only Sabak Para available
+                default:
+                    return [];
+            }
+        }
+
+        // ===== Step 5: Complete saveProgress Function =====
         async function saveProgress() {
             if (!currentProgressType || !currentStudent || currentUserType !== 'teacher') return;
             
+            // Handle pause selection - NO grade or lines required
+            if (window.selectedPause) {
+                const dateKey = currentDate || getDateKey();
+                const studentData = await window.getStudentData(currentStudent);
+                
+                if (!studentData[dateKey]) {
+                    studentData[dateKey] = {};
+                }
+                
+                studentData[dateKey].paused = true;
+                studentData[dateKey].pauseReason = window.selectedPause;
+                studentData[dateKey].greyedOutLessons = getGreyedOutLessons(window.selectedPause);
+                studentData[dateKey].date = new Date().toISOString();
+                
+                await window.saveStudentData(currentStudent, studentData);
+                
+                // Reset selections
+                selectedGrade = null;
+                window.selectedPause = null;
+                window.selectedHomeworkType = null;
+                
+                updateTodaysProgress();
+                updateStats();
+                generateCalendar();
+                closeModal('progressModal');
+                
+                if (currentDate && currentDate !== getDateKey()) {
+                    setTimeout(() => {
+                        const dayNumber = parseInt(currentDate.split('-')[2]);
+                        openDayModal(dayNumber);
+                    }, 200);
+                }
+                return;
+            }
+            
+            // Handle normal grade selection - YOUR ORIGINAL CODE
             let entryData = {
                 grade: selectedGrade,
                 timestamp: new Date().toISOString()
@@ -7517,6 +7872,39 @@
                     const dayNumber = parseInt(dateKey.split('-')[2]);
                     openDayModal(dayNumber);
                 }, 200);
+            }
+        }
+
+        // ===== Step 9: removePause Function =====
+        async function removePause(dateKey) {
+            if (!currentStudent || currentUserType !== 'teacher') return;
+            
+            const studentData = await window.getStudentData(currentStudent);
+            
+            if (studentData[dateKey]) {
+                // Remove pause-related properties
+                delete studentData[dateKey].paused;
+                delete studentData[dateKey].pauseReason;
+                delete studentData[dateKey].greyedOutLessons;
+                delete studentData[dateKey].date;
+                
+                // If no other data exists for this day, remove the entire day entry
+                const remainingKeys = Object.keys(studentData[dateKey]);
+                if (remainingKeys.length === 0) {
+                    delete studentData[dateKey];
+                }
+                
+                await window.saveStudentData(currentStudent, studentData);
+                updateTodaysProgress();
+                updateStats();
+                generateCalendar();
+                closeModal('dayModal');
+                
+                // Reopen the day modal to show normal view
+                setTimeout(() => {
+                    const dayNumber = parseInt(dateKey.split('-')[2]);
+                    openDayModal(dayNumber);
+                }, 100);
             }
         }
 
@@ -7837,7 +8225,7 @@
             }
         }
 
-        // ===== COMPLETE: updateTodaysProgress Function =====
+        // ===== COMPLETE: updateTodaysProgress Function with Debug =====
         async function updateTodaysProgress() {
             if (!currentStudent) return;
             
@@ -7856,6 +8244,20 @@
             const progressContainer = document.getElementById('todayProgressContainer');
             const absentButton = document.getElementById('absentButton');
             const didNotGiveButton = document.getElementById('didNotGiveButton');
+            
+            // Get current student info to check if Dhor-only
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === currentStudent);
+            const isDhorOnly = student ? student.dhorOnly : false;
+            
+            // DEBUG LINES - Enhanced debugging
+            console.log('DEBUG - updateTodaysProgress called');
+            console.log('DEBUG - Current student ID:', currentStudent);
+            console.log('DEBUG - Found student:', student);
+            console.log('DEBUG - Student dhorOnly property:', student?.dhorOnly);
+            console.log('DEBUG - isDhorOnly result:', isDhorOnly);
+            console.log('DEBUG - All students:', students.map(s => ({id: s.id, name: s.name, dhorOnly: s.dhorOnly})));
+            console.log('DEBUG - About to generate HTML layout...');
             
             if (isWeekendToday) {
                 // Weekend mode - show mosque closed message
@@ -7932,8 +8334,6 @@
                 }
                 
                 // Get student name for personalized message
-                const students = await window.getStudents();
-                const student = students.find(s => s.id === currentStudent);
                 const studentName = student ? student.name : 'Student';
                 
                 // Show did not give message instead of progress
@@ -7957,9 +8357,21 @@
                 return;
             }
             
-            // Weekday mode - restore normal progress display
-            progressSectionTitle.textContent = 'Today\'s Progress';
+            // NEW: Handle paused days - add pause notice but keep normal progress rows
+            if (todayData.paused) {
+                const pauseReasons = {
+                    'stopped-for-dhor': 'Stopped for Dhor',
+                    'stopped-for-juz-dhor': 'Stopped for Juz Dhor',
+                    'stopped-for-sabak-para': 'Stopped for Sabak Para'
+                };
+                
+                progressSectionTitle.textContent = `Sabak Paused (${pauseReasons[todayData.pauseReason]})`;
+            } else {
+                // Normal weekday mode
+                progressSectionTitle.textContent = 'Today\'s Progress';
+            }
             
+            // Weekday mode - restore normal progress display
             // UPDATED: Show buttons for teachers
             if (currentUserType === 'teacher') {
                 if (absentButton) {
@@ -7970,50 +8382,115 @@
                 }
             }
             
-            // Restore progress rows structure if it was changed
-            progressContainer.innerHTML = `
-                <div class="progress-row" onclick="openProgressModal('sabak', 'Sabak')" id="sabakRow">
-                    <div class="progress-info">
-                        <div class="progress-icon sabak">📖</div>
-                        <div class="progress-details">
-                            <h4>Sabak</h4>
-                            <p>New Lesson</p>
+            // FIXED: Check if student is Dhor-only and show appropriate layout
+            console.log('DEBUG - Creating HTML layout, isDhorOnly:', isDhorOnly);
+            
+            if (isDhorOnly) {
+                console.log('DEBUG - Creating Dhor-only layout');
+                // Dhor-only student layout
+                progressContainer.innerHTML = `
+                    <div class="progress-row" onclick="openProgressModal('dhor1', 'Dhor 1')" id="dhor1Row">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">📖</div>
+                            <div class="progress-details">
+                                <h4>Dhor 1</h4>
+                                <p>First Revision Session</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhor1Status">
+                            <span class="amount-badge">--</span>
                         </div>
                     </div>
-                    <div class="progress-status" id="sabakStatus">
-                        <span class="amount-badge">--</span>
-                    </div>
-                </div>
-                <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
-                    <div class="progress-info">
-                        <div class="progress-icon para">🔄</div>
-                        <div class="progress-details">
-                            <h4>Sabak Para</h4>
-                            <p>Previous Lessons</p>
+                    <div class="progress-row" onclick="openProgressModal('dhor2', 'Dhor 2')" id="dhor2Row">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">🔄</div>
+                            <div class="progress-details">
+                                <h4>Dhor 2</h4>
+                                <p>Second Revision Session</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhor2Status">
+                            <span class="amount-badge">--</span>
                         </div>
                     </div>
-                    <div class="progress-status" id="paraStatus">
-                        <span class="amount-badge">--</span>
-                    </div>
-                </div>
-                <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
-                    <div class="progress-info">
-                        <div class="progress-icon dhor">💭</div>
-                        <div class="progress-details">
-                            <h4>Dhor</h4>
-                            <p>Revision</p>
+                    <div class="progress-row" onclick="openProgressModal('dhor3', 'Dhor 3')" id="dhor3Row">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">💭</div>
+                            <div class="progress-details">
+                                <h4>Dhor 3</h4>
+                                <p>Third Revision Session</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhor3Status">
+                            <span class="amount-badge">--</span>
                         </div>
                     </div>
-                    <div class="progress-status" id="dhorStatus">
-                        <span class="amount-badge">--</span>
+                `;
+            } else {
+                console.log('DEBUG - Creating regular student layout');
+                // Regular student layout
+                progressContainer.innerHTML = `
+                    <div class="progress-row" onclick="openProgressModal('sabak', 'Sabak')" id="sabakRow">
+                        <div class="progress-info">
+                            <div class="progress-icon sabak">📖</div>
+                            <div class="progress-details">
+                                <h4>Sabak</h4>
+                                <p>New Lesson</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="sabakStatus">
+                            <span class="amount-badge">--</span>
+                        </div>
                     </div>
-                </div>
-            `;
+                    <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
+                        <div class="progress-info">
+                            <div class="progress-icon para">🔄</div>
+                            <div class="progress-details">
+                                <h4>Sabak Para</h4>
+                                <p>Previous Lessons</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="paraStatus">
+                            <span class="amount-badge">--</span>
+                        </div>
+                    </div>
+                    <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">💭</div>
+                            <div class="progress-details">
+                                <h4>Dhor</h4>
+                                <p>Revision</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhorStatus">
+                            <span class="amount-badge">--</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            console.log('DEBUG - HTML layout created');
+            
+            // NEW: Grey out paused lessons after creating the rows
+            if (todayData.paused) {
+                const greyedOutLessons = todayData.greyedOutLessons || [];
+                greyedOutLessons.forEach(lessonType => {
+                    const lessonRow = document.getElementById(`${lessonType}Row`);
+                    if (lessonRow) {
+                        lessonRow.style.opacity = '0.5';
+                        lessonRow.style.pointerEvents = 'none';
+                        lessonRow.style.cursor = 'not-allowed';
+                    }
+                });
+            }
             
             // Update UI based on user type for weekdays
             updateUIForUserType();
             
-            // Update progress display
+            // Update progress display - FIXED for Dhor-only students
+            const progressTypes = isDhorOnly ? ['dhor1', 'dhor2', 'dhor3'] : ['sabak', 'para', 'dhor'];
+            console.log('DEBUG - Progress types:', progressTypes);
+            
             progressTypes.forEach(type => {
                 const statusEl = document.getElementById(`${type}Status`);
                 const entry = todayData[type];
@@ -8069,7 +8546,6 @@
 
             // UPDATED: Update absent and did not give buttons for teachers
             if (currentUserType === 'teacher' && absentButton && didNotGiveButton) {
-                const progressContainer = document.getElementById('todayProgressContainer');
                 const isAbsent = todayData.absent || false;
                 const isDidNotGive = todayData.didNotGive || false;
                 
@@ -8115,9 +8591,11 @@
                     }
                 }
             }
+            
+            console.log('DEBUG - updateTodaysProgress completed');
         }
 
-        // ===== COMPLETE: openDayModal Function =====
+        // ===== Step 8: Complete openDayModal Function =====
         async function openDayModal(day) {
             if (!currentStudent) return;
             
@@ -8165,8 +8643,246 @@
                         <p style="color: #8E8E93; font-size: 16px;">Holiday - ${holidayInfo.name}</p>
                     </div>
                 `;
+            } else if (dayData.paused) {
+                // NEW: Compact pause view - like normal progress view but with available lessons only
+                const greyedOutLessons = dayData.greyedOutLessons || [];
+                const pauseReasons = {
+                    'stopped-for-dhor': 'Stopped for Dhor',
+                    'stopped-for-juz-dhor': 'Stopped for Juz Dhor', 
+                    'stopped-for-sabak-para': 'Stopped for Sabak Para'
+                };
+                
+                // Add pause notice
+                const pauseNotice = document.createElement('div');
+                pauseNotice.style.cssText = 'text-align: center; padding: 12px; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; margin-bottom: 20px; color: #DC2626; font-size: 14px; font-weight: 600;';
+                pauseNotice.innerHTML = `Sabak Paused (${pauseReasons[dayData.pauseReason]})`;
+                progressList.appendChild(pauseNotice);
+                
+                // Add teacher action buttons for paused days
+                if (currentUserType === 'teacher') {
+                    const buttonDiv = document.createElement('div');
+                    buttonDiv.style.marginBottom = '20px';
+                    buttonDiv.innerHTML = `
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="markDayAbsent('${dateKey}')" style="
+                                background: #FF3B30; color: white; border: none; 
+                                padding: 14px 24px; border-radius: 10px; 
+                                font-size: 16px; font-weight: 600; 
+                                cursor: pointer; flex: 1;
+                            ">🔴 Mark as Absent</button>
+                            <button onclick="markDayDidNotGive('${dateKey}')" style="
+                                background: #FF9500; color: white; border: none; 
+                                padding: 14px 24px; border-radius: 10px; 
+                                font-size: 16px; font-weight: 600; 
+                                cursor: pointer; flex: 1;
+                            ">🟠 Did Not Give</button>
+                        </div>
+                    `;
+                    progressList.appendChild(buttonDiv);
+                }
+                
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'today-progress';
+                progressContainer.style.marginTop = '20px';
+                
+                // Show only available lessons (not greyed out)
+                let progressData;
+                if (isDhorOnly) {
+                    // For Dhor-only students, show all Dhor lessons
+                    progressData = [
+                        { type: 'dhor1', title: 'Dhor 1', icon: '📖' },
+                        { type: 'dhor2', title: 'Dhor 2', icon: '🔄' },
+                        { type: 'dhor3', title: 'Dhor 3', icon: '💭' }
+                    ];
+                } else {
+                    // For regular students, show only non-greyed-out lessons
+                    progressData = [];
+                    if (!greyedOutLessons.includes('sabak')) {
+                        progressData.push({ type: 'sabak', title: 'Sabak', icon: '📖' });
+                    }
+                    if (!greyedOutLessons.includes('para')) {
+                        progressData.push({ type: 'para', title: 'Sabak Para', icon: '🔄' });
+                    }
+                    if (!greyedOutLessons.includes('dhor')) {
+                        progressData.push({ type: 'dhor', title: 'Dhor', icon: '💭' });
+                    }
+                }
+                
+                progressData.forEach((item, index) => {
+                    const entry = dayData[item.type];
+                    
+                    const progressRow = document.createElement('div');
+                    progressRow.className = 'progress-row';
+                    progressRow.style.padding = '24px';
+                    progressRow.style.margin = '0 -8px';
+                    
+                    if (index < progressData.length - 1) {
+                        progressRow.style.borderBottom = '1px solid #F2F2F7';
+                    }
+                    
+                    let statusHtml = '<span class="amount-badge">--</span>';
+                    if (entry) {
+                        if (item.type === 'sabak' && entry.lines && !isDhorOnly) {
+                            statusHtml = `
+                                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                                    <div style="display: flex; gap: 4px;">
+                                        <span class="amount-badge">${entry.lines} lines</span>
+                                        <span class="grade-badge ${entry.grade}"></span>
+                                    </div>
+                                    ${entry.fraction ? `<div class="conversion-badge">${entry.fraction}</div>` : ''}
+                                </div>
+                            `;
+                        } else {
+                            statusHtml = `
+                                <div style="display: flex; gap: 4px;">
+                                    <span class="amount-badge">${entry.amount}</span>
+                                    <span class="grade-badge ${entry.grade}"></span>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    // Set description based on type and mode
+                    let description;
+                    if (isDhorOnly) {
+                        const descriptions = {
+                            'dhor1': 'First Revision Session',
+                            'dhor2': 'Second Revision Session', 
+                            'dhor3': 'Third Revision Session'
+                        };
+                        description = descriptions[item.type];
+                    } else {
+                        const descriptions = {
+                            'sabak': 'New Lesson',
+                            'para': 'Previous Lessons',
+                            'dhor': 'Revision'
+                        };
+                        description = descriptions[item.type];
+                    }
+                    
+                    progressRow.innerHTML = `
+                        <div class="progress-info">
+                            <div class="progress-icon ${item.type === 'dhor1' || item.type === 'dhor2' || item.type === 'dhor3' ? 'dhor' : item.type}">${item.icon}</div>
+                            <div class="progress-details">
+                                <h4>${item.title}</h4>
+                                <p style="color: #8E8E93; font-size: 14px;">${description}</p>
+                            </div>
+                        </div>
+                        <div class="progress-status">${statusHtml}</div>
+                    `;
+                    
+                    // Only make clickable for teachers
+                    if (currentUserType === 'teacher') {
+                        progressRow.style.cursor = 'pointer';
+                        progressRow.addEventListener('click', function() {
+                            currentProgressType = item.type;
+                            currentDate = dateKey;
+                            document.getElementById('modalTitle').textContent = `${item.title}`;
+                            
+                            const linesInputGroup = document.getElementById('linesInputGroup');
+                            const amountInputGroup = document.getElementById('amountInputGroup');
+                            const linesInput = document.getElementById('linesInput');
+                            const amountInput = document.getElementById('amountInput');
+                            
+                            if (item.type === 'sabak' && !isDhorOnly) {
+                                linesInputGroup.style.display = 'block';
+                                amountInputGroup.style.display = 'none';
+                                
+                                if (entry) {
+                                    linesInput.value = entry.lines || '';
+                                } else {
+                                    linesInput.value = '';
+                                }
+                            } else {
+                                linesInputGroup.style.display = 'none';
+                                amountInputGroup.style.display = 'block';
+                                
+                                if (entry) {
+                                    amountInput.value = entry.amount || '';
+                                } else {
+                                    amountInput.value = '';
+                                }
+                            }
+                            
+                            if (entry) {
+                                selectedGrade = entry.grade;
+                                document.querySelectorAll('.grade-button').forEach(btn => {
+                                    btn.classList.remove('selected');
+                                });
+                                document.querySelector(`[data-grade="${entry.grade}"]`).classList.add('selected');
+                            } else {
+                                selectedGrade = null;
+                                document.querySelectorAll('.grade-button').forEach(btn => {
+                                    btn.classList.remove('selected');
+                                });
+                            }
+                            
+                            updateConversionDisplay();
+                            closeModal('dayModal');
+                            document.getElementById('progressModal').style.display = 'block';
+                            
+                            linesInput.addEventListener('input', updateConversionDisplay);
+                        });
+                    }
+                    
+                    progressContainer.appendChild(progressRow);
+                });
+                
+                // Add Remove Pause button for teachers
+                if (currentUserType === 'teacher') {
+                    const removePauseDiv = document.createElement('div');
+                    removePauseDiv.style.cssText = 'padding: 16px 24px; border-top: 1px solid #F2F2F7; text-align: center;';
+                    removePauseDiv.innerHTML = `
+                        <button onclick="removePause('${dateKey}')" style="
+                            background: #10A37F; color: white; border: none; 
+                            padding: 14px 24px; border-radius: 10px; 
+                            font-size: 16px; font-weight: 600; 
+                            cursor: pointer;
+                        ">Remove Pause</button>
+                    `;
+                    progressContainer.appendChild(removePauseDiv);
+                }
+                
+                // Add parent check section for paused days
+                if (date.getDay() >= 1 && date.getDay() <= 5) {
+                    if (currentUserType === 'parent') {
+                        const parentCheckRow = document.createElement('div');
+                        parentCheckRow.style.cssText = 'padding: 16px 24px; border-top: 1px solid #F2F2F7; background: #F8F9FA;';
+                        
+                        const isChecked = dayData.parentChecked || false;
+                        const buttonText = isChecked ? '✓ Checked by Parent' : '✓ Mark as Checked';
+                        const buttonColor = isChecked ? '#8E8E93' : '#34C759';
+                        
+                        parentCheckRow.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #1C1C1E;">Parent Review</h4>
+                                </div>
+                                <button onclick="toggleParentCheck('${dateKey}')" style="
+                                    background: ${buttonColor}; color: white; border: none; 
+                                    padding: 12px 16px; border-radius: 8px; 
+                                    font-size: 14px; font-weight: 600; 
+                                    cursor: pointer; min-width: 140px;
+                                ">${buttonText}</button>
+                            </div>
+                        `;
+                        progressContainer.appendChild(parentCheckRow);
+                    } else if (currentUserType === 'teacher' || currentUserType === 'office') {
+                        const parentStatusRow = document.createElement('div');
+                        if (dayData.parentChecked) {
+                            parentStatusRow.style.cssText = 'padding: 16px 24px; background: #F0F9FF; border-top: 1px solid #E0F2FE; text-align: center; color: #0369A1; font-size: 14px; font-weight: 600;';
+                            parentStatusRow.innerHTML = '✓ Reviewed by Parent';
+                        } else {
+                            parentStatusRow.style.cssText = 'padding: 16px 24px; background: #FEF2F2; border-top: 1px solid #FECACA; text-align: center; color: #DC2626; font-size: 14px; font-weight: 600;';
+                            parentStatusRow.innerHTML = '✗ Not yet reviewed by Parent';
+                        }
+                        progressContainer.appendChild(parentStatusRow);
+                    }
+                }
+                
+                progressList.appendChild(progressContainer);
             } else {
-                // Weekday view
+                // Weekday view (your existing logic)
                 if (dayData.absent) {
                     // Get student name for personalized message
                     const studentName = student ? student.name : 'Student';
@@ -8380,7 +9096,7 @@
                     });
                     
                     // Add parent check section for any weekday
-                    if (!isWeekendDay && !isHolidayDay) {
+                    if (date.getDay() >= 1 && date.getDay() <= 5) {
                         // Parent check button for parents
                         if (currentUserType === 'parent') {
                             const parentCheckRow = document.createElement('div');
@@ -10670,6 +11386,8 @@
         window.openDayModal = openDayModal;
         window.markDayAbsent = markDayAbsent;
         window.removeAbsent = removeAbsent;
+        window.selectPause = selectPause;
+        window.removePause = removePause;
         window.showManageStudentsModal = showManageStudentsModal;
         window.switchManageTab = switchManageTab;
         window.copyAccessCode = copyAccessCode;
