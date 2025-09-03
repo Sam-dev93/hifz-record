@@ -6783,12 +6783,14 @@
         window.getStudents = async function() {
             // Hardcoded student data instead of fetching from CSV
             const students = [
-                { id: 'arafat_rayyan', name: 'Arafat Rayyan', quranType: 13, accessCode: '151110' },
-                { id: 'ayyan_miah', name: 'Ayyan Miah', quranType: 13, accessCode: '120416' },
-                { id: 'ishaq_noor', name: 'Ishaq Noor', quranType: 15, accessCode: '070213' },
-                { id: 'ismail_hussain', name: 'Ismail Hussain', quranType: 15, accessCode: '220218' },
-                { id: 'naveed_khan', name: 'Naveed Khan', quranType: 13, accessCode: '030213' },
-                { id: 'rayhan_rahman', name: 'Rayhan Rahman', quranType: 13, accessCode: '290914' }
+                { id: 'ahsan_haque', name: 'Ahsan Haque', quranType: 15, accessCode: '290810', dhorOnly: false },
+                { id: 'arafat_rayyan', name: 'Arafat Rayyan', quranType: 13, accessCode: '151110', dhorOnly: false },
+                { id: 'ayyan_miah', name: 'Ayyan Miah', quranType: 13, accessCode: '120416', dhorOnly: false },
+                { id: 'ishaq_noor', name: 'Ishaq Noor', quranType: 15, accessCode: '070213', dhorOnly: false },
+                { id: 'ismail_hussain', name: 'Ismail Hussain', quranType: 15, accessCode: '220218', dhorOnly: false },
+                { id: 'naveed_khan', name: 'Naveed Khan', quranType: 13, accessCode: '030213', dhorOnly: false },
+                { id: 'raqib_awal', name: 'Raqib Awal', quranType: 13, accessCode: '001122', dhorOnly: true },
+                { id: 'rayhan_rahman', name: 'Rayhan Rahman', quranType: 13, accessCode: '290914', dhorOnly: false }
             ];
             
             return students.sort((a, b) => a.name.localeCompare(b.name));
@@ -6860,6 +6862,11 @@
             const studentData = await window.getStudentData(currentStudent);
             const todayData = studentData[todayKey] || {};
             
+            // Check if current student is Dhor-only
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === currentStudent);
+            const isDhorOnly = student ? student.dhorOnly : false;
+            
             // Check if today is weekend or holiday
             const isWeekendToday = isWeekend(today);
             const isHolidayToday = isHolidayDate(today);
@@ -6869,6 +6876,7 @@
             const progressSectionTitle = document.getElementById('progressSectionTitle');
             const progressContainer = document.getElementById('todayProgressContainer');
             const absentButton = document.getElementById('absentButton');
+            const didNotGiveButton = document.getElementById('didNotGiveButton');
             
             if (isWeekendToday) {
                 // Weekend mode - show mosque closed message
@@ -6877,6 +6885,9 @@
                 // Hide buttons
                 if (absentButton) {
                     absentButton.style.display = 'none';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'none';
                 }
                 
                 // Show weekend closed message instead of progress
@@ -6906,6 +6917,9 @@
                 if (absentButton) {
                     absentButton.style.display = 'none';
                 }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'none';
+                }
                 
                 // Show holiday message instead of progress
                 progressContainer.innerHTML = `
@@ -6926,66 +6940,151 @@
                 }
                 
                 return;
+            } else if (todayData.didNotGive) {
+                // Did Not Give mode - show special message
+                progressSectionTitle.textContent = 'Did Not Give Today';
+                
+                // Hide buttons
+                if (absentButton) {
+                    absentButton.style.display = 'none';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'none';
+                }
+                
+                // Get student name for personalized message
+                const studentName = student ? student.name : 'Student';
+                
+                // Show did not give message instead of progress
+                progressContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px 30px; color: #FF9500;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">😔</div>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1C1C1E;">${studentName} did not give anything today</h3>
+                        <p style="color: #8E8E93; font-size: 16px;">Please make sure he learns at home</p>
+                        <div style="margin-top: 20px; padding: 12px; background: #FFF3E0; border-radius: 8px; font-size: 14px; color: #F57C00;">
+                            📚 Home practice is important for progress
+                        </div>
+                    </div>
+                `;
+                
+                // Hide parent check section when did not give
+                const parentCheckSection = document.getElementById('parentCheckSection');
+                if (parentCheckSection) {
+                    parentCheckSection.style.display = 'none';
+                }
+                
+                return;
             }
             
             // Weekday mode - restore normal progress display
             progressSectionTitle.textContent = 'Today\'s Progress';
             
-            // Show absent button for teachers
-            if (currentUserType === 'teacher' && absentButton) {
-                absentButton.style.display = 'inline-block';
+            // Show buttons for teachers
+            if (currentUserType === 'teacher') {
+                if (absentButton) {
+                    absentButton.style.display = 'inline-block';
+                }
+                if (didNotGiveButton) {
+                    didNotGiveButton.style.display = 'inline-block';
+                }
             }
             
-            // Restore progress rows structure if it was changed
-            progressContainer.innerHTML = `
-                <div class="progress-row" onclick="openProgressModal('sabak', 'Sabak')" id="sabakRow">
-                    <div class="progress-info">
-                        <div class="progress-icon sabak">📖</div>
-                        <div class="progress-details">
-                            <h4>Sabak</h4>
-                            <p>New Lesson</p>
+            // Generate progress rows based on Dhor-only mode
+            if (isDhorOnly) {
+                // Dhor-only mode: Show Dhor 1, Dhor 2, Dhor 3
+                progressContainer.innerHTML = `
+                    <div class="progress-row" onclick="openProgressModal('dhor1', 'Dhor 1')" id="dhor1Row">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">📖</div>
+                            <div class="progress-details">
+                                <h4>Dhor 1</h4>
+                                <p>First Revision Session</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhor1Status">
+                            <span class="amount-badge">--</span>
                         </div>
                     </div>
-                    <div class="progress-status" id="sabakStatus">
-                        <span class="amount-badge">--</span>
-                    </div>
-                </div>
-                <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
-                    <div class="progress-info">
-                        <div class="progress-icon para">🔄</div>
-                        <div class="progress-details">
-                            <h4>Sabak Para</h4>
-                            <p>Previous Lessons</p>
+                    <div class="progress-row" onclick="openProgressModal('dhor2', 'Dhor 2')" id="dhor2Row">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">🔄</div>
+                            <div class="progress-details">
+                                <h4>Dhor 2</h4>
+                                <p>Second Revision Session</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhor2Status">
+                            <span class="amount-badge">--</span>
                         </div>
                     </div>
-                    <div class="progress-status" id="paraStatus">
-                        <span class="amount-badge">--</span>
-                    </div>
-                </div>
-                <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
-                    <div class="progress-info">
-                        <div class="progress-icon dhor">💭</div>
-                        <div class="progress-details">
-                            <h4>Dhor</h4>
-                            <p>Revision</p>
+                    <div class="progress-row" onclick="openProgressModal('dhor3', 'Dhor 3')" id="dhor3Row">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">💭</div>
+                            <div class="progress-details">
+                                <h4>Dhor 3</h4>
+                                <p>Third Revision Session</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhor3Status">
+                            <span class="amount-badge">--</span>
                         </div>
                     </div>
-                    <div class="progress-status" id="dhorStatus">
-                        <span class="amount-badge">--</span>
+                `;
+            } else {
+                // Regular mode: Show Sabak, Sabak Para, Dhor
+                progressContainer.innerHTML = `
+                    <div class="progress-row" onclick="openProgressModal('sabak', 'Sabak')" id="sabakRow">
+                        <div class="progress-info">
+                            <div class="progress-icon sabak">📖</div>
+                            <div class="progress-details">
+                                <h4>Sabak</h4>
+                                <p>New Lesson</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="sabakStatus">
+                            <span class="amount-badge">--</span>
+                        </div>
                     </div>
-                </div>
-            `;
+                    <div class="progress-row" onclick="openProgressModal('para', 'Sabak Para')" id="paraRow">
+                        <div class="progress-info">
+                            <div class="progress-icon para">🔄</div>
+                            <div class="progress-details">
+                                <h4>Sabak Para</h4>
+                                <p>Previous Lessons</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="paraStatus">
+                            <span class="amount-badge">--</span>
+                        </div>
+                    </div>
+                    <div class="progress-row" onclick="openProgressModal('dhor', 'Dhor')" id="dhorRow">
+                        <div class="progress-info">
+                            <div class="progress-icon dhor">💭</div>
+                            <div class="progress-details">
+                                <h4>Dhor</h4>
+                                <p>Revision</p>
+                            </div>
+                        </div>
+                        <div class="progress-status" id="dhorStatus">
+                            <span class="amount-badge">--</span>
+                        </div>
+                    </div>
+                `;
+            }
             
             // Update UI based on user type for weekdays
             updateUIForUserType();
             
             // Update progress display
-            progressTypes.forEach(type => {
+            const progressTypesToCheck = isDhorOnly ? ['dhor1', 'dhor2', 'dhor3'] : ['sabak', 'para', 'dhor'];
+            progressTypesToCheck.forEach(type => {
                 const statusEl = document.getElementById(`${type}Status`);
+                if (!statusEl) return; // Skip if element doesn't exist
+                
                 const entry = todayData[type];
                 
                 if (entry) {
-                    if (type === 'sabak' && entry.lines) {
+                    if (type === 'sabak' && entry.lines && !isDhorOnly) {
                         const conversionInfo = entry.fraction ? `<div class="conversion-badge">${entry.fraction}</div>` : '';
                         let parentCheckHtml = '';
                         
@@ -7033,19 +7132,32 @@
                 }
             });
 
-            // Update absent button for teachers
-            if (currentUserType === 'teacher' && absentButton) {
+            // Update absent and did not give buttons for teachers
+            if (currentUserType === 'teacher' && absentButton && didNotGiveButton) {
                 const progressContainer = document.getElementById('todayProgressContainer');
                 const isAbsent = todayData.absent || false;
+                const isDidNotGive = todayData.didNotGive || false;
                 
                 if (isAbsent) {
                     absentButton.textContent = '✓ Present';
                     absentButton.classList.add('active');
+                    didNotGiveButton.textContent = '🟠 Did Not Give';
+                    didNotGiveButton.classList.remove('active');
                     progressContainer.classList.add('absent');
+                    progressContainer.classList.remove('did-not-give');
+                } else if (isDidNotGive) {
+                    didNotGiveButton.textContent = '✓ Gave Today';
+                    didNotGiveButton.classList.add('active');
+                    absentButton.textContent = '🔴 Absent';
+                    absentButton.classList.remove('active');
+                    progressContainer.classList.add('did-not-give');
+                    progressContainer.classList.remove('absent');
                 } else {
                     absentButton.textContent = '🔴 Absent';
                     absentButton.classList.remove('active');
-                    progressContainer.classList.remove('absent');
+                    didNotGiveButton.textContent = '🟠 Did Not Give';
+                    didNotGiveButton.classList.remove('active');
+                    progressContainer.classList.remove('absent', 'did-not-give');
                 }
             }
 
@@ -7077,8 +7189,9 @@
             const students = await window.getStudents();
             const student = students.find(s => s.id === currentStudent);
             const quranType = student ? student.quranType || 13 : 13;
+            const isDhorOnly = student ? student.dhorOnly : false;
             
-            const stats = { sabak: 0, sabakPages: 0, para: 0, dhor: 0 };
+            const stats = { sabak: 0, sabakPages: 0, para: 0, dhor: 0, dhor1: 0, dhor2: 0, dhor3: 0 };
             
             const currentMonth = `${currentDisplayYear}-${String(currentDisplayMonth).padStart(2, '0')}`;
             
@@ -7099,45 +7212,81 @@
                 }
                 
                 if (date.startsWith(currentMonth)) {
-                    // Calculate SABAK pages instead of days
-                    if (dayData.sabak && dayData.sabak.lines && !dayData.absent && !dayData.didNotGive) {
-                        const lines = dayData.sabak.lines;
-                        const pages = lines / quranType; // Convert lines to pages based on Quran type
-                        stats.sabakPages += pages;
-                        stats.sabak++; // Keep day count for reference if needed
-                    }
-                    
-                    // Count days for Para and Dhor (unchanged)
-                    if (dayData.para && !dayData.absent && !dayData.didNotGive) {
-                        stats.para++;
-                    }
-                    if (dayData.dhor && !dayData.absent && !dayData.didNotGive) {
-                        stats.dhor++;
+                    if (isDhorOnly) {
+                        // Count Dhor 1, Dhor 2, Dhor 3 sessions
+                        if (dayData.dhor1 && !dayData.absent && !dayData.didNotGive) {
+                            stats.dhor1++;
+                        }
+                        if (dayData.dhor2 && !dayData.absent && !dayData.didNotGive) {
+                            stats.dhor2++;
+                        }
+                        if (dayData.dhor3 && !dayData.absent && !dayData.didNotGive) {
+                            stats.dhor3++;
+                        }
+                    } else {
+                        // Calculate SABAK pages instead of days
+                        if (dayData.sabak && dayData.sabak.lines && !dayData.absent && !dayData.didNotGive) {
+                            const lines = dayData.sabak.lines;
+                            const pages = lines / quranType; // Convert lines to pages based on Quran type
+                            stats.sabakPages += pages;
+                            stats.sabak++; // Keep day count for reference if needed
+                        }
+                        
+                        // Count days for Para and Dhor (unchanged)
+                        if (dayData.para && !dayData.absent && !dayData.didNotGive) {
+                            stats.para++;
+                        }
+                        if (dayData.dhor && !dayData.absent && !dayData.didNotGive) {
+                            stats.dhor++;
+                        }
                     }
                 }
             });
             
-            // Display total pages for SABAK (rounded to nearest whole page)
-            const totalPagesDisplay = Math.round(stats.sabakPages);
-            document.getElementById('sabakCount').textContent = totalPagesDisplay;
-            
-            // Update SABAK label to show "SABAK PAGES" 
-            const sabakLabel = document.querySelector('.stat-card.sabak .stat-label');
-            if (sabakLabel) {
-                sabakLabel.textContent = 'SABAK PAGES';
-            }
-            
-            // Keep Para and Dhor as day counts with "DAYS" labels
-            document.getElementById('paraCount').textContent = stats.para;
-            const paraLabel = document.querySelector('.stat-card.para .stat-label');
-            if (paraLabel) {
-                paraLabel.textContent = 'SABAK PARA';
-            }
-            
-            document.getElementById('dhorCount').textContent = stats.dhor;
-            const dhorLabel = document.querySelector('.stat-card.dhor .stat-label');
-            if (dhorLabel) {
-                dhorLabel.textContent = 'DHOR';
+            if (isDhorOnly) {
+                // Display Dhor session counts
+                document.getElementById('sabakCount').textContent = stats.dhor1;
+                document.getElementById('paraCount').textContent = stats.dhor2;
+                document.getElementById('dhorCount').textContent = stats.dhor3;
+                
+                // Update labels for Dhor-only mode
+                const sabakLabel = document.querySelector('.stat-card.sabak .stat-label');
+                if (sabakLabel) {
+                    sabakLabel.textContent = 'DHOR 1';
+                }
+                
+                const paraLabel = document.querySelector('.stat-card.para .stat-label');
+                if (paraLabel) {
+                    paraLabel.textContent = 'DHOR 2';
+                }
+                
+                const dhorLabel = document.querySelector('.stat-card.dhor .stat-label');
+                if (dhorLabel) {
+                    dhorLabel.textContent = 'DHOR 3';
+                }
+            } else {
+                // Display total pages for SABAK (rounded to nearest whole page)
+                const totalPagesDisplay = Math.round(stats.sabakPages);
+                document.getElementById('sabakCount').textContent = totalPagesDisplay;
+                
+                // Update SABAK label to show "SABAK PAGES" 
+                const sabakLabel = document.querySelector('.stat-card.sabak .stat-label');
+                if (sabakLabel) {
+                    sabakLabel.textContent = 'SABAK PAGES';
+                }
+                
+                // Keep Para and Dhor as day counts with their labels
+                document.getElementById('paraCount').textContent = stats.para;
+                const paraLabel = document.querySelector('.stat-card.para .stat-label');
+                if (paraLabel) {
+                    paraLabel.textContent = 'SABAK PARA';
+                }
+                
+                document.getElementById('dhorCount').textContent = stats.dhor;
+                const dhorLabel = document.querySelector('.stat-card.dhor .stat-label');
+                if (dhorLabel) {
+                    dhorLabel.textContent = 'DHOR';
+                }
             }
         }
 
@@ -7981,6 +8130,11 @@
             const studentData = await window.getStudentData(currentStudent);
             const dayData = studentData[dateKey] || {};
             
+            // Get current student info to check if Dhor-only
+            const students = await window.getStudents();
+            const student = students.find(s => s.id === currentStudent);
+            const isDhorOnly = student ? student.dhorOnly : false;
+            
             const dateStr = date.toLocaleDateString('en-US', {
                 weekday: 'long',
                 month: 'long',
@@ -8015,8 +8169,6 @@
                 // Weekday view
                 if (dayData.absent) {
                     // Get student name for personalized message
-                    const students = await window.getStudents();
-                    const student = students.find(s => s.id === currentStudent);
                     const studentName = student ? student.name : 'Student';
                     
                     let absentHtml = `
@@ -8040,10 +8192,7 @@
                     absentHtml += '</div>';
                     progressList.innerHTML = absentHtml;
                 } else if (dayData.didNotGive) {
-                    // UPDATED: Did Not Give view
-                    // Get student name for personalized message
-                    const students = await window.getStudents();
-                    const student = students.find(s => s.id === currentStudent);
+                    // Did Not Give view
                     const studentName = student ? student.name : 'Student';
                     
                     let didNotGiveHtml = `
@@ -8067,7 +8216,7 @@
                     didNotGiveHtml += '</div>';
                     progressList.innerHTML = didNotGiveHtml;
                 } else {
-                    // UPDATED: Add absent and did not give buttons for teachers only on non-absent/non-did-not-give days
+                    // Add absent and did not give buttons for teachers only on non-absent/non-did-not-give days
                     if (currentUserType === 'teacher') {
                         const buttonDiv = document.createElement('div');
                         buttonDiv.style.marginBottom = '20px';
@@ -8094,11 +8243,21 @@
                     progressContainer.className = 'today-progress';
                     progressContainer.style.marginTop = '20px';
                     
-                    const progressData = [
-                        { type: 'sabak', title: 'Sabak', icon: '📖' },
-                        { type: 'para', title: 'Sabak Para', icon: '🔄' },
-                        { type: 'dhor', title: 'Dhor', icon: '💭' }
-                    ];
+                    // Define progress data based on student mode
+                    let progressData;
+                    if (isDhorOnly) {
+                        progressData = [
+                            { type: 'dhor1', title: 'Dhor 1', icon: '📖' },
+                            { type: 'dhor2', title: 'Dhor 2', icon: '🔄' },
+                            { type: 'dhor3', title: 'Dhor 3', icon: '💭' }
+                        ];
+                    } else {
+                        progressData = [
+                            { type: 'sabak', title: 'Sabak', icon: '📖' },
+                            { type: 'para', title: 'Sabak Para', icon: '🔄' },
+                            { type: 'dhor', title: 'Dhor', icon: '💭' }
+                        ];
+                    }
                     
                     progressData.forEach((item, index) => {
                         const entry = dayData[item.type];
@@ -8114,7 +8273,7 @@
                         
                         let statusHtml = '<span class="amount-badge">--</span>';
                         if (entry) {
-                            if (item.type === 'sabak' && entry.lines) {
+                            if (item.type === 'sabak' && entry.lines && !isDhorOnly) {
                                 statusHtml = `
                                     <div style="display: flex; flex-direction: column; align-items: flex-end;">
                                         <div style="display: flex; gap: 4px;">
@@ -8134,12 +8293,30 @@
                             }
                         }
                         
+                        // Set description based on type and mode
+                        let description;
+                        if (isDhorOnly) {
+                            const descriptions = {
+                                'dhor1': 'First Revision Session',
+                                'dhor2': 'Second Revision Session', 
+                                'dhor3': 'Third Revision Session'
+                            };
+                            description = descriptions[item.type];
+                        } else {
+                            const descriptions = {
+                                'sabak': 'New Lesson',
+                                'para': 'Previous Lessons',
+                                'dhor': 'Revision'
+                            };
+                            description = descriptions[item.type];
+                        }
+                        
                         progressRow.innerHTML = `
                             <div class="progress-info">
-                                <div class="progress-icon ${item.type}">${item.icon}</div>
+                                <div class="progress-icon ${item.type === 'dhor1' || item.type === 'dhor2' || item.type === 'dhor3' ? 'dhor' : item.type}">${item.icon}</div>
                                 <div class="progress-details">
                                     <h4>${item.title}</h4>
-                                    <p style="color: #8E8E93; font-size: 14px;">${item.type === 'sabak' ? 'New Lesson' : item.type === 'para' ? 'Previous Lessons' : 'Revision'}</p>
+                                    <p style="color: #8E8E93; font-size: 14px;">${description}</p>
                                 </div>
                             </div>
                             <div class="progress-status">${statusHtml}</div>
@@ -8158,7 +8335,7 @@
                                 const linesInput = document.getElementById('linesInput');
                                 const amountInput = document.getElementById('amountInput');
                                 
-                                if (item.type === 'sabak') {
+                                if (item.type === 'sabak' && !isDhorOnly) {
                                     linesInputGroup.style.display = 'block';
                                     amountInputGroup.style.display = 'none';
                                     
