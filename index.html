@@ -1405,7 +1405,7 @@
         }
         
         .indicator.dhor { 
-            background: #FF9500; 
+            background: #4169E1; 
         }
 
         .indicator.homework {
@@ -3247,7 +3247,6 @@
                         <!-- Ustaadh Controls -->
                         <div id="teacherControls" style="display: none;">
                             <button class="control-button" onclick="showManageStudentsModal()">🧑‍🧑‍🧒‍🧒 Manage Students</button>
-                            <button class="control-button" onclick="showImportDataModal()">📥 Import Student Data</button>
                             <button class="control-button" onclick="showUpdateStudentOverviewModal()">📊 Update Student Overview</button>
                             <button class="control-button" onclick="showStudentTargetsModal()">🎯 Student Targets</button>
                             <button class="control-button" onclick="showAssignHomeworkModal()">📚 Assign Homework</button>
@@ -3761,88 +3760,6 @@
             <div class="modal-body">
                 <div id="viewTargetsContent">
                     <!-- Targets will be displayed here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Import Data Modal -->
-    <div id="importDataModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-                <h2 class="modal-title">📥 Import Student Data</h2>
-                <span class="close" onclick="closeModal('importDataModal')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="homework-section">
-                    <div class="homework-section-title">
-                        📊 Upload Sabak Data
-                    </div>
-                    
-                    <div style="background: #e8f4fd; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                        <strong>📝 Expected Format:</strong><br>
-                        • CSV or Excel files (.csv, .xlsx, .xls)<br>
-                        • Columns: Student Name, Date, Sabak, Grade, Absent<br><br>
-                        <strong>📋 Example:</strong><br>
-                        <code>Rayhan Rahman, 2024-09-03, 14 Lines, excellent, no</code>
-                    </div>
-                    
-                    <div class="entry-form">
-                        <div class="form-group">
-                            <label class="form-label">Select Student for Import</label>
-                            <select class="form-select" id="importStudentSelect">
-                                <option value="">Choose student to import data for</option>
-                            </select>
-                        </div>
-                    
-                        <div class="form-group">
-                            <label class="form-label">Select File to Import</label>
-                            <input type="file" class="form-input" id="importFile" 
-                                   accept=".xlsx,.xls,.csv" 
-                                   onchange="handleFileSelection()">
-                        </div>
-                        
-                        <div id="filePreview" style="display: none;">
-                            <div class="homework-section-title">
-                                📋 File Preview
-                            </div>
-                            <div id="previewContent" style="max-height: 300px; overflow-y: auto; background: #f8f9fa; border-radius: 8px; padding: 15px;">
-                                <!-- Preview content will be loaded here -->
-                            </div>
-                            
-                            <div style="margin-top: 20px;">
-                                <div class="form-group">
-                                    <label class="form-label">Import Options</label>
-                                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
-                                        <label style="display: flex; align-items: center; gap: 6px;">
-                                            <input type="checkbox" id="skipDuplicates" checked>
-                                            <span style="font-size: 14px;">Skip duplicate entries</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button class="save-button" onclick="processImportData()" id="importButton">
-                                📥 Import Data
-                            </button>
-                        </div>
-                        
-                        <div id="importProgress" style="display: none;">
-                            <div style="background: #e8f4fd; border-radius: 8px; padding: 16px; text-align: center;">
-                                <div class="loading-spinner" style="display: inline-block; margin-right: 10px;"></div>
-                                <span id="importProgressText">Processing data...</span>
-                            </div>
-                        </div>
-                        
-                        <div id="importResults" style="display: none;">
-                            <div class="homework-section-title">
-                                ✅ Import Results
-                            </div>
-                            <div id="resultsContent">
-                                <!-- Results will be shown here -->
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -7017,6 +6934,7 @@
         window.getStudents = async function() {
             // Hardcoded student data instead of fetching from CSV
             const students = [
+                { id: 'abdullah_dheriwala', name: 'Abdullah Dheriwala', quranType: 13, accessCode: '060313', dhorOnly: false },
                 { id: 'ahsan_haque', name: 'Ahsan Haque', quranType: 15, accessCode: '290810', dhorOnly: false },
                 { id: 'arafat_rayyan', name: 'Arafat Rayyan', quranType: 13, accessCode: '151110', dhorOnly: false },
                 { id: 'ayyan_miah', name: 'Ayyan Miah', quranType: 13, accessCode: '120416', dhorOnly: false },
@@ -8090,7 +8008,6 @@
             }
         }
 
-        // ===== COMPLETE: generateCalendar Function =====
         function generateCalendar() {
             const grid = document.getElementById('calendarGrid');
             const monthTitle = document.getElementById('monthTitle');
@@ -8193,12 +8110,27 @@
                                 
                                 // Show progress indicators (only for weekdays)
                                 if (!isWeekendDay) {
-                                    progressTypes.forEach(type => {
-                                        if (dayData[type]) {
-                                            const indicator = document.createElement('div');
-                                            indicator.className = `indicator ${type}`;
-                                            indicators.appendChild(indicator);
+                                    // Get current student info to check if Dhor-only
+                                    window.getStudents().then(students => {
+                                        const student = students.find(s => s.id === currentStudent);
+                                        const isDhorOnly = student ? student.dhorOnly : false;
+                                        
+                                        let typesToCheck;
+                                        if (isDhorOnly) {
+                                            typesToCheck = ['dhor1', 'dhor2', 'dhor3'];
+                                        } else {
+                                            typesToCheck = ['sabak', 'para', 'dhor'];
                                         }
+                                        
+                                        typesToCheck.forEach(type => {
+                                            if (dayData[type]) {
+                                                const indicator = document.createElement('div');
+                                                // Map dhor1, dhor2, dhor3 to 'dhor' class for styling
+                                                const cssClass = (type === 'dhor1' || type === 'dhor2' || type === 'dhor3') ? 'dhor' : type;
+                                                indicator.className = `indicator ${cssClass}`;
+                                                indicators.appendChild(indicator);
+                                            }
+                                        });
                                     });
                                 }
                                 
@@ -11095,18 +11027,36 @@
                 } else {
                     // REGULAR WEEKDAY ROW: Show actual data
                     // Sabak - Centered (truncate if too long)
-                    let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                    let sabakText;
+                    if (dayData.paused) {
+                        sabakText = 'Sabak Paused';
+                    } else if (dayData.sabak) {
+                        sabakText = dayData.sabak.amount || `${dayData.sabak.lines} lines`;
+                    } else {
+                        sabakText = '--';
+                    }
+                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 16);
+                    if (dayData.paused) {
+                        pdf.setTextColor(255, 59, 48); // Red color
+                        pdf.setFont(undefined, 'normal');
+                    } else {
+                        pdf.setTextColor(28, 28, 30); // Normal black color
+                        pdf.setFont(undefined, 'normal');
+                    }
                     centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+
+                    // Always reset to normal after sabak column
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFont(undefined, 'normal');
                     
                     // Sabak Para - Centered (truncate if too long)
                     let paraText = dayData.para ? dayData.para.amount : '--';
-                    if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                    if (paraText.length > 8) paraText = paraText.substring(0, 16);
                     centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
                     
                     // Dhor - Centered (truncate if too long)
                     let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 16);
                     centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
                     
                     // Status - Centered
@@ -11115,11 +11065,23 @@
                     centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
                     
                     // Parent Review - Centered
-                    const parentReview = dayData.parentChecked ? '✓' : '✗';
+                    const parentReview = dayData.parentChecked ? 'Yes' : 'No';
                     const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                    pdf.setFont(undefined, 'bold');
-                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+
+                    // Check if future date
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const isFutureDate = currentDate > today;
+
+                    if (isFutureDate) {
+                        pdf.setTextColor(142, 142, 147); // Grey
+                        pdf.setFont(undefined, 'normal');
+                        centerTextInColumn('--', colStarts[5], colWidths[5], yPos + 5);
+                    } else {
+                        pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                        pdf.setFont(undefined, 'bold');
+                        centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+                    }
                 }
                 
                 yPos += rowHeight;
@@ -12293,18 +12255,36 @@
                 } else {
                     // REGULAR WEEKDAY ROW: Show actual data
                     // Sabak - Centered (truncate if too long)
-                    let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                    let sabakText;
+                    if (dayData.paused) {
+                        sabakText = 'Sabak Paused';
+                    } else if (dayData.sabak) {
+                        sabakText = dayData.sabak.amount || `${dayData.sabak.lines} lines`;
+                    } else {
+                        sabakText = '--';
+                    }
+                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 16);
+                    if (dayData.paused) {
+                        pdf.setTextColor(255, 59, 48); // Red color
+                        pdf.setFont(undefined, 'normal');
+                    } else {
+                        pdf.setTextColor(28, 28, 30); // Normal black color
+                        pdf.setFont(undefined, 'normal');
+                    }
                     centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+
+                    // Always reset to normal after sabak column
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFont(undefined, 'normal');
                     
                     // Sabak Para - Centered (truncate if too long)
                     let paraText = dayData.para ? dayData.para.amount : '--';
-                    if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                    if (paraText.length > 8) paraText = paraText.substring(0, 16);
                     centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
                     
                     // Dhor - Centered (truncate if too long)
                     let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 16);
                     centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
                     
                     // Status - Centered
@@ -12313,11 +12293,23 @@
                     centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
                     
                     // Parent Review - Centered
-                    const parentReview = dayData.parentChecked ? '✓' : '✗';
+                    const parentReview = dayData.parentChecked ? 'Yes' : 'No';
                     const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                    pdf.setFont(undefined, 'bold');
-                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+
+                    // Check if future date
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const isFutureDate = currentDate > today;
+
+                    if (isFutureDate) {
+                        pdf.setTextColor(142, 142, 147); // Grey
+                        pdf.setFont(undefined, 'normal');
+                        centerTextInColumn('--', colStarts[5], colWidths[5], yPos + 5);
+                    } else {
+                        pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                        pdf.setFont(undefined, 'bold');
+                        centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+                    }
                 }
                 
                 yPos += rowHeight;
@@ -13231,18 +13223,36 @@
                 } else {
                     // REGULAR WEEKDAY ROW: Show actual data
                     // Sabak - Centered (truncate if too long)
-                    let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                    let sabakText;
+                    if (dayData.paused) {
+                        sabakText = 'Sabak Paused';
+                    } else if (dayData.sabak) {
+                        sabakText = dayData.sabak.amount || `${dayData.sabak.lines} lines`;
+                    } else {
+                        sabakText = '--';
+                    }
+                    if (sabakText.length > 10) sabakText = sabakText.substring(0, 16);
+                    if (dayData.paused) {
+                        pdf.setTextColor(255, 59, 48); // Red color
+                        pdf.setFont(undefined, 'normal');
+                    } else {
+                        pdf.setTextColor(28, 28, 30); // Normal black color
+                        pdf.setFont(undefined, 'normal');
+                    }
                     centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 5);
+
+                    // Always reset to normal after sabak column
+                    pdf.setTextColor(28, 28, 30);
+                    pdf.setFont(undefined, 'normal');
                     
                     // Sabak Para - Centered (truncate if too long)
                     let paraText = dayData.para ? dayData.para.amount : '--';
-                    if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                    if (paraText.length > 8) paraText = paraText.substring(0, 16);
                     centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 5);
                     
                     // Dhor - Centered (truncate if too long)
                     let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                    if (dhorText.length > 8) dhorText = dhorText.substring(0, 16);
                     centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 5);
                     
                     // Status - Centered
@@ -13251,11 +13261,23 @@
                     centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 5);
                     
                     // Parent Review - Centered
-                    const parentReview = dayData.parentChecked ? '✓' : '✗';
+                    const parentReview = dayData.parentChecked ? 'Yes' : 'No';
                     const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                    pdf.setFont(undefined, 'bold');
-                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+
+                        // Check if future date
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const isFutureDate = currentDate > today;
+
+                        if (isFutureDate) {
+                            pdf.setTextColor(142, 142, 147); // Grey
+                            pdf.setFont(undefined, 'normal');
+                            centerTextInColumn('--', colStarts[5], colWidths[5], yPos + 5);
+                        } else {
+                            pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                            pdf.setFont(undefined, 'bold');
+                            centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+                        }
                 }
                 
                 yPos += rowHeight;
@@ -13965,16 +13987,23 @@
                 
                 centerTextInColumn(day.toString(), colStarts[0], colWidths[0], yPos + 4);
                 
-                let sabakText = dayData.sabak ? (dayData.sabak.amount || `${dayData.sabak.lines} lines`) : '--';
-                if (sabakText.length > 10) sabakText = sabakText.substring(0, 8) + '..';
+                let sabakText;
+                if (dayData.paused) {
+                    sabakText = 'Sabak Paused';
+                } else if (dayData.sabak) {
+                    sabakText = dayData.sabak.amount || `${dayData.sabak.lines} lines`;
+                } else {
+                    sabakText = '--';
+                }
+                if (sabakText.length > 10) sabakText = sabakText.substring(0, 16);
                 centerTextInColumn(sabakText, colStarts[1], colWidths[1], yPos + 4);
                 
                 let paraText = dayData.para ? dayData.para.amount : '--';
-                if (paraText.length > 8) paraText = paraText.substring(0, 6) + '..';
+                if (paraText.length > 8) paraText = paraText.substring(0, 16);
                 centerTextInColumn(paraText, colStarts[2], colWidths[2], yPos + 4);
                 
                 let dhorText = dayData.dhor ? dayData.dhor.amount : '--';
-                if (dhorText.length > 8) dhorText = dhorText.substring(0, 6) + '..';
+                if (dhorText.length > 8) dhorText = dhorText.substring(0, 16);
                 centerTextInColumn(dhorText, colStarts[3], colWidths[3], yPos + 4);
                 
                 let statusText = 'Present';
@@ -13991,11 +14020,23 @@
                 pdf.setFont(undefined, 'bold');
                 centerTextInColumn(statusText, colStarts[4], colWidths[4], yPos + 4);
                 
-                const parentReview = dayData.parentChecked ? '✓' : '✗';
+                const parentReview = dayData.parentChecked ? 'Yes' : 'No';
                 const parentColor = dayData.parentChecked ? [52, 199, 89] : [255, 59, 48];
-                pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
-                pdf.setFont(undefined, 'bold');
-                centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 4);
+
+                // Check if future date
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const isFutureDate = currentDate > today;
+
+                if (isFutureDate) {
+                    pdf.setTextColor(142, 142, 147); // Grey
+                    pdf.setFont(undefined, 'normal');
+                    centerTextInColumn('--', colStarts[5], colWidths[5], yPos + 5);
+                } else {
+                    pdf.setTextColor(parentColor[0], parentColor[1], parentColor[2]);
+                    pdf.setFont(undefined, 'bold');
+                    centerTextInColumn(parentReview, colStarts[5], colWidths[5], yPos + 5);
+                }
                 
                 yPos += rowHeight;
             }
@@ -14333,63 +14374,6 @@
         window.generateOverallProgressPDF = generateOverallProgressPDF;
         window.generateAllStudentsPDF = generateAllStudentsPDF;
 
-        // ===== IMPORT DATA FUNCTIONS =====
-        let importedData = null;
-
-        async function showImportDataModal() {
-            if (currentUserType !== 'teacher') return;
-            
-            // Reset modal state
-            document.getElementById('importFile').value = '';
-            document.getElementById('filePreview').style.display = 'none';
-            document.getElementById('importProgress').style.display = 'none';
-            document.getElementById('importResults').style.display = 'none';
-            importedData = null;
-            
-            // Populate student dropdown
-            try {
-                const students = await window.getStudents();
-                const select = document.getElementById('importStudentSelect');
-                select.innerHTML = '<option value="">Choose student to import data for</option>';
-                
-                students.forEach(student => {
-                    const option = document.createElement('option');
-                    option.value = student.id;
-                    option.textContent = student.name;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Error loading students for import:', error);
-            }
-            
-            document.getElementById('importDataModal').style.display = 'block';
-        }
-
-        async function handleFileSelection() {
-            const fileInput = document.getElementById('importFile');
-            const file = fileInput.files[0];
-            
-            if (!file) return;
-            
-            const fileExtension = file.name.toLowerCase().split('.').pop();
-            const supportedTypes = ['xlsx', 'xls', 'csv'];
-            
-            if (!supportedTypes.includes(fileExtension)) {
-                alert('Please select a valid Excel (.xlsx, .xls) or CSV (.csv) file');
-                fileInput.value = '';
-                return;
-            }
-            
-            try {
-                // Use FileReader API instead of window.fs.readFile
-                const fileData = await readFileAsArrayBuffer(file);
-                await parseImportFile(fileData, fileExtension, file.name);
-            } catch (error) {
-                console.error('Error reading file:', error);
-                alert('Error reading file. Please make sure the file is not corrupted.');
-            }
-        }
-
         // Add this new helper function
         function readFileAsArrayBuffer(file) {
             return new Promise((resolve, reject) => {
@@ -14404,443 +14388,6 @@
             });
         }
 
-        async function parseImportFile(fileData, fileType, fileName) {
-            try {
-                let parsedData = [];
-                
-                if (fileType === 'csv') {
-                    // Parse CSV using Papaparse
-                    const csvText = new TextDecoder().decode(new Uint8Array(fileData));
-                    const result = Papa.parse(csvText, {
-                        header: true,
-                        dynamicTyping: true,
-                        skipEmptyLines: true,
-                        transformHeader: (header) => header.trim().toLowerCase()
-                    });
-                    
-                    if (result.errors.length > 0) {
-                        console.warn('CSV parsing warnings:', result.errors);
-                    }
-                    
-                    parsedData = result.data;
-                } else {
-                    // Parse Excel using SheetJS
-                    const workbook = XLSX.read(fileData, {
-                        cellStyles: true,
-                        cellFormulas: true,
-                        cellDates: true,
-                        cellNF: true,
-                        sheetStubs: true
-                    });
-                    
-                    // Use the first sheet
-                    const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    
-                    // Convert to JSON with header normalization
-                    parsedData = XLSX.utils.sheet_to_json(worksheet, {
-                        header: 1,
-                        defval: ''
-                    });
-                    
-                    // Convert to object format with normalized headers
-                    if (parsedData.length > 0) {
-                        const headers = parsedData[0].map(h => String(h).trim().toLowerCase());
-                        const dataRows = parsedData.slice(1);
-                        
-                        parsedData = dataRows.map(row => {
-                            const obj = {};
-                            headers.forEach((header, index) => {
-                                obj[header] = row[index] || '';
-                            });
-                            return obj;
-                        }).filter(row => Object.values(row).some(val => val !== ''));
-                    } else {
-                        parsedData = [];
-                    }
-                }
-                
-                if (parsedData.length === 0) {
-                    alert('No data found in the file. Please check your file format.');
-                    return;
-                }
-                
-                importedData = parsedData;
-                displayFilePreview(parsedData, fileName);
-                
-            } catch (error) {
-                console.error('Error parsing file:', error);
-                alert('Error parsing file: ' + error.message);
-            }
-        }
-
-        function displayFilePreview(data, fileName) {
-            const previewDiv = document.getElementById('filePreview');
-            const previewContent = document.getElementById('previewContent');
-            
-            // Analyze data structure
-            const sampleRows = data.slice(0, 5);
-            const totalRows = data.length;
-            const headers = Object.keys(data[0] || {});
-            
-            let previewHtml = `
-                <div style="margin-bottom: 15px;">
-                    <strong>📁 File:</strong> ${fileName}<br>
-                    <strong>📊 Total Rows:</strong> ${totalRows}<br>
-                    <strong>📋 Columns Found:</strong> ${headers.join(', ')}<br>
-                    <strong>⚠️ Note:</strong> Student names in CSV will be ignored - all data will be imported for the selected student above
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                    <strong>🔍 Data Preview (first 5 rows):</strong>
-                </div>
-                
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                    <thead>
-                        <tr style="background: #10A37F; color: white;">
-            `;
-            
-            headers.forEach(header => {
-                previewHtml += `<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">${header}</th>`;
-            });
-            previewHtml += '</tr></thead><tbody>';
-            
-            sampleRows.forEach((row, index) => {
-                previewHtml += `<tr style="background: ${index % 2 === 0 ? '#f8f9fa' : 'white'};">`;
-                headers.forEach(header => {
-                    const value = row[header] || '';
-                    previewHtml += `<td style="padding: 6px; border: 1px solid #ddd;">${value}</td>`;
-                });
-                previewHtml += '</tr>';
-            });
-            
-            previewHtml += '</tbody></table>';
-            
-            if (totalRows > 5) {
-                previewHtml += `<div style="margin-top: 10px; color: #8E8E93; font-size: 12px;">... and ${totalRows - 5} more rows</div>`;
-            }
-            
-            previewContent.innerHTML = previewHtml;
-            previewDiv.style.display = 'block';
-        }
-
-        async function processImportData() {
-            if (!importedData || importedData.length === 0) {
-                alert('No data to import');
-                return;
-            }
-            
-            // Get selected student
-            const selectedStudentId = document.getElementById('importStudentSelect').value;
-            if (!selectedStudentId) {
-                alert('Please select a student first');
-                return;
-            }
-            
-            const skipDuplicates = document.getElementById('skipDuplicates').checked;
-            
-            // Show progress
-            document.getElementById('filePreview').style.display = 'none';
-            document.getElementById('importProgress').style.display = 'block';
-            document.getElementById('importProgressText').textContent = 'Analyzing data...';
-            
-            try {
-                const results = {
-                    totalRows: importedData.length,
-                    entriesImported: 0,
-                    entriesSkipped: 0,
-                    errors: []
-                };
-                
-                // Get existing student data
-                const studentData = await window.getStudentData(selectedStudentId);
-                
-                // Process each row
-                for (let i = 0; i < importedData.length; i++) {
-                    const row = importedData[i];
-                    
-                    document.getElementById('importProgressText').textContent = 
-                        `Processing row ${i + 1} of ${importedData.length}...`;
-                    
-                    try {
-                        const dateStr = parseDate(row['date'] || '');
-                        
-                        if (!dateStr) {
-                            results.errors.push(`Row ${i + 1}: Missing or invalid date`);
-                            continue;
-                        }
-                        
-                        // Check for duplicates
-                        if (skipDuplicates && studentData[dateStr]) {
-                            results.entriesSkipped++;
-                            continue;
-                        }
-                        
-                        // Create day entry
-                        const dayEntry = {};
-                        
-                        // Handle absent status
-                        const absent = String(row['absent'] || '').toLowerCase();
-                        if (absent === 'yes' || absent === 'true' || absent === '1') {
-                            dayEntry.absent = true;
-                        } else {
-                            // Process Sabak only
-                            const sabakAmount = String(row['sabak'] || '').trim();
-                            if (sabakAmount && sabakAmount !== '0' && sabakAmount !== '-') {
-                                const grade = normalizeGrade(row['grade'] || 'good');
-                                
-                                dayEntry['sabak'] = {
-                                    amount: sabakAmount,
-                                    grade: grade,
-                                    timestamp: new Date().toISOString()
-                                };
-                                
-                                // Special handling for sabak lines conversion
-                                if (/^\d+\s*lines?$/i.test(sabakAmount)) {
-                                    const lines = parseInt(sabakAmount.match(/\d+/)[0]);
-                                    // Get student's Quran type
-                                    const students = await window.getStudents();
-                                    const student = students.find(s => s.id === selectedStudentId);
-                                    const quranType = student ? student.quranType || 13 : 13;
-                                    const conversion = convertLinesToPagesAndJuz(lines, quranType);
-                                    
-                                    dayEntry['sabak'].lines = lines;
-                                    dayEntry['sabak'].pages = conversion.pages;
-                                    dayEntry['sabak'].juz = conversion.juz;
-                                    dayEntry['sabak'].fraction = conversion.fraction;
-                                    dayEntry['sabak'].quranType = quranType;
-                                }
-                            }
-                        }
-                        
-                        // Save day entry if it has data
-                        if (Object.keys(dayEntry).length > 0) {
-                            studentData[dateStr] = dayEntry;
-                            results.entriesImported++;
-                        }
-                        
-                    } catch (error) {
-                        results.errors.push(`Row ${i + 1}: ${error.message}`);
-                    }
-                }
-                
-                // Save all data at once
-                await window.saveStudentData(selectedStudentId, studentData);
-                
-                // Show results
-                displayImportResults(results);
-                
-                // Refresh UI if current student is the imported one
-                if (currentStudent === selectedStudentId) {
-                    updateTodaysProgress();
-                    updateStats();
-                    generateCalendar();
-                }
-                
-            } catch (error) {
-                console.error('Import error:', error);
-                alert('Import failed: ' + error.message);
-            } finally {
-                document.getElementById('importProgress').style.display = 'none';
-            }
-        }
-
-        function displayImportResults(results) {
-            const resultsDiv = document.getElementById('importResults');
-            const resultsContent = document.getElementById('resultsContent');
-            
-            let resultsHtml = `
-                <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #E5E5EA;">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
-                        <div style="text-align: center; padding: 16px; background: #F0FDF4; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: 700; color: #16A34A;">${results.entriesImported}</div>
-                            <div style="font-size: 12px; color: #8E8E93; font-weight: 600;">ENTRIES IMPORTED</div>
-                        </div>
-                        <div style="text-align: center; padding: 16px; background: #FEF3C7; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: 700; color: #D97706;">${results.entriesSkipped}</div>
-                            <div style="font-size: 12px; color: #8E8E93; font-weight: 600;">ENTRIES SKIPPED</div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 16px;">
-                        <strong>📊 Import Summary:</strong><br>
-                        • Total rows processed: ${results.totalRows}<br>
-                        • Selected student: Import completed<br>
-                        • Entries imported: ${results.entriesImported}<br>
-                        • Entries skipped: ${results.entriesSkipped}<br>
-                        • Errors: ${results.errors.length}
-                    </div>
-            `;
-            
-            if (results.errors.length > 0) {
-                resultsHtml += `
-                    <div style="margin-top: 16px;">
-                        <strong style="color: #FF3B30;">⚠️ Errors Encountered:</strong><br>
-                        <div style="max-height: 150px; overflow-y: auto; background: #FEF2F2; padding: 12px; border-radius: 8px; margin-top: 8px;">
-                `;
-                
-                results.errors.slice(0, 10).forEach(error => {
-                    resultsHtml += `<div style="font-size: 12px; color: #991B1B; margin-bottom: 4px;">• ${error}</div>`;
-                });
-                
-                if (results.errors.length > 10) {
-                    resultsHtml += `<div style="font-size: 12px; color: #991B1B;">... and ${results.errors.length - 10} more errors</div>`;
-                }
-                
-                resultsHtml += '</div></div>';
-            }
-            
-            resultsHtml += '</div>';
-            
-            resultsContent.innerHTML = resultsHtml;
-            resultsDiv.style.display = 'block';
-        }
-
-        // Helper Functions
-        function parseDate(dateInput) {
-            if (!dateInput) return null;
-            
-            const dateStr = String(dateInput).trim();
-            console.log('Parsing date:', dateStr);
-            
-            // Handle various date formats - prioritize DD/MM/YYYY
-            try {
-                // Check for DD/MM/YYYY format first (most common in CSV exports)
-                if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
-                    const parts = dateStr.split('/');
-                    const day = parseInt(parts[0]);
-                    const month = parseInt(parts[1]);
-                    const year = parseInt(parts[2]);
-                    
-                    // Validate day and month ranges to determine DD/MM vs MM/DD
-                    if (day > 12) {
-                        // Must be DD/MM/YYYY since day > 12
-                        const date = new Date(year, month - 1, day);
-                        if (!isNaN(date.getTime())) {
-                            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                        }
-                    } else if (month > 12) {
-                        // Must be MM/DD/YYYY since month > 12
-                        const date = new Date(year, day - 1, month);
-                        if (!isNaN(date.getTime())) {
-                            return `${year}-${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}`;
-                        }
-                    } else {
-                        // Ambiguous - assume DD/MM/YYYY (European format)
-                        const date = new Date(year, month - 1, day);
-                        if (!isNaN(date.getTime())) {
-                            console.log(`Assuming DD/MM/YYYY: ${dateStr} → ${year}-${month}-${day}`);
-                            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                        }
-                    }
-                }
-                
-                // Check for DD-MM-YYYY format
-                if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(dateStr)) {
-                    const [day, month, year] = dateStr.split('-').map(n => parseInt(n));
-                    const date = new Date(year, month - 1, day);
-                    if (!isNaN(date.getTime())) {
-                        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    }
-                }
-                
-                // Check for YYYY-MM-DD format (already correct)
-                if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateStr)) {
-                    const date = new Date(dateStr);
-                    if (!isNaN(date.getTime())) {
-                        return dateStr;
-                    }
-                }
-                
-                // Check for MM/DD/YYYY format (US format)
-                if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
-                    const [month, day, year] = dateStr.split('/').map(n => parseInt(n));
-                    const date = new Date(year, month - 1, day);
-                    if (!isNaN(date.getTime())) {
-                        console.log(`Using MM/DD/YYYY: ${dateStr} → ${year}-${month}-${day}`);
-                        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    }
-                }
-                
-                // Fallback to Date constructor
-                const date = new Date(dateStr);
-                if (!isNaN(date.getTime())) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-                
-            } catch (error) {
-                console.error('Date parsing error:', error);
-            }
-            
-            return null;
-        }
-
-        // Function to fix existing incorrectly parsed dates
-        async function fixExistingDates(studentId) {
-            console.log('Fixing existing incorrect dates for student:', studentId);
-            
-            const studentData = await window.getStudentData(studentId);
-            const correctedData = {};
-            let fixCount = 0;
-            
-            Object.entries(studentData).forEach(([date, dayData]) => {
-                // Fix dates that were parsed as 200X instead of 2024
-                if (date.match(/^200[0-9]-09-/)) {
-                    const correctDate = date.replace(/^200[0-9]/, '2024');
-                    correctedData[correctDate] = dayData;
-                    fixCount++;
-                    console.log(`Fixed: ${date} → ${correctDate}`);
-                } else {
-                    // Keep correctly formatted dates
-                    correctedData[date] = dayData;
-                }
-            });
-            
-            if (fixCount > 0) {
-                await window.saveStudentData(studentId, correctedData);
-                console.log(`Fixed ${fixCount} dates`);
-                
-                // Refresh UI
-                currentDisplayMonth = 9;
-                currentDisplayYear = 2024;
-                await updateTodaysProgress();
-                await updateStats();
-                generateCalendar();
-                
-                alert(`Fixed ${fixCount} incorrectly parsed dates! Your data should now be visible.`);
-            }
-            
-            return fixCount;
-        }
-
-        function normalizeGrade(gradeInput) {
-            const grade = String(gradeInput).toLowerCase().trim();
-            
-            const gradeMap = {
-                'excellent': 'excellent',
-                'exc': 'excellent',
-                'e': 'excellent',
-                '4': 'excellent',
-                'good': 'good',
-                'very good': 'good', // Convert "Very Good" to "good"
-                'g': 'good',
-                '3': 'good',
-                'okay': 'okay',
-                'ok': 'okay',
-                'o': 'okay',
-                '2': 'okay',
-                'poor': 'poor',
-                'p': 'poor',
-                '1': 'poor',
-                'bad': 'poor'
-            };
-            
-            return gradeMap[grade] || 'good';
-        }
-
         function generateAccessCode() {
             const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
             let result = '';
@@ -14851,10 +14398,6 @@
         }
 
         // Make import functions available globally
-        window.showImportDataModal = showImportDataModal;
-        window.handleFileSelection = handleFileSelection;
-        window.processImportData = processImportData;
-        window.fixExistingDates = fixExistingDates;
     </script>
 </body>
 </html>
