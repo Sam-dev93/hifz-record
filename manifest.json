@@ -1,6 +1,6 @@
 {
-  "name": "Hifz Record - Progress Tracking",
-  "short_name": "Hifz Record",
+  "name": "Hifz Tracker",
+  "short_name": "Hifz Tracker",
   "description": "Track daily student Hifz progress with Firebase real-time sync",
   "start_url": "./index.html",
   "display": "standalone",
