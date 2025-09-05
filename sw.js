@@ -1,5 +1,5 @@
 // Service Worker for Hifz Record PWA
-const CACHE_NAME = 'hifz-record-v1';
+const CACHE_NAME = 'hifz-tracker-v1';
 const urlsToCache = [
   './',
   './index.html',
